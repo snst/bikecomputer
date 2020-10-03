@@ -1,10 +1,8 @@
 import bike_data
 import gui_edit_value
 import gui_csc
-#import gui_menu
-import gui_base_menu
-import menu_item
-import gui_menu_setting
+import gui_menu
+import menu_config
 
 class BikeGUI:
 
@@ -12,12 +10,10 @@ class BikeGUI:
     color_black = (0x0000)
     rh = 40
 
-    def __init__(self, tft, csc, data, settings, goal):
+    def __init__(self, tft, csc, data):
         self.csc = csc
         self.tft = tft
         self.data = data
-        self.settings = settings
-        self.goal = goal
         self.active_gui = None
         self.gui_stack = []
         self.clear()
@@ -64,16 +60,16 @@ class BikeGUI:
         return val
 
     def go_menu_main(self):
-        self.add_to_gui_stack(gui_base_menu.GuiBaseMenu(self, menu_item.MenuMain()))
+        self.add_to_gui_stack(gui_menu.GuiMenu(self, menu_config.MenuMain()))
 
     def go_menu_reset(self):
-        self.add_to_gui_stack(gui_base_menu.GuiBaseMenu(self, menu_item.MenuReset()))
+        self.add_to_gui_stack(gui_menu.GuiMenu(self, menu_config.MenuReset()))
 
     def go_menu_goal(self):
-        self.add_to_gui_stack(gui_menu_setting.GuiMenuSetting(self, self.goal))
+        self.add_to_gui_stack(gui_menu.GuiMenu(self, menu_config.MenuGoal(self.data.goal)))
 
     def go_menu_settings(self):
-        self.add_to_gui_stack(gui_menu_setting.GuiMenuSetting(self, self.settings))
+        self.add_to_gui_stack(gui_menu.GuiMenu(self, menu_config.MenuSettings(self.data.settings)))
 
 
     def action_go_csc(self):
@@ -119,3 +115,7 @@ class BikeGUI:
     def do_start_goal(self):
         self.action_go_csc()
         print("START GOAL!")
+
+    def do_save_settings(self):
+        self.action_go_csc()
+        print("do_save_settings")

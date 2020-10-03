@@ -1,19 +1,26 @@
 import time
 import threading
+from const import *
 
 SHORT_CLICK_MS = 300
 
 class ButtonHandler:
-    def __init__(self, tft, display, settings):
+    def __init__(self, tft):
         tft.set_btn_callback(self.handle_touch_down, self.handle_touch_up)
         self.click_cb = None
         self.btn_timestamp = [0,0]
         self.last_btn_id = 0
-        self.display = display
+        self.display = None
         self.ignore_touch = False
-        self.settings = settings
+        self.settings = None
         self.t = None
         pass
+
+    def set_settings(self, settings):
+        self.settings = settings
+
+    def set_display(self, display):
+        self.display = display
 
     def get_ms(self):
         return int(round(time.time() * 1000))
@@ -27,7 +34,7 @@ class ButtonHandler:
         #print("long click %d: %d" % (self.last_btn_id, delta))
 
     def handle_touch_down(self, id):
-        self.ignore_touch = False if self.settings.touch_ignore.value == 1 else not self.display.is_display_on()
+        self.ignore_touch = False if self.settings.touch_ignore == 1 else not self.display.is_display_on()
         self.display.set_display_on()
 
         if self.ignore_touch:
@@ -44,7 +51,7 @@ class ButtonHandler:
         if self.t:
             self.t.cancel()
         if self.ignore_touch:
-            return
+            return            
         delta = self.get_ms() - self.btn_timestamp[id]
         if delta < SHORT_CLICK_MS:
             if self.click_cb:

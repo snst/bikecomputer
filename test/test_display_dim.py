@@ -5,7 +5,7 @@ import sys
 from time import sleep
 site.addsitedir('./src')  # Always appends to end
 import display_dim
-import bike_settings
+import bike_data
 
 class TestDisplayDim(unittest.TestCase):
 
@@ -18,7 +18,7 @@ class TestDisplayDim(unittest.TestCase):
     def setUp(self):
         self.on_cnt = 0
         self.off_cnt = 0
-        self.settings = bike_settings.BikeSettings()
+        self.settings = bike_data.DataSetting()
         self.settings.led_time.value = 1
         self.display = display_dim.DisplayDim(self.settings)
         self.display.set_callback(self.display_cb)

@@ -34,7 +34,7 @@ class TestCSCMethods(unittest.TestCase):
     def test_calc_kmh(self):
         cnt = 12
         sec = 13
-        kmh = cnt * self.csc.wheel_size_cm  / 1000 / (sec / 36)
+        kmh = cnt * self.data.settings.wheel_cm.value  / 1000 / (sec / 36)
         self.assertEqual(kmh, self.csc.calc_kmh(cnt, sec))
 
     def test_cadence(self):
@@ -50,7 +50,7 @@ class TestCSCMethods(unittest.TestCase):
         val = struct.pack("<BIHHH", 0, 1342, 6423, 1231, 323)
         self.csc.on_notify(val)
         delta_sec = (6423-2213) / 1024
-        kmh = (1342-1322) * self.csc.wheel_size_cm * 3.6 / delta_sec / 100
+        kmh = (1342-1322) * self.data.settings.wheel_cm.value * 3.6 / delta_sec / 100
         self.assertEqual((6423-2213)/1024, delta_sec)
         self.assertEqual(kmh, self.csc.speed_kmh)
         self.assertTrue(self.csc.is_riding)

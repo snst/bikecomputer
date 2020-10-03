@@ -11,7 +11,6 @@ class CSC:
         self.crank_event = 0
         self.init = False
         self.is_riding = False
-        self.wheel_size_cm = 214
         self.speed_kmh = 0
         self.crank_sec_avg_sum = 0
         self.crank_counter_avg_sum = 0
@@ -42,7 +41,7 @@ class CSC:
 
     def calc_kmh(self, counter_delta, time_delta):
         if time_delta > 0:
-            return (self.wheel_size_cm * counter_delta * 3.6) / time_delta / 100.0
+            return (self.data.settings.wheel_cm.value * counter_delta * 3.6) / time_delta / 100.0
         else:
             return 0
 
@@ -90,13 +89,14 @@ class CSC:
                 self.average_speed_kmh = self.calc_average_kmh(wheel_counter_diff, wheel_delta_sec)
 
             print("is_riding=%d, speed=%.2f/%.2f, cadence=%d/%d" % (self.is_riding, self.speed_kmh, self.average_speed_kmh, self.cadence, self.average_cadence))
-            self.data.speed = self.speed_kmh
-            self.data.speed_avg = self.average_speed_kmh
-            self.data.speed_max = max(self.data.speed_max, self.speed_kmh)
-            self.data.cadence = self.cadence
-            self.data.cadence_avg = self.average_cadence
-            self.data.trip_distance = (self.wheel_counter_sum*self.wheel_size_cm) / 100000
-            self.data.trip_duration = self.wheel_sec_sum / 60
+            self.data.csc.speed = self.speed_kmh
+            self.data.csc.speed_avg = self.average_speed_kmh
+            self.data.csc.speed_max = max(self.data.csc.speed_max, self.speed_kmh)
+            self.data.csc.cadence = self.cadence
+            self.data.csc.cadence_avg = self.average_cadence
+            self.data.csc.trip_distance = (self.wheel_counter_sum*self.data.settings.wheel_cm.value) / 100000
+            self.data.csc.trip_duration = self.wheel_sec_sum / 60
+            self.data.csc.is_riding = self.is_riding
 
         self.wheel_counter = wheel_counter
         self.wheel_event = wheel_event
@@ -117,4 +117,4 @@ class CSC:
         self.wheel_counter_sum = 0
 
     def reset_max_speed(self):
-        self.data.speed_max = 0
+        self.data.csc.speed_max = 0

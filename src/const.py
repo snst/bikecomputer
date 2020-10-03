@@ -9,7 +9,7 @@ class Layout:
 class Button:
     left = 0
     right = 1
-
+    
 class Color:
     black = 0
     white = 1
