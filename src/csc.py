@@ -4,7 +4,7 @@ import struct
 
 class CSC:
 
-    def __init__(self):
+    def __init__(self, data):
         self.wheel_counter = 0
         self.wheel_event = 0
         self.crank_counter = 0
@@ -13,13 +13,16 @@ class CSC:
         self.is_riding = False
         self.wheel_size_cm = 214
         self.speed_kmh = 0
-        self.crank_sec_sum = 0
-        self.crank_counter_sum = 0
+        self.crank_sec_avg_sum = 0
+        self.crank_counter_avg_sum = 0
         self.average_cadence = 0
         self.cadence = 0
         self.wheel_sec_sum = 0
         self.wheel_counter_sum = 0
+        self.wheel_sec_avg_sum = 0
+        self.wheel_counter_avg_sum = 0
         self.average_speed_kmh = 0
+        self.data = data
 
     def diff_uint32(self, now, last):
         diff = 0
@@ -50,13 +53,13 @@ class CSC:
             return 0
 
     def calc_average_cadence(self, val, time):
-        self.crank_counter_sum += val
-        self.crank_sec_sum += time
-        return self.calc_cadence(self.crank_counter_sum, self.crank_sec_sum)
+        self.crank_counter_avg_sum += val
+        self.crank_sec_avg_sum += time
+        return self.calc_cadence(self.crank_counter_avg_sum, self.crank_sec_avg_sum)
 
     def calc_average_kmh(self, val, time):
-        self.wheel_counter_sum += val
-        self.wheel_sec_sum += time
+        self.wheel_counter_avg_sum += val
+        self.wheel_sec_avg_sum += time
         return self.calc_kmh(self.wheel_counter_sum, self.wheel_sec_sum)
 
     def unpack_data(self, data):
@@ -82,12 +85,36 @@ class CSC:
                 self.average_cadence = self.calc_average_cadence(crank_counter_diff, crank_delta_sec)
 
             if self.speed_kmh > 5 and self.speed_kmh < 100:
+                self.wheel_counter_sum += wheel_counter_diff
+                self.wheel_sec_sum += wheel_delta_sec
                 self.average_speed_kmh = self.calc_average_kmh(wheel_counter_diff, wheel_delta_sec)
 
             print("is_riding=%d, speed=%.2f/%.2f, cadence=%d/%d" % (self.is_riding, self.speed_kmh, self.average_speed_kmh, self.cadence, self.average_cadence))
+            self.data.speed = self.speed_kmh
+            self.data.speed_avg = self.average_speed_kmh
+            self.data.speed_max = max(self.data.speed_max, self.speed_kmh)
+            self.data.cadence = self.cadence
+            self.data.cadence_avg = self.average_cadence
+            self.data.trip_distance = (self.wheel_counter_sum*self.wheel_size_cm) / 100000
+            self.data.trip_duration = self.wheel_sec_sum / 60
 
         self.wheel_counter = wheel_counter
         self.wheel_event = wheel_event
         self.crank_counter = crank_counter
         self.crank_event = crank_event
         self.init = True
+
+    def reset_avg_cadence(self):
+        self.crank_sec_avg_sum = 0
+        self.crank_counter_avg_sum = 0
+
+    def reset_avg_speed(self):
+        self.wheel_sec_avg_sum = 0
+        self.wheel_counter_avg_sum = 0
+
+    def reset_trip(self):
+        self.wheel_sec_sum = 0
+        self.wheel_counter_sum = 0
+
+    def reset_max_speed(self):
+        self.data.speed_max = 0
