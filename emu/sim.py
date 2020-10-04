@@ -9,9 +9,9 @@ import math
 class Sim:
     def __init__(self, bike_computer):
         self.gui = bike_computer.gui
-        self.data = bike_computer.data
+        self.csc_data = bike_computer.csc_data
         #self.set_demo_data(self.data)
-        self.csc = bike_computer.csc
+        self.bc = bike_computer
         self.display = bike_computer.display
         self.wheel_counter = 0
         self.wheel_event = 0
@@ -50,12 +50,12 @@ class Sim:
         self.last_ms = now
 
         #delta_ticks = (int)(1024 + (100 * random()))
-        #delta_ticks = (int)(2024 + 1012 * math.sin(self.s))
-        delta_ticks = 1024
+        delta_ticks = (int)(2024 + 1012 * math.sin(self.s))
+        #delta_ticks = 1024
         self.s += 0.1
 
         val1 = struct.pack("<BIHHH", 0, self.wheel_counter,self.wheel_event & 0xFFFF, self.crank_counter & 0xFFFF, self.crank_event & 0xFFFF)
-        self.csc.on_notify(val1)
+        self.bc.on_notify(val1)
         self.start()
         #self.gui.tft.tk.after(10, self.gui.cyclic_update)
         self.wheel_counter += 2

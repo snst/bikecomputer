@@ -5,18 +5,18 @@ class MenuMain:
     def __init__(self):
         self.title = "Menu"
         self.items = [ MenuItem("Settings", "go_menu_settings"),
-                       MenuItem("Reset", "go_menu_reset"),
+                       MenuItem("Meter", "go_menu_meter"),
                        MenuItem("Goal", "go_menu_goal")
         ]
         pass
 
 
-class MenuReset:
+class MenuMeter:
     def __init__(self):
         self.title = "Reset"
-        self.items = [ MenuItem("Trip", "do_reset_trip"),
-                       MenuItem("Max", "do_reset_max"),
-                       MenuItem("Avg", "do_reset_avg"),
+        self.items = [ 
+                       MenuItem("Add", "do_add_meter"),
+                       MenuItem("Reset", "do_reset_meter"),
         ]
         pass    
 

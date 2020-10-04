@@ -1,6 +1,6 @@
 class GoalCalc:
-    def __init__(self, data):
-        self.goal = data.goal
+    def __init__(self, goal):
+        self.goal = goal
         pass
 
     def calc(self):

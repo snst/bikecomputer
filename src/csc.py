@@ -1,47 +1,30 @@
 
 import struct
 
-
 class CSC:
 
-    def __init__(self, data):
-        self.wheel_counter = 0
-        self.wheel_event = 0
-        self.crank_counter = 0
-        self.crank_event = 0
-        self.init = False
-        self.is_riding = False
-        self.speed_kmh = 0
-        self.crank_sec_avg_sum = 0
-        self.crank_counter_avg_sum = 0
-        self.average_cadence = 0
-        self.cadence = 0
-        self.wheel_sec_sum = 0
-        self.wheel_counter_sum = 0
-        self.wheel_sec_avg_sum = 0
-        self.wheel_counter_avg_sum = 0
-        self.average_speed_kmh = 0
-        self.data = data
+    def __init__(self, settings):
+        self.settings = settings
 
-    def diff_uint32(self, now, last):
-        diff = 0
-        if now >= last:
-            diff = now - last
+    def calc_kmh_from_csc_val(self, wheel_counter, time_counter):
+        if time_counter > 0:
+            # wheel_counter * wheel_cm     3600
+            # ------------------------  *  ---------------
+            #         100 * 1000           time_counter / 1024
+            return (self.settings.wheel_cm.value * wheel_counter * 36) / (1000 * time_counter / 1024)
         else:
-            diff = now + (0xFFFFFFFF - last)
-        return diff
+            return 0
 
-    def diff_uint16(self, now, last):
-        diff = 0
-        if now >= last:
-            diff = now - last
+    def calc_cadence_from_csc_val(self, crank_counter, time_delta):
+        if time_delta > 0:
+            return (crank_counter * 60 * 1024) / time_delta
         else:
-            diff = now + (0xFFFFFFFF - last)
-        return diff
+            return 0
+
 
     def calc_kmh(self, counter_delta, time_delta):
         if time_delta > 0:
-            return (self.data.settings.wheel_cm.value * counter_delta * 3.6) / time_delta / 100.0
+            return (self.settings.wheel_cm.value * counter_delta * 3.6) / time_delta / 100.0
         else:
             return 0
 
@@ -51,70 +34,57 @@ class CSC:
         else:
             return 0
 
-    def calc_average_cadence(self, val, time):
-        self.crank_counter_avg_sum += val
-        self.crank_sec_avg_sum += time
-        return self.calc_cadence(self.crank_counter_avg_sum, self.crank_sec_avg_sum)
-
-    def calc_average_kmh(self, val, time):
-        self.wheel_counter_avg_sum += val
-        self.wheel_sec_avg_sum += time
-        return self.calc_kmh(self.wheel_counter_sum, self.wheel_sec_sum)
-
     def unpack_data(self, data):
         val = struct.unpack("<BIHHH", data)
         return val[1], val[2], val[3], val[4]
 
-    def on_notify(self, data):
-        wheel_counter, wheel_event, crank_counter, crank_event = self.unpack_data(data)
+    
+    def process(self, raw_data, data):
+        wheel_counter, wheel_time, crank_counter, crank_time = self.unpack_data(raw_data)
 
-        if self.init:
-            wheel_counter_diff = self.diff_uint32(wheel_counter, self.wheel_counter)
-            wheel_delta_sec = self.diff_uint16(wheel_event, self.wheel_event) / 1024.0
-            crank_counter_diff = self.diff_uint16(crank_counter, self.crank_counter)
-            crank_delta_sec = self.diff_uint16(crank_event, self.crank_event) / 1024.0
-            
-            self.is_riding = wheel_counter_diff > 0
+        data.wheel_counter.calc_delta(wheel_counter)
+        data.wheel_time.calc_delta(wheel_time)
+        data.crank_counter.calc_delta(crank_counter)
+        data.crank_time.calc_delta(crank_time)
 
-            self.speed_kmh = self.calc_kmh(wheel_counter_diff, wheel_delta_sec)
+        if data.init:
 
-            self.cadence = self.calc_cadence(crank_counter_diff, crank_delta_sec)
+            data.speed = self.calc_kmh_from_csc_val(data.wheel_counter.delta, data.wheel_time.delta)
 
-            if self.cadence > 30 and self.cadence < 200:
-                self.average_cadence = self.calc_average_cadence(crank_counter_diff, crank_delta_sec)
+            data.cadence = self.calc_cadence_from_csc_val(data.crank_counter.delta, data.crank_time.delta)
 
-            if self.speed_kmh > 5 and self.speed_kmh < 100:
-                self.wheel_counter_sum += wheel_counter_diff
-                self.wheel_sec_sum += wheel_delta_sec
-                self.average_speed_kmh = self.calc_average_kmh(wheel_counter_diff, wheel_delta_sec)
+            if data.cadence > 10 and data.cadence < 200:
+                data.crank_counter.add_delta()
+                data.crank_time.add_delta()
+                data.cadence_avg = self.calc_cadence_from_csc_val(data.crank_counter.sum, data.crank_time.sum)
 
-            print("is_riding=%d, speed=%.2f/%.2f, cadence=%d/%d" % (self.is_riding, self.speed_kmh, self.average_speed_kmh, self.cadence, self.average_cadence))
-            self.data.csc.speed = self.speed_kmh
-            self.data.csc.speed_avg = self.average_speed_kmh
-            self.data.csc.speed_max = max(self.data.csc.speed_max, self.speed_kmh)
-            self.data.csc.cadence = self.cadence
-            self.data.csc.cadence_avg = self.average_cadence
-            self.data.csc.trip_distance = (self.wheel_counter_sum*self.data.settings.wheel_cm.value) / 100000
-            self.data.csc.trip_duration = self.wheel_sec_sum / 60
-            self.data.csc.is_riding = self.is_riding
+            if data.speed < 100:
+                data.speed_max = max(data.speed_max, data.speed)
+                if data.speed > 5:
+                    data.wheel_counter.add_delta()
+                    data.wheel_time.add_delta()
+                    data.speed_avg = self.calc_kmh_from_csc_val(data.wheel_counter.sum, data.wheel_time.sum)
+    
 
-        self.wheel_counter = wheel_counter
-        self.wheel_event = wheel_event
-        self.crank_counter = crank_counter
-        self.crank_event = crank_event
-        self.init = True
+            #print("is_riding=%d, speed=%.2f/%.2f, cadence=%d/%d" % (self.is_riding, self.speed_kmh, self.average_speed_kmh, self.cadence, self.average_cadence))
+            data.trip_distance = data.wheel_counter.get_distance_in_km(self.settings.wheel_cm.value)
+            data.trip_duration = data.wheel_time.get_sum_in_min()
+            data.is_riding = data.speed > 5
 
+        data.init = True
+'''
     def reset_avg_cadence(self):
-        self.crank_sec_avg_sum = 0
-        self.crank_counter_avg_sum = 0
+        self.crank_counter.reset()
+        self.crank_time.reset()
 
     def reset_avg_speed(self):
         self.wheel_sec_avg_sum = 0
         self.wheel_counter_avg_sum = 0
 
     def reset_trip(self):
-        self.wheel_sec_sum = 0
-        self.wheel_counter_sum = 0
+        self.wheel_counter.reset()
+        self.wheel_time.reset()
 
     def reset_max_speed(self):
-        self.data.csc.speed_max = 0
+        self.data.speed_max = 0
+        '''

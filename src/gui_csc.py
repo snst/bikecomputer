@@ -1,11 +1,12 @@
-import bike_data
+from data_csc import *
 import fonts
+import const
 
 class GuiCsc:
     rh = 40
     def __init__(self, main):
         self.main = main
-        self.shown_data = bike_data.DataCsc()
+        self.shown_data = DataCsc(0)
         pass
 
     def get_title(self):
@@ -14,7 +15,9 @@ class GuiCsc:
     def show(self, redraw_all):
         #print("show gui_csc")
 
-        csc_data = self.main.data.csc
+        csc_data = self.main.get_csc_data()
+
+        self.main.tft.text(fonts.small, "%d" % (csc_data.id), 1, 1)
 
         if redraw_all or self.shown_data.speed != csc_data.speed:
             self.main.tft.text(fonts.big, "%4.1f" % (csc_data.speed), 48, 0*self.rh)
@@ -55,3 +58,8 @@ class GuiCsc:
         #print("handler_csc")
         if long_click:
             self.main.go_menu_main()
+        else:
+            if id == const.Button.left:
+                self.main.prev_csc()
+            elif id == const.Button.right:
+                self.main.next_csc()
