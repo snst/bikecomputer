@@ -15,17 +15,20 @@ class GuiMenu:
     def get_title(self):
         return self.menu.title
 
+
+
     def show(self, redraw_all):
         #print("gui_menu")
         self.main.clear()
         item = self.get_selected_item()
-        self.main.tft.text(fonts.middle, self.breadcrum, 8, Layout.y_breadcrum)
-        self.main.tft.text(fonts.big, item.name, 8, Layout.y_line1)
+        self.main.text(fonts.middle, self.breadcrum, 8, Layout.y_breadcrum)
+        #self.main.tft.text(fonts.big, item.name, 8, Layout.y_line1)
+        self.main.draw_multiple_line(fonts.big, item.name, Layout.y_line1)
 
         if item.type == MenuItem.INT_ITEM:
-            self.main.tft.text(fonts.big, "%5d" %(item.data.value), 8, Layout.y_line2)
+            self.main.text(fonts.huge, "%3d" %(item.data.value), -1, Layout.y_line2)
         elif item.type == MenuItem.FLOAT_ITEM:
-            self.main.tft.text(fonts.big, "%7.1f" %(item.data.value), 8, Layout.y_line2)
+            self.main.text(fonts.huge, "%5.1f" %(item.data.value), -1, Layout.y_line2)
 
 
     def handle(self, id, long_click):

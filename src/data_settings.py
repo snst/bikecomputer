@@ -15,4 +15,6 @@ class DataSettings:
         self.led_off = SettingVal(3, 0, 10)
         self.touch_ignore = SettingVal(0, 0, 1)
         self.wheel_cm = SettingVal(214, 200, 230, True)
+        self.long_click = SettingVal(30, 20, 50)
+        self.min_speed = SettingVal(5, 1, 10)
         pass

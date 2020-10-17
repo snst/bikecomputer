@@ -23,7 +23,11 @@ class FloatMenuItem(IntMenuItem):
         self.type = self.FLOAT_ITEM
 
 class MenuValueItem(MenuItem):
-    def __init__(self, name, data):
+    def __init__(self, name, data, cb = None):
         MenuItem.__init__(self, name, None)
         self.data = data
         self.type = self.FLOAT_ITEM if data.is_float else self.INT_ITEM
+        self.callback_changed = cb
+
+    def set_value_changed_callback(self, cb):
+        self.callback_changed = cb

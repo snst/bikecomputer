@@ -58,9 +58,13 @@ class CSC:
                 data.crank_time.add_delta()
                 data.cadence_avg = self.calc_cadence_from_csc_val(data.crank_counter.sum, data.crank_time.sum)
 
-            if data.speed < 100:
+            valid_speed = data.speed < 100
+            data.is_riding = valid_speed and data.speed > self.settings.min_speed.value
+
+            if valid_speed:
                 data.speed_max = max(data.speed_max, data.speed)
-                if data.speed > 5:
+
+                if data.is_riding:
                     data.wheel_counter.add_delta()
                     data.wheel_time.add_delta()
                     data.speed_avg = self.calc_kmh_from_csc_val(data.wheel_counter.sum, data.wheel_time.sum)
@@ -68,23 +72,13 @@ class CSC:
 
             #print("is_riding=%d, speed=%.2f/%.2f, cadence=%d/%d" % (self.is_riding, self.speed_kmh, self.average_speed_kmh, self.cadence, self.average_cadence))
             data.trip_distance = data.wheel_counter.get_distance_in_km(self.settings.wheel_cm.value)
-            data.trip_duration = data.wheel_time.get_sum_in_min()
-            data.is_riding = data.speed > 5
+            data.trip_duration_min = data.wheel_time.get_sum_in_min()
+
+            if data.goal != None:
+                self.calc_goal(data)
 
         data.init = True
-'''
-    def reset_avg_cadence(self):
-        self.crank_counter.reset()
-        self.crank_time.reset()
 
-    def reset_avg_speed(self):
-        self.wheel_sec_avg_sum = 0
-        self.wheel_counter_avg_sum = 0
 
-    def reset_trip(self):
-        self.wheel_counter.reset()
-        self.wheel_time.reset()
-
-    def reset_max_speed(self):
-        self.data.speed_max = 0
-        '''
+    def calc_goal(self, data):
+        data.goal.calculate_progress(data)

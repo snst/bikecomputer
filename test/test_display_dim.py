@@ -4,10 +4,10 @@ import site
 import sys
 from time import sleep
 site.addsitedir('./src')  # Always appends to end
-from display_dim import *
+from display_ctrl import *
 from data_settings import *
 
-class TestDisplayDim(unittest.TestCase):
+class TestDisplayCtrl(unittest.TestCase):
 
     def display_cb(self, is_on):
         if is_on:
@@ -20,7 +20,7 @@ class TestDisplayDim(unittest.TestCase):
         self.off_cnt = 0
         self.settings = DataSettings()
         self.settings.led_time.value = 1
-        self.display = DisplayDim(self.settings)
+        self.display = DisplayCtrl(self.settings)
         self.display.set_callback(self.display_cb)
 
 

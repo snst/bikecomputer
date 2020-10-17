@@ -70,7 +70,7 @@ class TestCSCMethods(unittest.TestCase):
         delta_sec = (6423-2213) / 1024
         dist_km = (1342-1322) * self.settings.wheel_cm.value / 100000
         kmh =  dist_km * 3600 / delta_sec
-        self.assertEqual(delta_sec/60, self.data.trip_duration)
+        self.assertEqual(delta_sec/60, self.data.trip_duration_min)
         self.assertEqual(dist_km, self.data.trip_distance)
         self.assertEqual((int)(kmh*100), (int)(self.data.speed*100))
         self.assertTrue(self.data.is_riding)
