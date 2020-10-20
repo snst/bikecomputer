@@ -1,6 +1,7 @@
 import threading
 import time
 import pygame
+import json
 
 
 class Hal_emu:
@@ -37,6 +38,13 @@ class Hal_emu:
 
     def ticks_ms(self):
         return int(round(time.time() * 1000))
+
+
+    def json_load(self, x):
+        return json.loads(x)
+
+    def json_dump(self, x):
+        return json.dumps(x)
 
     def mainloop(self):
         while True:

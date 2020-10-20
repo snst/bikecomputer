@@ -1,6 +1,10 @@
 from data_settings import SettingVal
+from data_store import *
 
-class DataGoal:
+filename = "goal.cfg"
+
+
+class DataGoal(DataStore):
     def __init__(self):
         self.target_time_min = SettingVal(60, 1, 500)
         self.target_dist_km = SettingVal(30, 1, 300, True)
@@ -31,3 +35,12 @@ class DataGoal:
                 self.calc_required_average_km_h = 0
             self.optimal_distance_km = self.target_average_km_h.value * data.trip_duration_min / 60
             pass
+
+    def get_all_attributes(self):
+        return [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
+
+    def save(self, hal):
+        DataStore.save(self, filename, hal)
+
+    def load(self, hal):
+        DataStore.load(self, filename, hal)

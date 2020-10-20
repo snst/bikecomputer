@@ -1,5 +1,6 @@
 import machine
 import utime
+import ujson
 
 
 class Hal_esp32:
@@ -44,3 +45,10 @@ class Hal_esp32:
 
     def ticks_ms(self):
         return utime.ticks_ms()
+
+
+    def json_load(self, x):
+        return ujson.loads(x)
+
+    def json_dump(self, x):
+        return ujson.dumps(x)        

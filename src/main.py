@@ -2,12 +2,14 @@ import micropython
 import machine
 import st7789
 import time
+import _thread
 from button_handler import *
 from bike_computer import *
 from const import *
 from ble_csc_central import *
 from hal_esp32 import *
 from machine import Timer
+
 
 Color.red = st7789.color565(255, 0, 0)
 Color.green = st7789.color565(0, 255, 0)
@@ -37,15 +39,31 @@ hal = Hal_esp32()
 bc = BikeComputer(display, hal)
 
 
+ 
+def gui_update_thread():
+  while True:
+    #print("+Hello from thread.")
+    #bc.gui.cyclic_update()
+    #print("-Hello from thread")
+    time.sleep(1)
+
+#_thread.start_new_thread(gui_update_thread, ())
 
 def on_notify(data):
+    #print("+on_notify")
     bc.on_notify(data)
-    bc.gui.cyclic_update()
+    #print("-on_notify")
+    #bc.gui.cyclic_update()
 
-
-#b = BleCscManager()
-#b.set_callback_notify(on_notify)
-#while(True):
-#    b.scan()
-#    b.loop()
-#    time.sleep_ms(1000)
+if bc.settings.bt.value == 1:
+    print("BT on")
+    b = BleCscManager()
+    b.set_callback_notify(on_notify)
+    b.set_callback_info(bc.on_info)
+    while(True):
+        b.scan()
+        b.loop()
+        while b.is_connected():
+            print(".\n")
+            bc.gui.cyclic_update()
+            time.sleep_ms(1000)

@@ -5,6 +5,7 @@ from data_goal import *
 from menu_config import *
 from data_goal import *
 from const import *
+import fonts 
 
 class GuiMain:
 
@@ -116,16 +117,14 @@ class GuiMain:
         csc_data = self.get_current_csc_data()
         if csc_data.goal == None:
             csc_data.goal = DataGoal()
-
+            csc_data.goal.load(self.hal)
         self.add_to_gui_stack(GuiMenu(self, MenuGoal(csc_data.goal)))
 
     def go_menu_settings(self):
-
         m = MenuSettings(self.settings)
         m.led_on.set_value_changed_callback(self.callback_display_brightness_changed)
         m.led_off.set_value_changed_callback(self.callback_display_brightness_changed)
         self.add_to_gui_stack(GuiMenu(self, m))
-
 
     def action_go_csc(self):
         while len(self.gui_stack) > 1:
@@ -162,6 +161,7 @@ class GuiMain:
     def do_start_goal(self):
         csc_data = self.get_current_csc_data()
         csc_data.goal.is_active = True
+        csc_data.goal.calculate_progress(csc_data)
         self.action_go_csc()
 
     def do_stop_goal(self):
@@ -172,6 +172,13 @@ class GuiMain:
     def do_save_settings(self):
         self.action_go_csc()
         print("do_save_settings")
+        self.settings.save(self.hal)
+
+    def do_save_goal(self):
+        self.get_current_csc_data().goal.save(self.hal)
+
+    def do_load_goal(self):
+        self.get_current_csc_data().goal.load(self.hal)
 
     def get_csc_data(self):
         return self.csc_data[self.csc_index]
@@ -189,17 +196,25 @@ class GuiMain:
         self.hal.set_backlight(val)
 
 
-    def draw_centered(self, font, text, y):
-        w = len(text) * font.WIDTH    
-        x = (int)((135-w) / 2)
+    def text_aligned(self, font, text, x, y, align = Align.left):
+    
+        if align == Align.left:
+            pass
+        else:
+            w = len(text) * font.WIDTH    
+            if align == Align.center:
+                x = (int)((Display.width-w) / 2)
+            else:
+                x = Display.width - w - x
         self.tft.text(font, text, x, y, Color.white, Color.black)
-        #print("dc")
-        #print(text)
 
-    def draw_multiple_line(self, font, text, y):
+    def draw_multiple_line(self, font, text, y, align = Align.center):
         txt = text.split()
         n = len(txt)
         k=1
         for t in txt:
-            self.draw_centered(font, t, y - ((n-k)*font.HEIGHT))
+            self.text_aligned(font, t, 0, y - ((n-k)*font.HEIGHT), align)
             k += 1        
+
+    def show_info(self, txt):
+        self.text_aligned(fonts.middle, txt, 0, Display.height - fonts.middle.HEIGHT)

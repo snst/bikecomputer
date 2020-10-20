@@ -264,6 +264,11 @@ class BleCscManager:
         self.central = BLECscCentral(self.ble)
         print("b3")
         self.central.on_notify(callback=self.on_notify)
+        self.on_info = None
+
+    def show_info(self, txt):
+        if self.on_info:
+            self.on_info(txt)
 
     def on_scan(self, addr_type, addr, name):
         if addr_type is not None:
@@ -272,14 +277,14 @@ class BleCscManager:
         else:
             #nonlocal not_found
             self.not_found = True
-            print("No sensor found.")
+            self.show_info("No sensor")
 
     def on_notify(self, data):
         print("on_notify")
 
     def scan(self):
         self.not_found = False
-        print("scanning...")
+        self.show_info("Scanning ")
         self.central.scan(callback=self.on_scan)
 
 
@@ -288,16 +293,25 @@ class BleCscManager:
             time.sleep_ms(100)
             if self.not_found:
                 return
+                
 
-        print("Connected")
-        while self.central.is_connected():
-            time.sleep_ms(2000)
+        self.show_info("Connected")
+        #while self.central.is_connected():
+        #    time.sleep_ms(2000)
 
-        print("Disconnected")
+        #self.show_info("Disconnected")
+
+    def is_connected(self):
+        ret = self.central.is_connected()
+        if not ret:
+            self.show_info("Disconnected")
+        return ret
 
     def set_callback_notify(self, cb):
         self.central.on_notify(callback=cb)
 
+    def set_callback_info(self, cb):
+        self.on_info = cb
 
 def demo():
     b = BleCscManager()

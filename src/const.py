@@ -22,3 +22,8 @@ class Color:
 class Display:
     width = 135
     height = 240
+
+class Align:
+    left = 0
+    center = 1
+    right = 2
