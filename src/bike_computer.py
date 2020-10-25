@@ -34,17 +34,22 @@ class BikeComputer:
         for data in self.csc_data:
             self.csc.process(raw_data, data)
 
-    def on_info(self, txt):
-        print(txt)
-        self.gui.show_info(txt)
+    def on_conn_state(self, state):
+        #print(txt)
+        self.gui.on_conn_state(state)
 
-    def left(self, long):
+    def ignore_click(self, is_long):
+        display_off = not self.display_ctrl.is_display_on()
         self.display_ctrl.set_display_on()
-        print("left %s" % ("long" if long else "short"))
-        self.gui.handle_click(Button.left, long)
+        return not is_long and display_off and self.settings.touch_ignore.value != 0
 
-    def right(self, long):
-        self.display_ctrl.set_display_on()
-        print("right %s" % ("long" if long else "short"))
-        self.gui.handle_click(Button.right, long)
+    def left(self, is_long):
+        #print("left %s" % ("long" if long else "short"))
+        if not self.ignore_click(is_long):
+            self.gui.handle_click(Button.left, is_long)
+
+    def right(self, is_long):
+        #print("right %s" % ("long" if long else "short"))
+        if not self.ignore_click(is_long):
+            self.gui.handle_click(Button.right, is_long)
 

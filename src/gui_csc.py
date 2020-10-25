@@ -2,7 +2,7 @@ from data_csc import *
 import fonts
 import const
 from gui_base import *
-from a import *
+#from a import *
 
 
 class GuiCsc(GuiBase):
@@ -35,8 +35,9 @@ class GuiCsc(GuiBase):
             self.show_float_speed(data.speed_avg, 75, y)
             self.shown_data.speed_avg = data.speed_avg
 
-    def show_speed_goal(self, goal, y):
-        self.show_float_speed(goal.calc_required_average_km_h, 0, y)
+    def show_speed_goal(self, goal, data, y):
+        col = Color.green if goal.calc_required_average_km_h < data.speed_avg else Color.red
+        self.show_float_speed(goal.calc_required_average_km_h, 0, y, color=col)
 
     def show_distance_goal(self, goal, y):
         self.show_float_speed(goal.remaining_distance_km, 0, y)
@@ -79,6 +80,8 @@ class GuiCsc(GuiBase):
 
         data = self.main.get_csc_data()
         goal = data.goal if data.goal and data.goal.is_active else None
+        if goal:
+            goal.calculate_progress(data)
 
         y = 0
         y_1 = 65
@@ -89,10 +92,10 @@ class GuiCsc(GuiBase):
         self.show_speed(data, y)
         self.show_cadence(data, y)
 
-        self.show_title("avg", y_1)
         self.show_speed_avg(data, y_1)
 
         if self.second_view:
+            self.show_title("avg", y_1)
             self.show_title("kmh max", y_2)
             self.show_speed_max(data, y_2)
             self.show_title("cad avg", y_3)
@@ -103,11 +106,12 @@ class GuiCsc(GuiBase):
             self.show_trip_duration(data, y_3)
 
             if goal:
-                self.show_speed_goal(goal, y_1)
+                self.show_speed_goal(goal, data,y_1)
                 self.show_distance_goal(goal, y_2)
                 self.show_progress_goal(goal, y_2)
                 self.show_time_goal(goal, y_3)
             else:
+                self.show_title("avg", y_1)
                 self.show_title("km", y_2)
                 self.show_title("h:m", y_3)
 

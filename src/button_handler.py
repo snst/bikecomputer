@@ -22,7 +22,7 @@ class ButtonHandler:
         delta = self.get_delta()
         
         if val == 0:
-            print("Down")
+            #print("Down")
             #self.t = machine.Timer(-1)
             #self.t.init(period=SHORT_CLICK_MS, mode=machine.Timer.ONE_SHOT, callback=self.on_timer)
             self.t = self.hal.start_timer(1, self.longclick_ms, self.on_timer)
@@ -30,7 +30,7 @@ class ButtonHandler:
             if self.t != None and delta < self.longclick_ms - 50:
                 self.hal.cancel_timer(self.t)
                 self.t = None
-                print("%d Short    %d" % (self.cnt, delta))
+                #print("%d Short    %d" % (self.cnt, delta))
                 self.cnt += 1
                 if self.callback:
                     self.callback(False)
@@ -39,7 +39,7 @@ class ButtonHandler:
         if self.t != None:
             delta = self.get_delta()
             self.t = None
-            print("%d Long    %d" % (self.cnt, delta))
+            #print("%d Long    %d" % (self.cnt, delta))
             self.cnt += 1
             if self.callback:
                 self.callback(True)

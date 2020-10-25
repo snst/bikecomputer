@@ -34,12 +34,12 @@ class GuiMenu:
     def handle(self, id, long_click):
         #print("handler_menu")
         if long_click:
-            if id == 0:
+            if id == Button.left:
                 self.long_click_left()
             else:
                 self.long_click_right()
         else:
-            if 0==id:
+            if id == Button.left:
                 self.short_click_left()
             else:
                 self.short_click_right()

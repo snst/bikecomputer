@@ -41,6 +41,7 @@ class MenuSettings:
                        self.touch_ignore,
                        self.long_click,
                        self.bluetooth,
+                       MenuItem("dis- connect", "do_reconnect"),
                        MenuItem("save", "do_save_settings"),
         ]
         pass        
@@ -50,7 +51,7 @@ class MenuGoal:
     def __init__(self, data):
         self.title = "Goal"
         self.data = data
-        self.dist = MenuValueItem("Dist", data.target_dist_km, data.calculate_avg)
+        self.dist = MenuValueItem("Dist", data.target_dist_km, data.calculate_time)
         self.avg = MenuValueItem("Avg", data.target_average_km_h, data.calculate_time)
         self.time = MenuValueItem("Time", data.target_time_min, data.calculate_avg)
         self.save = MenuItem("Save", "do_save_goal")

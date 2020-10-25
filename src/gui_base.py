@@ -25,7 +25,7 @@ class GuiBase:
         self.main.tft.fill_rect(0, y, 135, h, Color.grey)
         if p > m:
             self.main.tft.fill_rect(0, y, p, h, Color.green)
-            self.main.tft.fill_rect(0, y, m, h, Color.yellow)
+            self.main.tft.fill_rect(0, y, m, h, Color.red)
         else:
             self.main.tft.fill_rect(0, y, m, h, Color.red)
             self.main.tft.fill_rect(0, y, p, h, Color.green)
@@ -34,7 +34,7 @@ class GuiBase:
 
 
 
-    def show_float_speed(self, val, x, y, font = fonts.huge):
+    def show_float_speed(self, val, x, y, font = fonts.huge, color = Color.white):
         if val > 999:
             val = 999
         if val < 0:
@@ -43,12 +43,12 @@ class GuiBase:
         dval = (int)((val - ival)*10)
         self.main.tft.fill_rect(x, y, 3*font.WIDTH+10, font.HEIGHT, Color.black)
         if val < 100:
-            self.main.text(font, "%2d" % (ival), x, y)
+            self.main.text(font, "%2d" % (ival), x, y, fg=color)
             x += 2 * font.WIDTH
-            self.main.text(font, "%d" % (dval), x + 10, y)
-            self.main.tft.fill_rect(x + 3, y + font.HEIGHT - 5, 4, 5, Color.white)
+            self.main.text(font, "%d" % (dval), x + 10, y, fg=color)
+            self.main.tft.fill_rect(x + 3, y + font.HEIGHT - 5, 4, 5, color)
         else:
-            self.main.text(font, "%3d" % (ival), x + 10, y)
+            self.main.text(font, "%3d" % (ival), x + 10, y, fg=color)
 
     def show_float_time(self, val, x, y):
         h = (int)(val / 60)

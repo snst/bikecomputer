@@ -6,6 +6,7 @@ class GuiEditValue:
     def __init__(self, main, item):
         self.main = main
         self.edit_val = item.data.value
+        print("edit_val %f" % (self.edit_val))
         self.item = item
         self.breadcrum = self.main.get_breadcrum()
         self.edit_decimal_place = False
@@ -38,6 +39,7 @@ class GuiEditValue:
                     self.main.show()
                 else:
                     self.item.data.value = self.edit_val
+                    #print("set val %f" % (self.edit_val))
                     if self.item.callback_changed:
                         self.item.callback_changed(self.edit_val, True)
                     self.main.action_go_back()
@@ -49,10 +51,12 @@ class GuiEditValue:
                     self.main.action_go_back()
         else:
             step = 0.1 if self.edit_decimal_place  else 1
-            if 0 == id:
+            if Button.left == id:
                 self.edit_val = self.edit_val - step if self.edit_val > self.item.data.min else self.item.data.max
-            else:
+            elif Button.right == id:
                 self.edit_val = self.edit_val + step if self.edit_val < self.item.data.max else self.item.data.min
+            self.edit_val = (int) (self.edit_val*10)
+            self.edit_val /= 10
             if self.item.callback_changed:
                 self.item.callback_changed(self.edit_val, False)
             self.main.show()

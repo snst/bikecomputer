@@ -12,7 +12,7 @@ class DisplayCtrl:
         return self.display_on
 
     def set_display_off(self, tim=None):
-        print("set_display_off")
+        #print("set_display_off")
         self.hal.set_backlight(self.settings.led_off.value)
         self.display_on = False
         if self.callback != None:
@@ -27,7 +27,7 @@ class DisplayCtrl:
         self.hal.cancel_timer(self.t)
 
         if self.settings.led_time.value > 0:
-            self.t = self.hal.start_timer(-1, self.settings.led_time.value*1000, self.set_display_off)
+            self.t = self.hal.start_timer(-1, (int)(self.settings.led_time.value*1000), self.set_display_off)
 
     def set_callback(self, cb):
         self.callback = cb

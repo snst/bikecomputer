@@ -3,6 +3,7 @@ import random
 import struct
 import time
 import micropython
+from const import *
 
 from micropython import const
 from ble_advertising import decode_services, decode_name
@@ -51,10 +52,20 @@ class BLECscCentral:
     def __init__(self, ble):
         self._ble = ble
         self._ble.active(True)
-#        self._ble.irq(handler=self._irq)
         self._ble.irq(self._irq)
 
+        # Persistent callback for when new data is notified from the device.
+        self._notify_callback = None
+        self._state_callback = self.print_state
+
         self._reset()
+
+    def print_state(self, state):
+        print("print_state: %d" % (state))
+
+    def print_ble(self, str):
+        #print(str)
+        pass
 
     def _reset(self):
         # Cached name and address from a successful scan.
@@ -71,8 +82,6 @@ class BLECscCentral:
         self._conn_callback = None
         self._read_callback = None
 
-        # Persistent callback for when new data is notified from the device.
-        self._notify_callback = None
 
         # Connected device.
         self._conn_handle = None
@@ -93,25 +102,26 @@ class BLECscCentral:
             if addr == _CSC_ADDR:
                 # Found a potential device, remember it and stop scanning.
                 self._addr_type = addr_type
-                self._addr = bytes(
-                    addr
-                )  # Note: addr buffer is owned by caller so need to copy it.
+                self._addr = bytes(addr)  # Note: addr buffer is owned by caller so need to copy it.
                 self._name = decode_name(adv_data) or "?"
                 self._ble.gap_scan(None)
 
         elif event == _IRQ_SCAN_DONE:
-            if self._scan_callback:
-                if self._addr:
-                    # Found a device during the scan (and the scan was explicitly stopped).
+            if self._addr:
+                # Found a device during the scan (and the scan was explicitly stopped).
+                self._state_callback(ConnState.found_device)
+                if self._scan_callback:
                     self._scan_callback(self._addr_type, self._addr, self._name)
-                    self._scan_callback = None
-                else:
-                    # Scan timed out.
+                self._scan_callback = None
+            else:
+                # Scan timed out.
+                self._state_callback(ConnState.no_device)
+                if self._scan_callback:
                     self._scan_callback(None, None, None)
 
         elif event == _IRQ_PERIPHERAL_CONNECT:
             # Connect successful.
-            print("_IRQ_PERIPHERAL_CONNECT")
+            self.print_ble("_IRQ_PERIPHERAL_CONNECT")
             conn_handle, addr_type, addr = data
             if addr_type == self._addr_type and addr == self._addr:
                 self._conn_handle = conn_handle
@@ -119,8 +129,9 @@ class BLECscCentral:
 
         elif event == _IRQ_PERIPHERAL_DISCONNECT:
             # Disconnect (either initiated by us or the remote end).
-            print("_IRQ_PERIPHERAL_DISCONNECT")
+            self.print_ble("_IRQ_PERIPHERAL_DISCONNECT")
             conn_handle, _, _ = data
+            self._state_callback(ConnState.disconnected)
             if conn_handle == self._conn_handle:
                 # If it was initiated by us, it'll already be reset.
                 self._reset()
@@ -128,63 +139,61 @@ class BLECscCentral:
         elif event == _IRQ_GATTC_SERVICE_RESULT:
             # Connected device returned a service.
             conn_handle, start_handle, end_handle, uuid = data
-            print("_IRQ_GATTC_SERVICE_RESULT")
-            print(uuid)
+            self.print_ble("_IRQ_GATTC_SERVICE_RESULT")
+            self.print_ble(uuid)
             if conn_handle == self._conn_handle and uuid == _CSC_SERVICE_UUID:
                 self._start_handle, self._end_handle = start_handle, end_handle
 
         elif event == _IRQ_GATTC_SERVICE_DONE:
             # Service query complete.
-            print("_IRQ_GATTC_SERVICE_DONE")
+            self.print_ble("_IRQ_GATTC_SERVICE_DONE")
             if self._start_handle and self._end_handle:
                 self._ble.gattc_discover_characteristics(
                     self._conn_handle, self._start_handle, self._end_handle
                 )
             else:
-                print("Failed to find csc service.")
+                self.print_ble("Failed to find csc service.")
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_RESULT:
-            print("_IRQ_GATTC_CHARACTERISTIC_RESULT")
-            print(data)
+            self.print_ble("_IRQ_GATTC_CHARACTERISTIC_RESULT")
+            self.print_ble(data)
             # Connected device returned a characteristic.
             conn_handle, def_handle, value_handle, properties, uuid = data
             if conn_handle == self._conn_handle and uuid == _CSC_MEASUREMENT_UUID:
                 self._value_handle = value_handle
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_DONE:
-            print("_IRQ_GATTC_CHARACTERISTIC_DONE")
+            self.print_ble("_IRQ_GATTC_CHARACTERISTIC_DONE")
             # Characteristic query complete.
             if self._value_handle:
                 # We've finished connecting and discovering device, fire the connect callback.
                 if self._conn_callback:
                     self._conn_callback()
 
-                print("w1")
                 #self._ble.gattc_write(self._conn_handle, self._value_handle, struct.pack("<H", int(1)))
                 self._ble.gattc_discover_descriptors(
                     self._conn_handle, self._start_handle, self._end_handle
                 )
-
-                print("w2")
             else:
-                print("Failed to find csc characteristic.")
+                self.print_ble("Failed to find csc characteristic.")
 
         elif event == _IRQ_GATTC_DESCRIPTOR_RESULT:
             # Called for each descriptor found by gattc_discover_descriptors().
             conn_handle, dsc_handle, uuid = data
-            print("_IRQ_GATTC_DESCRIPTOR_RESULT")
-            print(data)
+            self.print_ble("_IRQ_GATTC_DESCRIPTOR_RESULT")
+            self.print_ble(data)
             if conn_handle == self._conn_handle and uuid == _CSC_DESC_UUID:
                 self._dsc_handle = dsc_handle
         elif event == _IRQ_GATTC_DESCRIPTOR_DONE:
              # Called once service discovery is complete.
              # Note: Status will be zero on success, implementation-specific value otherwise.
             conn_handle, status = data
-            print("_IRQ_GATTC_DESCRIPTOR_DONE")
+            self.print_ble("_IRQ_GATTC_DESCRIPTOR_DONE")
+            self._state_callback(ConnState.connected)
             self._ble.gattc_write(self._conn_handle, self._dsc_handle, struct.pack("<H", int(1)))
         elif event == _IRQ_GATTC_READ_RESULT:
             # A read completed successfully.
-            print("_IRQ_GATTC_READ_RESULT")
+            self.print_ble("_IRQ_GATTC_READ_RESULT")
             conn_handle, value_handle, char_data = data
             if conn_handle == self._conn_handle and value_handle == self._value_handle:
                 self._update_value(char_data)
@@ -197,7 +206,7 @@ class BLECscCentral:
             conn_handle, value_handle, status = data
 
         elif event == _IRQ_GATTC_NOTIFY:
-            #print("_IRQ_GATTC_NOTIFY")
+            #self.print_ble("_IRQ_GATTC_NOTIFY")
             # The ble_temperature.py demo periodically notifies its value.
             conn_handle, value_handle, notify_data = data
             if conn_handle == self._conn_handle and value_handle == self._value_handle:
@@ -214,6 +223,7 @@ class BLECscCentral:
         self._addr_type = None
         self._addr = None
         self._scan_callback = callback
+        self._state_callback(ConnState.scanning)
         self._ble.gap_scan(2000, 30000, 30000)
 
     # Connect to the specified device (otherwise use cached address from a scan).
@@ -223,12 +233,13 @@ class BLECscCentral:
         self._conn_callback = callback
         if self._addr_type is None or self._addr is None:
             return False
+        self._state_callback(ConnState.connecting)
         self._ble.gap_connect(self._addr_type, self._addr)
         return True
 
     # Disconnect from current device.
     def disconnect(self):
-        if not self._conn_handle:
+        if None == self._conn_handle:
             return
         self._ble.gap_disconnect(self._conn_handle)
         self._reset()
@@ -241,14 +252,17 @@ class BLECscCentral:
         self._ble.gattc_read(self._conn_handle, self._value_handle)
 
     # Sets a callback to be invoked when the device notifies us.
-    def on_notify(self, callback):
+    def set_on_notify(self, callback):
         self._notify_callback = callback
+
+    def set_on_state(self, callback):
+        self._state_callback = callback
 
     def _update_value(self, data):
         # Data is sint16 in degrees Celsius with a resolution of 0.01 degrees Celsius.
-        print(data)
+        self.print_ble(data)
         self._value = struct.unpack("<BIHHH", data)
-        print(self._value)
+        self.print_ble(self._value)
         return self._value
 
     def value(self):
@@ -258,60 +272,38 @@ class BLECscCentral:
 
 class BleCscManager:
     def __init__(self):
-        print("b1")
+        self._on_state = None
+        self.conn_state = ConnState.disconnected
         self.ble = bluetooth.BLE()
-        print("b2")
         self.central = BLECscCentral(self.ble)
-        print("b3")
-        self.central.on_notify(callback=self.on_notify)
-        self.on_info = None
+        self.central.set_on_state(self.on_state)
 
-    def show_info(self, txt):
-        if self.on_info:
-            self.on_info(txt)
-
-    def on_scan(self, addr_type, addr, name):
-        if addr_type is not None:
-            print("Found csc sensor:", addr_type, addr, name)
-            self.central.connect()
-        else:
-            #nonlocal not_found
-            self.not_found = True
-            self.show_info("No sensor")
-
-    def on_notify(self, data):
-        print("on_notify")
+    def on_state(self, state):
+        print("on_state(%d)" % (state))
+        self.conn_state = state
+        if self._on_state:
+            self._on_state(state)
 
     def scan(self):
-        self.not_found = False
-        self.show_info("Scanning ")
-        self.central.scan(callback=self.on_scan)
+        print("scan")
+        self.central.scan(callback=None)
 
+    def connect(self):
+        print("connect")
+        self.central.connect()
 
-    def loop(self):
-        while not self.central.is_connected():
-            time.sleep_ms(100)
-            if self.not_found:
-                return
-                
+    def set_on_notify(self, cb):
+        self.central.set_on_notify(callback=cb)
 
-        self.show_info("Connected")
-        #while self.central.is_connected():
-        #    time.sleep_ms(2000)
+    def set_on_state(self, cb):
+        self._on_state = cb
 
-        #self.show_info("Disconnected")
+    def reset(self):
+        self.central._reset()
 
-    def is_connected(self):
-        ret = self.central.is_connected()
-        if not ret:
-            self.show_info("Disconnected")
-        return ret
-
-    def set_callback_notify(self, cb):
-        self.central.on_notify(callback=cb)
-
-    def set_callback_info(self, cb):
-        self.on_info = cb
+    def disconnect(self):
+        print("bt disconnect")
+        self.central.disconnect()
 
 def demo():
     b = BleCscManager()

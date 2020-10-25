@@ -11,6 +11,7 @@ class GuiMain:
 
 
     def __init__(self, tft, hal, settings, csc_data):
+        self.conn_state = ConnState.disconnected
         self.callback_repaint = None
         self.tft = tft
         self.hal = hal
@@ -75,6 +76,7 @@ class GuiMain:
         if isinstance(self.active_gui, GuiCsc):
             self.active_gui.show(False)
             self.repaint()
+        self.update_state()
 
 
     def show(self):
@@ -87,6 +89,7 @@ class GuiMain:
         if self.callback_repaint:
             self.callback_repaint()
         #self.tft.update()
+        self.update_state()
         pass
 
     def activate_gui(self, gui):
@@ -143,18 +146,18 @@ class GuiMain:
         self.activate_gui(gui)
 
     def do_action(self, action):
-        print("do action:" + action)
+        #print("do action:" + action)
         getattr(self, action)()
 
     def do_add_meter(self):
-        print("do_add_meter")
+        #print("do_add_meter")
         n = len(self.csc_data) + 1
         self.csc_data.append(DataCsc(n))
         self.csc_index = n - 1
         self.action_go_csc()
 
     def do_reset_meter(self):
-        print("do_reset_meter")
+        #print("do_reset_meter")
         self.get_csc_data().reset()
         self.action_go_csc()
 
@@ -171,8 +174,12 @@ class GuiMain:
 
     def do_save_settings(self):
         self.action_go_csc()
-        print("do_save_settings")
+        #print("do_save_settings")
         self.settings.save(self.hal)
+
+    def do_reconnect(self):
+        self.hal.bt_reconnect()
+        self.action_go_csc()
 
     def do_save_goal(self):
         self.get_current_csc_data().goal.save(self.hal)
@@ -192,7 +199,7 @@ class GuiMain:
         self.action_go_csc()        
 
     def callback_display_brightness_changed(self, val, closed):
-        print("callback_display_brightness_changed %d" % (val))
+        #print("callback_display_brightness_changed %d" % (val))
         self.hal.set_backlight(val)
 
 
@@ -216,5 +223,23 @@ class GuiMain:
             self.text_aligned(font, t, 0, y - ((n-k)*font.HEIGHT), align)
             k += 1        
 
-    def show_info(self, txt):
+    def on_conn_state(self, state):
+        self.conn_state = state
+
+    def update_state(self):
+        txt = ""
+        if self.conn_state == ConnState.disconnected:
+            txt = "Disconnected"
+        elif self.conn_state == ConnState.scanning:
+            txt = "Scanning    "
+        elif self.conn_state == ConnState.connecting:
+            txt = "Connecting  "
+        elif self.conn_state == ConnState.connected:
+            txt = "Connected   "
+        elif self.conn_state == ConnState.no_device:
+            txt = "No Device   "
+        elif self.conn_state == ConnState.found_device:
+            txt = "Found Device"
+
+        txt += " R" if self.get_current_csc_data().is_riding else "  "
         self.text_aligned(fonts.middle, txt, 0, Display.height - fonts.middle.HEIGHT)

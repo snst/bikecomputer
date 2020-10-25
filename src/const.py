@@ -27,3 +27,17 @@ class Align:
     left = 0
     center = 1
     right = 2
+
+
+class ConnState:
+    disconnected = 0
+    scanning = 1
+    connecting = 2
+    connected = 3
+    no_device = 4
+    found_device = 5
+    off = 6
+
+class StateFlags:
+    riding = 1
+    bt_on = 2

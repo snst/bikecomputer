@@ -16,6 +16,9 @@ class Hal_emu:
         self.sim_callback = None
         pass
 
+    def bt_reconnect(self):
+        print("bt_reconnect")
+
     def set_backlight(self, val):
         print("hal: set_backlight %d" % (val))
         self.tft.set_brightness(val)
