@@ -61,11 +61,11 @@ class GuiBase:
         self.main.tft.fill_rect(x + 3, y + font.HEIGHT - 7, 4, 5, Color.white)
 
 
-    def show_big_speed(self, val, x, y):
+    def show_big_speed(self, val, x, y, color):
         ival = (int) (val)
         dval = (int)((val - ival)*10)
-        self.main.text(fonts.giant, "%2d" % (ival), x, y)
-        self.main.text(fonts.huge, "%d" % (dval), x+2*fonts.giant.WIDTH+5, y)
+        self.main.text(fonts.giant, "%2d" % (ival), x, y, fg=color)
+        self.main.text(fonts.huge, "%d" % (dval), x+2*fonts.giant.WIDTH+5, y, fg=color)
 
     def show_float_3(self, val, x, y, font = fonts.font16):
         ival = (int)(val)

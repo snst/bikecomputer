@@ -18,6 +18,7 @@ class Color:
     red = st7789.color565(255, 0, 0)
     green = st7789.color565(0, 200, 0)    
     yellow = st7789.color565(200, 200, 0)    
+    blue = st7789.color565(0, 0, 255)    
 
 class Display:
     width = 135

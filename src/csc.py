@@ -75,10 +75,6 @@ class CSC:
             data.trip_duration_min = data.wheel_time.get_sum_in_min()
 
             if data.goal != None:
-                self.calc_goal(data)
+                data.goal.calculate_progress(data)
 
         data.init = True
-
-
-    def calc_goal(self, data):
-        data.goal.calculate_progress(data)

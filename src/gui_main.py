@@ -163,13 +163,13 @@ class GuiMain:
 
     def do_start_goal(self):
         csc_data = self.get_current_csc_data()
-        csc_data.goal.is_active = True
+        csc_data.goal.is_started = True
         csc_data.goal.calculate_progress(csc_data)
         self.action_go_csc()
 
     def do_stop_goal(self):
         csc_data = self.get_current_csc_data()
-        csc_data.goal.is_active = False
+        csc_data.goal.is_started = False
         self.action_go_csc()
 
     def do_save_settings(self):
@@ -242,4 +242,4 @@ class GuiMain:
             txt = "Found Device"
 
         txt += " R" if self.get_current_csc_data().is_riding else "  "
-        self.text_aligned(fonts.middle, txt, 0, Display.height - fonts.middle.HEIGHT)
+        self.text_aligned(fonts.middle, txt, 20, Display.height - fonts.middle.HEIGHT)
