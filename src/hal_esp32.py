@@ -1,6 +1,8 @@
 import machine
 import utime
 import ujson
+import time
+
 
 
 class Hal_esp32:
@@ -61,3 +63,6 @@ class Hal_esp32:
         if self.bt:
             self.bt.disconnect()
         pass
+
+    def sleep_ms(self, ms):
+        time.sleep_ms(ms)

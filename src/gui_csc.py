@@ -143,6 +143,6 @@ class GuiCsc(GuiBase):
                 self.main.show()
         else:
             if id == const.Button.left:
-                self.main.prev_csc()
+                self.main.show_komoot()
             elif id == const.Button.right:
                 self.main.next_csc()

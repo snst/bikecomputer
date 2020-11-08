@@ -2,6 +2,7 @@ from gui_main import *
 from data_settings import *
 from data_csc import *
 from data_goal import *
+from data_komoot import *
 from display_ctrl import *
 from const import *
 from button_handler import *
@@ -15,9 +16,10 @@ class BikeComputer:
         self.settings = DataSettings()
         self.settings.load(hal)
         self.csc_data = [ DataCsc(1) ]
+        self._data_komoot = DataKomoot()
         self.display_ctrl = DisplayCtrl(self.settings, hal)
         self.csc = csc.CSC(self.settings)
-        self.gui = GuiMain(self.tft, self.hal, self.settings, self.csc_data)
+        self.gui = GuiMain(self.tft, self.hal, self.settings, self.csc_data, self._data_komoot)
         self.btn_left = ButtonHandler(hal, hal.btn_left, self.left, self.settings.long_click.value*10) 
         self.btn_right = ButtonHandler(hal, hal.btn_right, self.right, self.settings.long_click.value*10)
         self.last_notify_ms = 0
@@ -25,7 +27,7 @@ class BikeComputer:
 
 
 
-    def on_notify(self, raw_data):
+    def on_data_csc(self, raw_data):
         now = self.hal.ticks_ms()
         diff = now - self.last_notify_ms
         self.last_notify_ms = now
@@ -33,6 +35,9 @@ class BikeComputer:
         print("on %u %ums" % (self.notify_cnt, diff))
         for data in self.csc_data:
             self.csc.process(raw_data, data)
+
+    def on_data_komoot(self, raw_data):
+        self._data_komoot.on_data(raw_data)
 
     def on_conn_state(self, state):
         #print(txt)

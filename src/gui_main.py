@@ -1,6 +1,7 @@
 from gui_edit_value import *
 from gui_csc import *
 from gui_menu import *
+from gui_komoot import *
 from data_goal import *
 from menu_config import *
 from data_goal import *
@@ -10,17 +11,19 @@ import fonts
 class GuiMain:
 
 
-    def __init__(self, tft, hal, settings, csc_data):
+    def __init__(self, tft, hal, settings, csc_data, komoot_data):
         self.conn_state = ConnState.disconnected
         self.callback_repaint = None
         self.tft = tft
         self.hal = hal
         self.settings = settings
         self.csc_data = csc_data
+        self._komoot_data = komoot_data
         self.csc_index = 0
         self.active_gui = None
         self.gui_stack = []
         self.clear()
+        self._gui_komoot = GuiKomoot(self)
         self.add_to_gui_stack(GuiCsc(self))
         pass
 
@@ -73,7 +76,7 @@ class GuiMain:
 
     def cyclic_update(self):
         #print("update")
-        if isinstance(self.active_gui, GuiCsc):
+        if isinstance(self.active_gui, GuiCsc) or isinstance(self.active_gui, GuiKomoot):
             self.active_gui.show(False)
             self.repaint()
         self.update_state()
@@ -187,6 +190,10 @@ class GuiMain:
     def do_load_goal(self):
         self.get_current_csc_data().goal.load(self.hal)
 
+    def show_komoot(self):
+        self.add_to_gui_stack(self._gui_komoot)
+        pass
+
     def get_csc_data(self):
         return self.csc_data[self.csc_index]
 
@@ -243,3 +250,6 @@ class GuiMain:
 
         txt += " R" if self.get_current_csc_data().is_riding else "  "
         self.text_aligned(fonts.middle, txt, 20, Display.height - fonts.middle.HEIGHT)
+
+    def get_komoot_data(self):
+        return self._komoot_data
