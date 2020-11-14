@@ -52,7 +52,9 @@ _KOMOOT_DESC_UUID = bluetooth.UUID("4a982902-1cc4-e7c1-c757-f1267dd021e8")
 
 #static BLEUUID charUUID("503DD605-9BCB-4F6E-B235-270A57483026");
 
-
+#machine.freq()          # get the current frequency of the CPU
+machine.freq(80000000) # set the CPU frequency to 240 MHz
+print("freq: %u" % (machine.freq() ))
 #if bc.settings.bt.value == 1:
 
 con_csc = ConnData(name = "csc", fix_addr = _CSC_ADDR, service_uuid = _CSC_SERVICE_UUID, char_uuid = _CSC_MEASUREMENT_UUID, csc_desc = _CSC_DESC_UUID, on_notify=bc.on_data_csc)
@@ -74,8 +76,9 @@ def task_update_bt():
     #print("task_update_bt")
     #if b.conn_state == ConnState.disconnected or b.conn_state == ConnState.no_device:
     sch.insert(1000, task_update_bt)
-    if con_csc._conn_handle == None or con_csc._conn_handle == None:
-        b.scan()
+    if bc.settings.bt.value == 1:
+        if con_csc._conn_handle == None or con_csc._conn_handle == None:
+            b.scan()
 
 def task_read_komoot():
     #print("task_read_komoot")

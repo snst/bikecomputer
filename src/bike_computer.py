@@ -32,7 +32,7 @@ class BikeComputer:
         diff = now - self.last_notify_ms
         self.last_notify_ms = now
         self.notify_cnt += 1
-        print("on %u %ums" % (self.notify_cnt, diff))
+        #print("on %u %ums" % (self.notify_cnt, diff))
         for data in self.csc_data:
             self.csc.process(raw_data, data)
 

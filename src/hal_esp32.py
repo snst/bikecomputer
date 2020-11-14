@@ -21,7 +21,7 @@ class Hal_esp32:
 
     def set_backlight(self, val):
         #print("hal: set_backlight %d" % (val))
-        self.led_pwm.duty(val*102)
+        self.led_pwm.duty((int)(val*102))
         #self.tft.set_brightness(val)
 
     def start_timer(self, id, ms, cb):

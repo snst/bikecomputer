@@ -2,10 +2,12 @@ import st7789
 import site
 import sys
 site.addsitedir('./src')
+site.addsitedir('./modules')
 import const
 from sim import *
 from bike_computer import *
 from hal_emu import *
+
 
 
 

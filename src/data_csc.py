@@ -21,6 +21,7 @@ class DataCsc:
         self.trip_distance = 0
         self.trip_duration_min = 0
         self.is_riding = False
+        self.sim = 10
 
     def add_goal(self, goal):
         self.goal = goal

@@ -7,6 +7,7 @@ from menu_config import *
 from data_goal import *
 from const import *
 import fonts 
+import math
 
 class GuiMain:
 
@@ -229,6 +230,18 @@ class GuiMain:
         for t in txt:
             self.text_aligned(font, t, 0, y - ((n-k)*font.HEIGHT), align)
             k += 1        
+
+    def draw_multiple_line2(self, font, text, y, align = Align.center):
+        w = font.WIDTH * len(text)
+        lines = math.ceil(w / Display.width)
+        n = int(math.ceil(len(text) / lines))
+        txt = [text[i:i+n] for i in range(0, len(text), n)]
+
+        k=0
+        for t in txt:
+            self.text_aligned(font, t, 0, y + k*font.HEIGHT, align)
+            k += 1        
+
 
     def on_conn_state(self, state):
         self.conn_state = state

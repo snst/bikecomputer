@@ -18,7 +18,7 @@ class Sim:
         self.crank_event = 0
         self.last_ms = self.get_ms()
         self.s = 0
-        self.speed = 15
+        self.speed = 10
         self.paused = True
 
     def set_demo_data(self, data):
@@ -82,7 +82,7 @@ class Sim:
             self.crank_event += delta_event
 
             val1 = struct.pack("<BIHHH", 0, self.wheel_counter,self.wheel_event & 0xFFFF, self.crank_counter & 0xFFFF, self.crank_event & 0xFFFF)
-            self.bc.on_notify(val1)
+            self.bc.on_data_csc(val1)
             self.gui.cyclic_update()
 
             time.sleep(1/factor)
@@ -112,11 +112,13 @@ class Sim:
 
     def btn_callback(self, btn):
         if btn == 120: #x
-            self.speed += 0.5
+            self.speed += 1#0.5
+            self.bc.csc_data[0].sim += 1
             pass
         elif btn == 121: #y
-            if self.speed > 0:
-                self.speed -= 0.5
+            if self.speed > 1:
+                self.speed -= 1#0.5
+            self.bc.csc_data[0].sim -= 1
             pass
         elif btn == 32: #space
             self.paused = not self.paused
