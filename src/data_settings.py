@@ -16,8 +16,8 @@ class DataSettings(DataStore):
         self.bt = SettingVal(0, 0, 1)
         pass
 
-    def save(self, hal):
-        DataStore.save(self, filename, hal)
+    def save(self):
+        DataStore.save(self, filename)
 
-    def load(self, hal):
-        DataStore.load(self, filename, hal)
+    def load(self):
+        DataStore.load(self, filename)

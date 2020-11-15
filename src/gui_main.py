@@ -8,15 +8,12 @@ from data_goal import *
 from const import *
 import fonts 
 import math
+import data_global as g
 
 class GuiMain:
-
-
-    def __init__(self, tft, hal, settings, csc_data, komoot_data):
+    def __init__(self, settings, csc_data, komoot_data):
         self.conn_state = ConnState.disconnected
         self.callback_repaint = None
-        self.tft = tft
-        self.hal = hal
         self.settings = settings
         self.csc_data = csc_data
         self._komoot_data = komoot_data
@@ -28,42 +25,6 @@ class GuiMain:
         self.add_to_gui_stack(GuiCsc(self))
         pass
 
-    def text2(self, font, text, x, y, fg = Color.white, bg = Color.black):
-        cx = 0
-        for char in text:
-            ch = ord(char)
-            if font.FIRST <= ch < font.LAST:
-                self.tft.text(font, "%c" % char, x+cx, y, fg, bg)
-            else:
-                self.tft.rect(x+cx, y, font.WIDTH, font.HEIGHT, 0)
-            cx += font.WIDTH
-
-    def get_text_center_pos(self, font, n):
-        space = 2
-        w = n * (font.WIDTH + space)
-        x = (int)((Display.width - w) / 2)
-        return x
-
-
-    def text(self, font, text, x, y, fg = Color.white, bg = Color.black):
-        space = 2
-        w = 0
-        cx = 0
-
-        if x < 0: # center
-            x = self.get_text_center_pos(font, len(text))
-
-        for char in text:
-            ch = ord(char)
-            if font.FIRST <= ch < font.LAST:
-                self.tft.text(font, "%c" % char, x+cx, y, fg, bg)
-                w = space
-                cx += font.WIDTH
-            else:
-                w = font.WIDTH + space
-            self.tft.fill_rect(x+cx, y, w, font.HEIGHT, bg)
-            cx += w
-
     def get_current_csc_data(self):
         return self.csc_data[self.csc_index]
 
@@ -71,9 +32,8 @@ class GuiMain:
         self.callback_repaint = cb
 
     def clear(self):
-        self.tft.fill(Color.black)
+        g.display.fill(Color.black)
         #print("clear")
-
 
     def cyclic_update(self):
         #print("update")
@@ -81,7 +41,6 @@ class GuiMain:
             self.active_gui.show(False)
             self.repaint()
         self.update_state()
-
 
     def show(self):
         #print("show")
@@ -124,7 +83,7 @@ class GuiMain:
         csc_data = self.get_current_csc_data()
         if csc_data.goal == None:
             csc_data.goal = DataGoal()
-            csc_data.goal.load(self.hal)
+            csc_data.goal.load()
         self.add_to_gui_stack(GuiMenu(self, MenuGoal(csc_data.goal)))
 
     def go_menu_settings(self):
@@ -179,17 +138,17 @@ class GuiMain:
     def do_save_settings(self):
         self.action_go_csc()
         #print("do_save_settings")
-        self.settings.save(self.hal)
+        self.settings.save()
 
     def do_reconnect(self):
-        self.hal.bt_reconnect()
+        g.hal.bt_reconnect()
         self.action_go_csc()
 
     def do_save_goal(self):
-        self.get_current_csc_data().goal.save(self.hal)
+        self.get_current_csc_data().goal.save()
 
     def do_load_goal(self):
-        self.get_current_csc_data().goal.load(self.hal)
+        self.get_current_csc_data().goal.load()
 
     def show_komoot(self):
         self.add_to_gui_stack(self._gui_komoot)
@@ -208,40 +167,7 @@ class GuiMain:
 
     def callback_display_brightness_changed(self, val, closed):
         #print("callback_display_brightness_changed %d" % (val))
-        self.hal.set_backlight(val)
-
-
-    def text_aligned(self, font, text, x, y, align = Align.left):
-    
-        if align == Align.left:
-            pass
-        else:
-            w = len(text) * font.WIDTH    
-            if align == Align.center:
-                x = (int)((Display.width-w) / 2)
-            else:
-                x = Display.width - w - x
-        self.tft.text(font, text, x, y, Color.white, Color.black)
-
-    def draw_multiple_line(self, font, text, y, align = Align.center):
-        txt = text.split()
-        n = len(txt)
-        k=1
-        for t in txt:
-            self.text_aligned(font, t, 0, y - ((n-k)*font.HEIGHT), align)
-            k += 1        
-
-    def draw_multiple_line2(self, font, text, y, align = Align.center):
-        w = font.WIDTH * len(text)
-        lines = math.ceil(w / Display.width)
-        n = int(math.ceil(len(text) / lines))
-        txt = [text[i:i+n] for i in range(0, len(text), n)]
-
-        k=0
-        for t in txt:
-            self.text_aligned(font, t, 0, y + k*font.HEIGHT, align)
-            k += 1        
-
+        g.hal.set_backlight(val)
 
     def on_conn_state(self, state):
         self.conn_state = state
@@ -262,7 +188,7 @@ class GuiMain:
             txt = "Found Device"
 
         txt += " R" if self.get_current_csc_data().is_riding else "  "
-        self.text_aligned(fonts.middle, txt, 20, Display.height - fonts.middle.HEIGHT)
+        #g.display.draw_text(fonts.pf_small, txt, 20, Display.height - fonts.pf_small.height() + 3)
 
     def get_komoot_data(self):
         return self._komoot_data

@@ -5,7 +5,7 @@ class DataKomoot:
     def __init__(self):
         self.direction = 0
         self.distance = 0
-        self.street = "1234567812345678a"
+        self.street = "Bahnhof Str."
         pass
 
     def on_data(self, data):

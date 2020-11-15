@@ -6,29 +6,29 @@ from data_komoot import *
 from display_ctrl import *
 from const import *
 from button_handler import *
-
+import data_global as g
 import csc
+from scheduler import *
+
 
 class BikeComputer:
-    def __init__(self, tft, hal):
-        self.tft = tft
-        self.hal = hal
+    def __init__(self):
         self.settings = DataSettings()
-        self.settings.load(hal)
+        self.settings.load()
         self.csc_data = [ DataCsc(1) ]
         self._data_komoot = DataKomoot()
-        self.display_ctrl = DisplayCtrl(self.settings, hal)
+        self.display_ctrl = DisplayCtrl(self.settings)
         self.csc = csc.CSC(self.settings)
-        self.gui = GuiMain(self.tft, self.hal, self.settings, self.csc_data, self._data_komoot)
-        self.btn_left = ButtonHandler(hal, hal.btn_left, self.left, self.settings.long_click.value*10) 
-        self.btn_right = ButtonHandler(hal, hal.btn_right, self.right, self.settings.long_click.value*10)
+        self.gui = GuiMain(self.settings, self.csc_data, self._data_komoot)
+        self.btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.left, self.settings.long_click.value*10) 
+        self.btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.right, self.settings.long_click.value*10)
         self.last_notify_ms = 0
         self.notify_cnt = 0
-
-
+        self._sch = Scheduler(g.hal)
+        self.task_update_gui()
 
     def on_data_csc(self, raw_data):
-        now = self.hal.ticks_ms()
+        now = g.hal.ticks_ms()
         diff = now - self.last_notify_ms
         self.last_notify_ms = now
         self.notify_cnt += 1
@@ -58,3 +58,10 @@ class BikeComputer:
         if not self.ignore_click(is_long):
             self.gui.handle_click(Button.right, is_long)
 
+    def task_update_gui(self):
+        #print("task_update_gui")
+        self._sch.insert(500, self.task_update_gui)
+        self.gui.cyclic_update()
+
+    def add_task(self, ms, task):
+        self._sch.insert(ms, task)

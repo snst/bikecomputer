@@ -1,6 +1,9 @@
 from data_csc import *
 import fonts
 from const import *
+import data_global as g
+from helper import *
+
 
 class GuiBase:
     x_desc = 6
@@ -8,11 +11,6 @@ class GuiBase:
     rh = 30
     def __init__(self, main):
         self.main = main
-
-
-    def show_desc(self, txt, y):
-        if txt:
-            self.main.tft.text(fonts.middle, txt, self.x_desc, y+13, Color.white, Color.black)
 
     def show_progress(self, y, h, max, val, marker=-1):
         if val > max:
@@ -22,74 +20,75 @@ class GuiBase:
         if max > 0:
             p = (int)(135 / max * val)
             m = (int)(135 / max * marker)
-        self.main.tft.fill_rect(0, y, 135, h, Color.grey)
+        g.display.fill_rect(0, y, 135, h, Color.grey)
         if p > m:
-            self.main.tft.fill_rect(0, y, p, h, Color.green)
-            self.main.tft.fill_rect(0, y, m, h, Color.red)
+            g.display.fill_rect(0, y, p, h, Color.green)
+            g.display.fill_rect(0, y, m, h, Color.red)
         else:
-            self.main.tft.fill_rect(0, y, m, h, Color.red)
-            self.main.tft.fill_rect(0, y, p, h, Color.green)
+            g.display.fill_rect(0, y, m, h, Color.red)
+            g.display.fill_rect(0, y, p, h, Color.green)
         #if marker > 0:
-            #self.main.tft.fill_rect(0, y, m, 5, Color.red)
+            #g.display.fill_rect(0, y, m, 5, Color.red)
 
-
-
-    def show_float_speed(self, val, x, y, font = fonts.huge, color = Color.white):
+    #new
+    def show_float_speed_old(self, val, x, y, font = fonts.pf_normal, color = Color.white, align = Align.right):
         if val > 999:
             val = 999
         if val < 0:
             val = 0
         ival = (int) (val)
         dval = (int)((val - ival)*10)
-        self.main.tft.fill_rect(x, y, 3*font.WIDTH+10, font.HEIGHT, Color.black)
+        #g.display.fill_rect(x, y, 3*font.WIDTH+10, font.height(), Color.black)
         if val < 100:
-            self.main.text(font, "%2d" % (ival), x, y, fg=color)
-            x += 2 * font.WIDTH
-            self.main.text(font, "%d" % (dval), x + 10, y, fg=color)
-            self.main.tft.fill_rect(x + 3, y + font.HEIGHT - 5, 4, 5, color)
+            g.display.draw_text(font, "%2d.%d" % (ival, dval), x, y, fg=color, align = align)
         else:
-            self.main.text(font, "%3d" % (ival), x + 10, y, fg=color)
+            g.display.draw_text(font, "%3d" % (ival), x + 10, y, fg=color, align = align)
 
-    def show_float_time(self, val, x, y):
+    def show_float_speed(self, val, x, y, font = fonts.pf_normal, color = Color.white, align = Align.right):
+        val = limit(val, 0, 999)
+        ival = (int) (val)
+        dval = (int)((val - ival)*10)
+        mw = font.get_width('0')
+        if align == Align.left:
+            if ival < 10:
+                mw *= -1
+            elif ival < 100:
+                mw *= -2
+            else:
+                mw *= -3
+            mw -= font.get_width('.')
+        if val < 100:
+            g.display.draw_text(font, "%2d." % (ival), x-mw, y, fg=color, align = Align.right)
+            g.display.draw_text(font, "%d" % (dval), x-mw, y, fg=color, align = Align.left)
+        else:
+            g.display.draw_text(font, "%3d" % (ival), x -mw, y, fg=color, align = Align.right)
+
+    def show_float_time(self, val, x, y, align = Align.right, font = fonts.pf_normal):
         h = (int)(val / 60)
         m = val % 60
-        font = fonts.huge
-        self.main.text(font, "%1d" % (h), x, y)
-        x += 1 * font.WIDTH
-        self.main.text(font, "%.2d" % (m), x + 10, y)
-        self.main.tft.fill_rect(x + 3, y + font.HEIGHT - 20, 4, 5, Color.white)
-        self.main.tft.fill_rect(x + 3, y + font.HEIGHT - 7, 4, 5, Color.white)
+        mw = font.get_width('0')
+        if align == Align.left:
+            if h < 10:
+                mw *= -1
+            else:
+                mw *= -2
+            mw -= font.get_width(':')
+        else:
+            mw *= 2
+        g.display.draw_text(font, "%d:" % (h), x-mw, y, align = Align.right)
+        g.display.draw_text(font, "%.2d" % (m), x-mw, y, align = Align.left)
+
+
+    def show_float_time_old(self, val, x, y, align = Align.right):
+        h = (int)(val / 60)
+        m = val % 60
+        font = fonts.pf_normal
+        g.display.draw_text(font, "%1d:%.2d" % (h,m), x, y, align = align)
 
 
     def show_big_speed(self, val, x, y, color):
         ival = (int) (val)
         dval = (int)((val - ival)*10)
-        self.main.text(fonts.giant, "%2d" % (ival), x, y, fg=color)
-        self.main.text(fonts.huge, "%d" % (dval), x+2*fonts.giant.WIDTH+5, y, fg=color)
-
-    def show_float_3(self, val, x, y, font = fonts.font16):
-        ival = (int)(val)
-        dval = (int)((val-ival)*10)
-        #self.main.tft.text(font, ".", x+40, y)
-        self.main.tft.text(font, "%2d" % (ival), x, y)
-        self.main.tft.text(font, "%d" % (dval), x+37, y)
-        self.main.tft.pixel(x+35, y+24, 1)
-        self.main.tft.pixel(x+36, y+24, 1)
-        self.main.tft.pixel(x+35, y+25, 1)
-        self.main.tft.pixel(x+36, y+25, 1)
-        
-
-
-    def show_float_1(self, txt, val, x, y, font = fonts.big):
-        self.show_desc(txt, y)
-        self.main.tft.text(font, "%4.1f" % (val), x, y)
-
-    def show_float_2(self, txt, val, x, y):
-        self.show_desc(txt, y)
-        self.main.tft.text(fonts.big, "%6.2f" % (val), x, y)
-
-    def show_duration(self, txt, minutes, x, y):
-        self.show_desc(txt, y)
-        h = minutes / 60
-        m = minutes % 60
-        self.main.tft.text(fonts.big, "%3d:%.2d" % (h, m), x, y)
+        mw = fonts.pf_normal.get_width('0')
+        g.display.draw_text(fonts.pf_huge, " %2d" % (ival), x-mw-3, y, fg=color, bg=Color.black, align=Align.right)
+        g.display.draw_text(fonts.pf_normal, "%d" % (dval), x-mw, y, fg=color, bg=Color.black, align=Align.left)

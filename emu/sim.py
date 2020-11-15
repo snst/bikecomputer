@@ -83,7 +83,7 @@ class Sim:
 
             val1 = struct.pack("<BIHHH", 0, self.wheel_counter,self.wheel_event & 0xFFFF, self.crank_counter & 0xFFFF, self.crank_event & 0xFFFF)
             self.bc.on_data_csc(val1)
-            self.gui.cyclic_update()
+            #self.gui.cyclic_update()
 
             time.sleep(1/factor)
             

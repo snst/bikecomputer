@@ -681,3 +681,63 @@ class ST7789:
                 self.blit_buffer(buffer, x0+cx, y0, font.WIDTH, font.HEIGHT)
                 cx += font.WIDTH
 
+
+
+    def bitblt(self, font, w, h, ch, x0, y0, fg, bg):
+        n = w * h
+        buffer = bytearray(n*2)
+        i = 0
+        idx = 0
+        bit = (0x80)
+        wp = 0
+        x = 0
+        y = 0
+        while i < n: # loop pixel
+            f = font[idx]
+            col = fg if ((f & bit) > 0) else bg
+            if bit == 1:
+                bit = (0x80) 
+                idx += 1
+            else:
+                bit = bit >> 1
+            k = (y*w+x)*2
+            buffer[k] = (col >> 8) & 0xFF
+            buffer[k+1] = (col) & 0xFF
+            i += 1
+            y += 1
+            if y == h:
+                y = 0
+                x += 1
+
+        self.blit_buffer(buffer, x0, y0, w, h)
+
+
+    def font_blt(self, font, ch, x, y, fg, bg):
+        data, height, width = font.get_ch(ch)
+        n = width * height
+        k = 0
+        buffer = bytearray(n*2)
+        for row in range(height):
+            bytes_per_col = (height - 1)//8 + 1
+            for col in range(width):
+                byte = data[col * bytes_per_col + row//8]
+                bit = (byte & (1 << (row % 8))) > 0
+                col = fg if bit else bg
+                buffer[k] = (col >> 8) & 0xFF
+                buffer[k+1] = (col) & 0xFF
+                k += 2
+
+        self.blit_buffer(buffer, x, y, width, height)
+
+    def map_bitarray_to_rgb565(self, bitarray, buffer, width, fg, bg):
+        height = int(len(buffer) / width / 2)
+        k = 0
+        for row in range(height):
+            bytes_per_row = (width - 1)//8 + 1
+            for col in range(width):
+                byte = bitarray[row * bytes_per_row + col // 8]
+                bit = (byte & (1 << (7 - (col % 8)))) > 0
+                col = fg if bit else bg
+                buffer[k] = (col >> 8) & 0xFF
+                buffer[k+1] = (col) & 0xFF
+                k += 2

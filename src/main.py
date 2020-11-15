@@ -9,7 +9,7 @@ from ble_csc_central import *
 from hal_esp32 import *
 from machine import Timer
 from data_komoot import *
-from scheduler import *
+import data_global as g
 
 #https://github.com/palto42/komoot-navi/blob/master/src/main.cpp
 #static BLEUUID serviceUUID("71C1E128-D92F-4FA8-A2B2-0F171DB3436C"); // navigationServiceUUID
@@ -26,18 +26,18 @@ from scheduler import *
 
 # MOSI 19, SCLK 18, CS 5, DC 16, RST 23, BL 4
 spi = machine.SPI(2, baudrate=30000000, polarity=1, phase=1, sck=machine.Pin(18), mosi=machine.Pin(19))
-display = st7789.ST7789(
+tft = st7789.ST7789(
         spi, 135, 240,
         reset=machine.Pin(23, machine.Pin.OUT),
         cs=machine.Pin(5, machine.Pin.OUT),
         dc=machine.Pin(16, machine.Pin.OUT),
     )
-display.init()
+tft.init()
 
-hal = Hal_esp32()
-sch = Scheduler(hal)
+g.display = Display(tft)
+g.hal = Hal_esp32()
 
-bc = BikeComputer(display, hal)
+bc = BikeComputer()
 
 _CSC_ADDR = bytes([0xf4, 0xb8, 0x5e, 0x40, 0xea, 0xe4])
 _CSC_SERVICE_UUID = bluetooth.UUID(0x1816)
@@ -53,7 +53,7 @@ _KOMOOT_DESC_UUID = bluetooth.UUID("4a982902-1cc4-e7c1-c757-f1267dd021e8")
 #static BLEUUID charUUID("503DD605-9BCB-4F6E-B235-270A57483026");
 
 #machine.freq()          # get the current frequency of the CPU
-machine.freq(80000000) # set the CPU frequency to 240 MHz
+#machine.freq(80000000) # set the CPU frequency to 240 MHz
 print("freq: %u" % (machine.freq() ))
 #if bc.settings.bt.value == 1:
 
@@ -63,39 +63,28 @@ b = BleCscManager()
 b.add_connection(con_csc)
 b.add_connection(con_komoot)
 
-hal.set_bt(b)
+g.hal.set_bt(b)
 #b.set_on_notify(bc.on_notify)
 b.set_on_state(bc.on_conn_state)
-
-def task_update_gui():
-    #print("task_update_gui")
-    sch.insert(500, task_update_gui)
-    bc.gui.cyclic_update()
 
 def task_update_bt():
     #print("task_update_bt")
     #if b.conn_state == ConnState.disconnected or b.conn_state == ConnState.no_device:
-    sch.insert(1000, task_update_bt)
+    bc.add_task(1000, task_update_bt)
     if bc.settings.bt.value == 1:
         if con_csc._conn_handle == None or con_csc._conn_handle == None:
             b.scan()
 
 def task_read_komoot():
     #print("task_read_komoot")
-    sch.insert(4000, task_read_komoot)
+    bc.add_task(4000, task_read_komoot)
     b.read(con_komoot)
 
-task_update_gui()
 task_update_bt()
 task_read_komoot()
 
 while(True):
-    
-    #elif b.conn_state == ConnState.found_device:
-    #    b.connect()
-    #else:
-    #    ms = 1000
     try:
-        sch.run()
+        bc._sch.run()
     except OSError:
         print("OSError")

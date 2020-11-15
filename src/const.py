@@ -4,7 +4,7 @@ class Layout:
     y_breadcrum = 10
     y_line05 = 35
     y_line0 = 40
-    y_line1 = 80
+    y_line1 = 70
     y_line2 = 120
 
 class Button:
@@ -19,10 +19,6 @@ class Color:
     green = st7789.color565(0, 200, 0)    
     yellow = st7789.color565(200, 200, 0)    
     blue = st7789.color565(0, 0, 255)    
-
-class Display:
-    width = 135
-    height = 240
 
 class Align:
     left = 0

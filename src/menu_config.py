@@ -41,7 +41,7 @@ class MenuSettings:
                        self.touch_ignore,
                        self.long_click,
                        self.bluetooth,
-                       MenuItem("dis- connect", "do_reconnect"),
+                       MenuItem("disconnect", "do_reconnect"),
                        MenuItem("save", "do_save_settings"),
         ]
         pass        

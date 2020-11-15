@@ -1,6 +1,8 @@
 import fonts
 from const import *
 from menu_item import *
+import data_global as g
+
 
 class GuiMenu:
     def __init__(self, main, menu):
@@ -15,20 +17,17 @@ class GuiMenu:
     def get_title(self):
         return self.menu.title
 
-
-
     def show(self, redraw_all):
         #print("gui_menu")
         self.main.clear()
         item = self.get_selected_item()
-        self.main.text(fonts.middle, self.breadcrum, 8, Layout.y_breadcrum)
-        #self.main.tft.text(fonts.big, item.name, 8, Layout.y_line1)
-        self.main.draw_multiple_line(fonts.big, item.name, Layout.y_line1)
+        g.display.draw_text(fonts.pf_small, self.breadcrum, 8, Layout.y_breadcrum)
+        g.display.draw_text(fonts.pf_narrow, item.name, 0, Layout.y_line1, align=Align.center)
 
         if item.type == MenuItem.INT_ITEM:
-            self.main.text(fonts.huge, "%3d" %(item.data.value), -1, Layout.y_line2)
+            g.display.draw_text(fonts.pf_normal, "%3d" %(item.data.value), 0, Layout.y_line2, align=Align.center)
         elif item.type == MenuItem.FLOAT_ITEM:
-            self.main.text(fonts.huge, "%5.1f" %(item.data.value), -1, Layout.y_line2)
+            g.display.draw_text(fonts.pf_normal, "%5.1f" %(item.data.value), 0, Layout.y_line2, align=Align.center)
 
 
     def handle(self, id, long_click):
@@ -48,7 +47,6 @@ class GuiMenu:
         self.main.action_go_back()
 
     def long_click_right(self):
-
         item = self.get_selected_item()
         if item.type == MenuItem.INT_ITEM or item.type == MenuItem.FLOAT_ITEM:
             self.main.action_go_edit_setting_value(item)

@@ -7,14 +7,15 @@ import const
 from sim import *
 from bike_computer import *
 from hal_emu import *
-
-
+from display import *
+import data_global as g
 
 
 tft = st7789.ST7789(None, Display.width, Display.height)
-hal = Hal_emu(tft)
+g.display = Display(tft)
+g.hal = Hal_emu(tft)
 
-bc = BikeComputer(tft, hal)
+bc = BikeComputer()
 
 tft.set_gui(bc.gui)
 
@@ -24,6 +25,7 @@ tft.update()
 
 sim = Sim(bc)
 sim.start()
-hal.register_sim_callback(sim.btn_callback)
+g.hal.register_sim_callback(sim.btn_callback)
 
-hal.mainloop()
+g.hal.start_scheduler(bc._sch)
+g.hal.mainloop()

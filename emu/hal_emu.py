@@ -8,6 +8,10 @@ class Hal_emu:
     btn_left = 97
     btn_right = 115
 
+    def scheduler_loop(self):
+        while True:
+            self._scheduler.run()
+
     def __init__(self, tft):
         self.t = None
         self.tft = tft
@@ -15,6 +19,11 @@ class Hal_emu:
         self.btn_callback = {}
         self.sim_callback = None
         pass
+
+    def start_scheduler(self, scheduler):
+        self._scheduler = scheduler
+        t = threading.Thread(target=self.scheduler_loop, args=())
+        t.start()
 
     def bt_reconnect(self):
         print("bt_reconnect")
@@ -42,15 +51,18 @@ class Hal_emu:
     def ticks_ms(self):
         return int(round(time.time() * 1000))
 
-
     def json_load(self, x):
         return json.loads(x)
 
     def json_dump(self, x):
         return json.dumps(x)
 
+    def sleep_ms(self, ms):
+        time.sleep(ms / 1000)
+
     def mainloop(self):
         while True:
+
             self.clock.tick(60)
 
             for event in pygame.event.get():
@@ -71,6 +83,3 @@ class Hal_emu:
                         self.btn_callback[event.key](val)
                     elif val==0 and self.sim_callback:
                         self.sim_callback(event.key)
-
-
-        pass        

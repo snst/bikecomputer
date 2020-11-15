@@ -12,8 +12,6 @@ class Scheduler:
         self._tasks.append((then, cb))
         self._tasks.sort(key=lambda tup: tup[0])
 
-        
-
     def run(self):
         if len(self._tasks) > 0:
             first = self._tasks.pop(0)
