@@ -61,7 +61,7 @@ class Hal_esp32:
 
     def bt_reconnect(self):
         if self.bt:
-            self.bt.disconnect()
+            self.bt.disconnect_all()
         pass
 
     def sleep_ms(self, ms):

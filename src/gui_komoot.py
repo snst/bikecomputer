@@ -17,7 +17,7 @@ class GuiKomoot(GuiBase):
         return Color.red if data.distance < 1000 else Color.white
 
     def show_distance(self, data, y):
-        print("d %u" % (data.distance))
+        #print("d %u" % (data.distance))
         if data.distance < 1000:
             str = "%3d" % data.distance
             g.display.draw_text(fonts.pf_normal, str, g.display.width, y, align=Align.right)

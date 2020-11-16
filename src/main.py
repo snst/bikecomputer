@@ -5,7 +5,7 @@ import time
 from button_handler import *
 from bike_computer import *
 from const import *
-from ble_csc_central import *
+from ble_central import *
 from hal_esp32 import *
 from machine import Timer
 from data_komoot import *
@@ -17,14 +17,8 @@ import data_global as g
 #static BLEUUID heartUUID("6D75DBF0-D763-4147-942A-D97B1BC700CF");   // navigationServiceHeartbeatWriteCharacteristicUUID
 #https://github.com/micropython/micropython/blob/master/examples/bluetooth/ble_temperature_central.py
 
-
-#Color.red = st7789.color565(255, 0, 0)
-#Color.green = st7789.color565(0, 255, 0)
-#Color.white = st7789.color565(255, 255, 255)
-#Color.black = st7789.color565(0, 0, 0)
-
-
 # MOSI 19, SCLK 18, CS 5, DC 16, RST 23, BL 4
+
 spi = machine.SPI(2, baudrate=30000000, polarity=1, phase=1, sck=machine.Pin(18), mosi=machine.Pin(19))
 tft = st7789.ST7789(
         spi, 135, 240,
@@ -59,26 +53,23 @@ print("freq: %u" % (machine.freq() ))
 
 con_csc = ConnData(name = "csc", fix_addr = _CSC_ADDR, service_uuid = _CSC_SERVICE_UUID, char_uuid = _CSC_MEASUREMENT_UUID, csc_desc = _CSC_DESC_UUID, on_notify=bc.on_data_csc)
 con_komoot = ConnData(name = "komoot", service_uuid = _KOMOOT_SERVICE_UUID, char_uuid = _KOMOOT_CHAR_UUID, csc_desc = None, on_read = bc.on_data_komoot)
-b = BleCscManager()
-b.add_connection(con_csc)
-b.add_connection(con_komoot)
+bt = BleCentral()
+bt.add_connection(con_csc)
+bt.add_connection(con_komoot)
 
-g.hal.set_bt(b)
-#b.set_on_notify(bc.on_notify)
-b.set_on_state(bc.on_conn_state)
+g.hal.set_bt(bt)
 
 def task_update_bt():
     #print("task_update_bt")
-    #if b.conn_state == ConnState.disconnected or b.conn_state == ConnState.no_device:
-    bc.add_task(1000, task_update_bt)
+    bc.add_task(5000, task_update_bt)
     if bc.settings.bt.value == 1:
-        if con_csc._conn_handle == None or con_csc._conn_handle == None:
-            b.scan()
+        if con_csc._conn_handle == None or con_komoot._conn_handle == None:
+            bt.scan()
 
 def task_read_komoot():
     #print("task_read_komoot")
     bc.add_task(4000, task_read_komoot)
-    b.read(con_komoot)
+    bt.read(con_komoot)
 
 task_update_bt()
 task_read_komoot()

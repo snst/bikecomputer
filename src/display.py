@@ -66,17 +66,23 @@ class Display:
 
     def draw_text(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left):
         text_width = 0
+        for ch in txt:
+            width = font.get_width(ch)
+            text_width += width
+        w0 = len(txt) * font.get_width('0') - text_width
+        x0 = None
+
         if align == Align.right:
-            #x = Display.width - x
-            for ch in txt:
-                _, _, width = font.get_ch(ch)
-                x -= width
+            x -= text_width
+            x0 = x - w0
         elif align == Align.center:
-            w = 0
-            for ch in txt:
-                _, _, width = font.get_ch(ch)
-                w += width
-            x = int((Display.width - w) / 2)
+            x = int((Display.width - text_width) / 2)
+        else:
+            x0 = x + text_width
+            pass
+
+        if None != x0 and 0 < w0:
+            self._tft.fill_rect(x0, y, w0, font.height(), bg)
 
         for ch in txt:
             data, height, width = font.get_ch(ch)

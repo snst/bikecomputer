@@ -5,11 +5,11 @@ class DataKomoot:
     def __init__(self):
         self.direction = 0
         self.distance = 0
-        self.street = "Bahnhof Str."
+        self.street = "?"
         pass
 
     def on_data(self, data):
-        print("k:on_data")
+        #print("k:on_data")
         #d = bytes(data)[:9]
         val = struct.unpack("<IBI", data)
         #print(val)
