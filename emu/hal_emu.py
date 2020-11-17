@@ -8,10 +8,6 @@ class Hal_emu:
     btn_left = 97
     btn_right = 115
 
-    def scheduler_loop(self):
-        while True:
-            self._scheduler.run()
-
     def __init__(self, tft):
         self.t = None
         self.tft = tft
@@ -19,14 +15,6 @@ class Hal_emu:
         self.btn_callback = {}
         self.sim_callback = None
         pass
-
-    def start_scheduler(self, scheduler):
-        self._scheduler = scheduler
-        t = threading.Thread(target=self.scheduler_loop, args=())
-        t.start()
-
-    def bt_reconnect(self):
-        print("bt_reconnect")
 
     def set_backlight(self, val):
         print("hal: set_backlight %d" % (val))
@@ -59,6 +47,12 @@ class Hal_emu:
 
     def sleep_ms(self, ms):
         time.sleep(ms / 1000)
+
+    def read_bat(self):
+        return 3.21
+
+    def update_bat(self):
+        pass
 
     def mainloop(self):
         while True:

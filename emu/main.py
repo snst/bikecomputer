@@ -9,11 +9,13 @@ from bike_computer import *
 from hal_emu import *
 from display import *
 import data_global as g
+from bt_manager_base import *
 
 
 tft = st7789.ST7789(None, Display.width, Display.height)
 g.display = Display(tft)
 g.hal = Hal_emu(tft)
+g.bt = BtManagerBase()
 
 bc = BikeComputer()
 
@@ -27,5 +29,9 @@ sim = Sim(bc)
 sim.start()
 g.hal.register_sim_callback(sim.btn_callback)
 
-g.hal.start_scheduler(bc._sch)
+
+
+t = threading.Thread(target=bc.run, args=())
+t.start()
+
 g.hal.mainloop()

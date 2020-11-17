@@ -66,10 +66,16 @@ class Display:
 
     def draw_text(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left):
         text_width = 0
+        chw0 = font.get_width('0')
+        w0 = 0
         for ch in txt:
             width = font.get_width(ch)
             text_width += width
-        w0 = len(txt) * font.get_width('0') - text_width
+            if ch >= '0' and ch <='9':
+                w0 += chw0
+            else:
+                w0 += width
+        w0 = w0 - text_width
         x0 = None
 
         if align == Align.right:
@@ -95,8 +101,7 @@ class Display:
     def draw_text_multi(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left):
         w = 0
         for ch in txt:
-            _, _, width = font.get_ch(ch)
-            w += width
+            w += font.get_width(ch)
 
         lines = math.ceil(w / Display.width)
         n = int(math.ceil(len(txt) / lines))

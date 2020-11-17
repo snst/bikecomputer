@@ -4,20 +4,15 @@ import ujson
 import time
 
 
-
 class Hal_esp32:
     btn_left = 0
     btn_right = 35
     def __init__(self):
         self.t = None
-        self.bt = None
-        #self.tft = tft
         self.pin_cb = []
         self.led_pwm = machine.PWM(machine.Pin(4),5000)
+        self._vbat = 0
         pass
-
-    def set_bt(self, bt):
-        self.bt = bt
 
     def set_backlight(self, val):
         #print("hal: set_backlight %d" % (val))
@@ -59,10 +54,16 @@ class Hal_esp32:
     def json_dump(self, x):
         return ujson.dumps(x)        
 
-    def bt_reconnect(self):
-        if self.bt:
-            self.bt.disconnect_all()
-        pass
-
     def sleep_ms(self, ms):
         time.sleep_ms(ms)
+
+    def read_bat(self):
+        return self._vbat
+
+    def update_bat(self):
+        vref = 1100
+        adc = machine.ADC(machine.Pin(34))
+        val = adc.read() 
+        self._vbat = (val / 4095.0) * 2.0 * 3.3 * (vref / 1000.0)
+        #print("vbat: %.2f" % (self._vbat))
+        return self._vbat

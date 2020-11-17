@@ -113,6 +113,7 @@ class GuiCsc(GuiBase):
             if goal:
                 if not goal.has_distance_reached:
                     self.show_speed_goal(goal, data, y_goal)
+                    pass
                 else:
                     self.show_speed_final(goal, y_goal)
                 self.show_distance_goal(goal, y_2)

@@ -39,10 +39,6 @@ class BikeComputer:
     def on_data_komoot(self, raw_data):
         self._data_komoot.on_data(raw_data)
 
-    def on_conn_state(self, state):
-        #print(txt)
-        self.gui.on_conn_state(state)
-
     def ignore_click(self, is_long):
         display_off = not self.display_ctrl.is_display_on()
         self.display_ctrl.set_display_on()
@@ -65,3 +61,33 @@ class BikeComputer:
 
     def add_task(self, ms, task):
         self._sch.insert(ms, task)
+
+
+    def task_update_bt(self):
+        #print("task_update_bt")
+        self.add_task(5000, self.task_update_bt)
+        if self.settings.bt.value == 1:
+            if not g.bt.is_csc_connected() or not g.bt.is_komoot_connected():
+                g.bt.scan()
+
+    def task_read_komoot(self):
+        #print("task_read_komoot")
+        self.add_task(4000, self.task_read_komoot)
+        g.bt.read_komoot()
+
+    def task_read_bat(self):
+        self.add_task(5000, self.task_read_bat)
+        g.hal.update_bat()
+
+
+    def run(self):
+        g.bt.set_on_csc(self.on_data_csc)
+        g.bt.set_on_komoot(self.on_data_komoot)
+        self.task_update_bt()
+        self.task_read_komoot()
+        self.task_read_bat()
+        while(True):
+            try:
+                self._sch.run()
+            except OSError:
+                print("OSError")

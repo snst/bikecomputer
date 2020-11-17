@@ -12,7 +12,6 @@ import data_global as g
 
 class GuiMain:
     def __init__(self, settings, csc_data, komoot_data):
-        self.conn_state = ConnState.disconnected
         self.callback_repaint = None
         self.settings = settings
         self.csc_data = csc_data
@@ -52,7 +51,7 @@ class GuiMain:
         if self.callback_repaint:
             self.callback_repaint()
         #self.tft.update()
-        self.update_state()
+        #self.update_state()
         pass
 
     def activate_gui(self, gui):
@@ -141,7 +140,7 @@ class GuiMain:
         self.settings.save()
 
     def do_reconnect(self):
-        g.hal.bt_reconnect()
+        g.bt.reconnect_all()
         self.action_go_csc()
 
     def do_save_goal(self):
@@ -169,26 +168,15 @@ class GuiMain:
         #print("callback_display_brightness_changed %d" % (val))
         g.hal.set_backlight(val)
 
-    def on_conn_state(self, state):
-        self.conn_state = state
-
     def update_state(self):
         txt = ""
-        if self.conn_state == ConnState.disconnected:
-            txt = "Disconnected"
-        elif self.conn_state == ConnState.scanning:
-            txt = "Scanning    "
-        elif self.conn_state == ConnState.connecting:
-            txt = "Connecting  "
-        elif self.conn_state == ConnState.connected:
-            txt = "Connected   "
-        elif self.conn_state == ConnState.no_device:
-            txt = "No Device   "
-        elif self.conn_state == ConnState.found_device:
-            txt = "Found Device"
+        txt += "S" if g.bt.is_scanning() else " "
+        txt += "R" if self.get_current_csc_data().is_riding else "  "
+        txt += "C" if g.bt.is_csc_connected() else " "
+        txt += "K" if g.bt.is_komoot_connected() else " "
 
-        txt += " R" if self.get_current_csc_data().is_riding else "  "
-        #g.display.draw_text(fonts.pf_small, txt, 20, Display.height - fonts.pf_small.height() + 3)
+        g.display.draw_text(fonts.pf_small, txt, 50, Display.height - fonts.pf_small.height())
+        g.display.draw_text(fonts.pf_small, "%.2f" % (g.hal.read_bat()), 0, Display.height - fonts.pf_small.height())
 
     def get_komoot_data(self):
         return self._komoot_data
