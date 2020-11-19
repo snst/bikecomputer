@@ -6,6 +6,10 @@ import data_global as g
 from data_cache import *
 
 class GuiKomoot(GuiBase):
+    y_direction = 0
+    y_distance = 20
+    y_street = 100
+
     def __init__(self, main):
         GuiBase.__init__(self, main)
         self.cache = DataCache(4)
@@ -29,8 +33,8 @@ class GuiKomoot(GuiBase):
         g.display.text(fonts.font_komoot, "%c" % (chr(46+data.direction)), 0, 0, fg=self.get_color_from_dist(data))
 
     def show_street(self, data, y):
-        g.display.fill_rect(0, y, g.display.width, fonts.pf_narrow.height() * 2, Color.black)
-        g.display.draw_text_multi(fonts.pf_narrow, "%s" % (data.street), 0, y, align=Align.center)
+        g.display.fill_rect(0, y, g.display.width, fonts.pf_text.height() * 2, Color.black)
+        g.display.draw_text_multi(fonts.pf_text, "%s" % (data.street), 0, y, align=Align.center)
 
     def show(self, redraw_all):
         if redraw_all:
@@ -39,21 +43,18 @@ class GuiKomoot(GuiBase):
 
         data = self.main.get_komoot_data()
         csc = self.main.get_csc_data()
-        #data.distance = csc.sim * 100
-        y = 0
-        y_1 = 45
-        y_2 = y_1 + 60
-        y_3 = y_2 + 50
+        data.distance = csc.sim * 100
+        #data.street = "abcdef0ghi0jklmno0p0qrx0yz"
 
         if self.cache.changed(0, data.direction) or self.cache.changed(1, self.get_color_from_dist(data)):
-            self.show_direction(data, y)
-            self.show_distance(data, y_1)
+            self.show_direction(data, self.y_direction)
+            self.show_distance(data, self.y_distance)
 
         if self.cache.changed(2, data.distance):
-            self.show_distance(data, y_1)
+            self.show_distance(data, self.y_distance)
 
         if self.cache.changed(3, data.street):
-            self.show_street(data, y_2)
+            self.show_street(data, self.y_street)
 
     
     def handle(self, id, long_click):
@@ -61,10 +62,9 @@ class GuiKomoot(GuiBase):
             if id == Button.right:
                 self.main.go_menu_main()
             elif id == Button.left:
-                self.second_view = not self.second_view
-                self.main.show()
+                self.main.action_go_csc()
         else:
             if id == const.Button.left:
-                self.main.prev_csc()
+                self.main.action_go_csc()
             elif id == const.Button.right:
-                self.main.next_csc()
+                self.main.action_go_csc()

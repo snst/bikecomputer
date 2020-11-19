@@ -71,7 +71,7 @@ class Display:
         for ch in txt:
             width = font.get_width(ch)
             text_width += width
-            if ch >= '0' and ch <='9':
+            if (ch >= '0' and ch <='9') or ch == ' ':
                 w0 += chw0
             else:
                 w0 += width

@@ -28,11 +28,11 @@ class MenuSettings:
         self.led_on = MenuValueItem("LED on", data.led_on)
         self.led_off = MenuValueItem("LED off", data.led_off)
         self.led_time = MenuValueItem("LED time",  data.led_time)
-        self.touch_ignore = MenuValueItem("Off ignore", data.touch_ignore)
+        self.touch_ignore = MenuValueItem("Off ign", data.touch_ignore)
         self.wheel_cm = MenuValueItem("Wheel cm", data.wheel_cm)
-        self.min_speed = MenuValueItem("min km/h", data.min_speed)
-        self.long_click = MenuValueItem("Long click", data.long_click)
-        self.bluetooth = MenuValueItem("BT on", data.bt)
+        self.min_speed = MenuValueItem("Min km/h", data.min_speed)
+        self.long_click = MenuValueItem("Long clk", data.long_click)
+        self.bluetooth = MenuValueItem("BLE on", data.bt)
         self.items = [ self.led_on,
                        self.led_off,
                        self.led_time,
@@ -41,8 +41,8 @@ class MenuSettings:
                        self.touch_ignore,
                        self.long_click,
                        self.bluetooth,
-                       MenuItem("disconnect", "do_reconnect"),
-                       MenuItem("save", "do_save_settings"),
+                       MenuItem("BLE scan", "do_reconnect"),
+                       MenuItem("Save", "do_save_settings"),
         ]
         pass        
 

@@ -20,15 +20,15 @@ class GuiEditValue:
     def show(self, redraw_all):
         #print("gui_edit_setting_value")
         g.display.draw_text(fonts.pf_small, self.breadcrum, 8, Layout.y_breadcrum)
-        g.display.draw_text(fonts.pf_narrow, self.item.name, 0, Layout.y_line1, align=Align.center)
+        g.display.draw_text(fonts.pf_text, self.item.name, 0, Layout.y_setting_text, align=Align.center)
         if self.item.type == MenuItem.FLOAT_ITEM:
             #x = self.main.get_text_center_pos(fonts.huge, 5)
             x = 75
-            g.display.draw_text(fonts.pf_normal, "  %3d" %(self.edit_val), x, Layout.y_line2, Color.white if self.edit_decimal_place else Color.red, align=Align.right)
-            g.display.draw_text(fonts.pf_normal, ".", x, Layout.y_line2, align=Align.left)
-            g.display.draw_text(fonts.pf_normal, "%1d  " %(self.edit_val*10%10), x + 5, Layout.y_line2, Color.red if self.edit_decimal_place else Color.white, align=Align.left)
+            g.display.draw_text(fonts.pf_normal, "  %3d" %(self.edit_val), x, Layout.y_setting_val, Color.white if self.edit_decimal_place else Color.red, align=Align.right)
+            g.display.draw_text(fonts.pf_normal, ".", x, Layout.y_setting_val, align=Align.left)
+            g.display.draw_text(fonts.pf_normal, "%1d  " %(self.edit_val*10%10), x + 5, Layout.y_setting_val, Color.red if self.edit_decimal_place else Color.white, align=Align.left)
         elif self.item.type == MenuItem.INT_ITEM:
-            g.display.draw_text(fonts.pf_normal, "  %3d  " %(self.edit_val), 0, Layout.y_line2, Color.red, align=Align.center)
+            g.display.draw_text(fonts.pf_normal, "  %3d  " %(self.edit_val), 0, Layout.y_setting_val, Color.red, align=Align.center)
 
 
     def handle(self, id, long_click):

@@ -8,6 +8,11 @@ from data_cache import *
 
 
 class GuiCsc(GuiBase):
+    y_speed = 0
+    y_avg = 60
+    y_distance = y_avg + 60
+    y_time = y_distance + 46
+
     def __init__(self, main):
         GuiBase.__init__(self, main)
         self.cache = DataCache(8)
@@ -43,19 +48,19 @@ class GuiCsc(GuiBase):
     def show_speed_goal(self, goal, data, y):
         #col = Color.green if goal.calc_required_average_km_h < data.speed_avg else Color.red
         col = Color.white
-        self.show_float_speed(goal.calc_required_average_km_h, 0, y, color=col, align = Align.left, font = fonts.pf_narrow)
+        self.show_float_speed(goal.calc_required_average_km_h, 0, y, color=col, align = Align.left)
 
     def show_speed_final(self, goal, y):
         self.show_float_speed(goal.calc_required_average_km_h, 0, y, color=Color.blue, align = Align.left)
 
     def show_distance_goal(self, data, y):
-        self.show_float_speed(data.remaining_distance_km, 0, y, align = Align.left, font = fonts.pf_narrow)
+        self.show_float_speed(data.remaining_distance_km, 0, y, align = Align.left)
 
     def show_progress_goal(self, goal, y):
         self.show_progress(y - 12, 8, goal.target_dist_km.value, goal.target_dist_km.value-goal.remaining_distance_km, goal.optimal_distance_km)
 
     def show_time_goal(self, goal, y):
-        self.show_float_time(goal.remaining_time_min, 0, y, align = Align.left, font = fonts.pf_narrow)
+        self.show_float_time(goal.remaining_time_min, 0, y, align = Align.left)
 
     def show_trip_distance(self, data, y):
         if self.cache.changed(4, data.trip_distance):
@@ -87,28 +92,24 @@ class GuiCsc(GuiBase):
         if goal:
             goal.calculate_progress(data)
 
-        y = 0
-        y_1 = 65
-        y_2 = y_1 + 60
-        y_3 = y_2 + 50
         y_goal = 5
 
         #self.show_id(data)
-        self.show_speed(data, y)
-        self.show_cadence(data, y_1)
+        self.show_speed(data, self.y_speed)
+        self.show_cadence(data, self.y_avg)
 
-        self.show_speed_avg(data, y_1)
+        self.show_speed_avg(data, self.y_avg)
 
         if self.second_view:
-            #self.show_title("avg", y_1)
-            self.show_title("max", y_2)
-            self.show_speed_max(data, y_2)
-            self.show_title("cad avg", y_3)
-            self.show_cadence_avg(data, y_3)
+            #self.show_title("avg", self.y_avg)
+            self.show_title("max", self.y_distance)
+            self.show_speed_max(data, self.y_distance)
+            self.show_title("cad avg", self.y_time)
+            self.show_cadence_avg(data, self.y_time)
 
         else:
-            self.show_trip_distance(data, y_2)
-            self.show_trip_duration(data, y_3)
+            self.show_trip_distance(data, self.y_distance)
+            self.show_trip_duration(data, self.y_time)
 
             if goal:
                 if not goal.has_distance_reached:
@@ -116,13 +117,13 @@ class GuiCsc(GuiBase):
                     pass
                 else:
                     self.show_speed_final(goal, y_goal)
-                self.show_distance_goal(goal, y_2)
-                self.show_progress_goal(goal, y_2)
-                self.show_time_goal(goal, y_3)
+                self.show_distance_goal(goal, self.y_distance)
+                self.show_progress_goal(goal, self.y_distance)
+                self.show_time_goal(goal, self.y_time)
             else:
-                #self.show_title("avg", y_1)
-                self.show_title("km", y_2)
-                self.show_title("h:m", y_3)
+                #self.show_title("avg", self.y_avg)
+                self.show_title("km", self.y_distance)
+                self.show_title("h:m", self.y_time)
 
     
     def handle(self, id, long_click):

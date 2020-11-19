@@ -22,12 +22,12 @@ class GuiMenu:
         self.main.clear()
         item = self.get_selected_item()
         g.display.draw_text(fonts.pf_small, self.breadcrum, 8, Layout.y_breadcrum)
-        g.display.draw_text(fonts.pf_narrow, item.name, 0, Layout.y_line1, align=Align.center)
+        g.display.draw_text(fonts.pf_text, item.name, 0, Layout.y_setting_text, align=Align.center)
 
         if item.type == MenuItem.INT_ITEM:
-            g.display.draw_text(fonts.pf_normal, "%3d" %(item.data.value), 0, Layout.y_line2, align=Align.center)
+            g.display.draw_text(fonts.pf_normal, "%3d" %(item.data.value), 0, Layout.y_setting_val, align=Align.center)
         elif item.type == MenuItem.FLOAT_ITEM:
-            g.display.draw_text(fonts.pf_normal, "%5.1f" %(item.data.value), 0, Layout.y_line2, align=Align.center)
+            g.display.draw_text(fonts.pf_normal, "%5.1f" %(item.data.value), 0, Layout.y_setting_val, align=Align.center)
 
 
     def handle(self, id, long_click):

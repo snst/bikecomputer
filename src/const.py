@@ -2,10 +2,9 @@ import st7789
 
 class Layout:
     y_breadcrum = 10
-    y_line05 = 35
-    y_line0 = 40
-    y_line1 = 70
-    y_line2 = 120
+    y_setting_text = 60
+    y_setting_val = 125
+
 
 class Button:
     left = 0
