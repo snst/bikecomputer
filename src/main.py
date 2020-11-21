@@ -8,7 +8,7 @@ from const import *
 from hal_esp32 import *
 from machine import Timer
 from machine import I2C
-from data_komoot import *
+from komoot_data import *
 import data_global as g
 from bt_manager import *
 from altimeter_bmp280 import *

@@ -1,11 +1,11 @@
-from data_komoot import *
+from komoot_data import *
 import fonts
 import const
 from gui_base import *
 import data_global as g
 from data_cache import *
 
-class GuiKomoot(GuiBase):
+class KomootGui(GuiBase):
     y_direction = 0
     y_distance = 20
     y_street = 100
@@ -40,7 +40,7 @@ class GuiKomoot(GuiBase):
         if redraw_all:
             self.cache.reset()
 
-        data = self.main.get_komoot_data()
+        data = self.main.komoot_data
         #data.distance = csc.sim * 100
         #data.street = "abcdef0ghi0jklmno0p0qrx0yz"
 
@@ -54,21 +54,8 @@ class GuiKomoot(GuiBase):
         if self.cache.changed(3, data.street):
             self.show_street(data, self.y_street)
 
-    
     def handle(self, event):
-
         if event == Event.toggle_komoot:
             self.main.gui_stack_pop_all()
         else:
             GuiBase.handle(self, event)
-
-        #if long_click:
-        #    if id == Button.right:
-        #        self.main.go_menu_main()
-        #    elif id == Button.left:
-        #        self.main.gui_stack_pop_all()
-        #else:
-        #    if id == const.Button.left:
-        #        self.main.gui_stack_pop_all()
-        #    elif id == const.Button.right:
-        #        self.main.gui_stack_pop_all()

@@ -161,7 +161,7 @@ class ST7789:
     def blit_buffer(self, buffer, x, y, width, height):
         
         i = 0
-        n = len(buffer)
+        n = width*height*2 #len(buffer)
         xx=0
         yy=0
         while i<n:
@@ -730,7 +730,12 @@ class ST7789:
         self.blit_buffer(buffer, x, y, width, height)
 
     def map_bitarray_to_rgb565(self, bitarray, buffer, width, fg, bg):
-        height = int(len(buffer) / width / 2)
+        #height2 = int(len(buffer) / width / 2)
+        n = len(bitarray) * 8
+        w = int(width / 8) * 8
+        if (width % 8) != 0:
+            w += 8
+        height = int(n / w)
         k = 0
         for row in range(height):
             bytes_per_row = (width - 1)//8 + 1

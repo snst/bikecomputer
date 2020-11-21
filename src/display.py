@@ -96,7 +96,7 @@ class Display:
         for ch in txt:
             data, height, width = font.get_ch(ch)
             n = width * height
-            #buffer = bytearray(n*2)
+            #self.buffer = bytearray(n*2)
             #if n*2 > self.m:
             #    self.m = n*2
             #    print("max %u" % (self.m))

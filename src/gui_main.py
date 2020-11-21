@@ -2,7 +2,7 @@ from gui_edit_value import *
 from gui_csc import *
 from gui_csc_stat import *
 from gui_menu import *
-from gui_komoot import *
+from komoot_gui import *
 from data_goal import *
 from menu_config import *
 from data_goal import *
@@ -23,15 +23,6 @@ class GuiMain(GuiBase):
         self.gui_stack = []
         self._gui_list = ItemList()
         self.clear()
-        #self._gui_komoot = GuiKomoot(self)
-        #self._gui_csc = GuiCsc(self)
-        #self._gui_csc_stat = GuiCscStat(self)
-        #self._gui_alt = GuiAltitude(self)
-        #self.add_to_gui_stack(self._gui_csc)
-
-        #self._gui_list.add(self._gui_csc)
-        #self._gui_list.add(self._gui_csc_stat)
-        #self._gui_list.add(self._gui_alt)
         self._gui_index = 0
         self.add_to_gui_stack(self.create_gui())
         pass
@@ -51,7 +42,7 @@ class GuiMain(GuiBase):
 
     def cyclic_update(self):
         #print("update")
-        #if isinstance(self.active_gui, GuiCsc) or isinstance(self.active_gui, GuiKomoot):
+        #if isinstance(self.active_gui, GuiCsc) or isinstance(self.active_gui, KomootGui):
         if len(self.gui_stack) == 1:
             self.active_gui.show(False)
             self.repaint()
@@ -189,7 +180,7 @@ class GuiMain(GuiBase):
         self.get_csc_data().goal.load()
 
     def gui_show_komoot(self):
-        self.add_to_gui_stack(GuiKomoot(self))
+        self.add_to_gui_stack(KomootGui(self))
 
     def get_csc_data(self):
         return self._list_csc_data.get()
@@ -216,5 +207,6 @@ class GuiMain(GuiBase):
         g.display.draw_text(fonts.pf_small, txt, 50, Display.height - fonts.pf_small.height())
         g.display.draw_text(fonts.pf_small, "%.2f" % (g.hal.read_bat()), 0, Display.height - fonts.pf_small.height())
 
-    def get_komoot_data(self):
+    @property
+    def komoot_data(self):
         return self._komoot_data

@@ -2,7 +2,7 @@ from gui_main import *
 from data_settings import *
 from data_csc import *
 from data_goal import *
-from data_komoot import *
+from komoot_data import *
 from display_ctrl import *
 from const import *
 from button_handler import *
@@ -18,7 +18,7 @@ class BikeComputer:
         self.settings.load()
         self._list_csc_data = ItemList()
         self._list_csc_data.add(DataCsc(1))
-        self._data_komoot = DataKomoot()
+        self._data_komoot = KomootData()
         self.display_ctrl = DisplayCtrl(self.settings)
         self.csc = csc.CSC(self.settings)
         self.gui = GuiMain(self.settings, self._list_csc_data, self._data_komoot)
