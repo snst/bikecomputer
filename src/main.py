@@ -7,9 +7,13 @@ from bike_computer import *
 from const import *
 from hal_esp32 import *
 from machine import Timer
+from machine import I2C
 from data_komoot import *
 import data_global as g
 from bt_manager import *
+from altimeter_bmp280 import *
+import gc
+
 
 #https://github.com/palto42/komoot-navi/blob/master/src/main.cpp
 #static BLEUUID serviceUUID("71C1E128-D92F-4FA8-A2B2-0F171DB3436C"); // navigationServiceUUID
@@ -32,12 +36,22 @@ g.display = Display(tft)
 g.hal = Hal_esp32()
 g.bt = BtManager()
 
-bc = BikeComputer()
+i2c = I2C(1, scl=machine.Pin(22), sda=machine.Pin(21), freq=400000)
+g.altimeter = Altimeter_bmp280(i2c)
+
+
+g.bc = BikeComputer()
 
 
 #machine.freq()          # get the current frequency of the CPU
 #machine.freq(80000000) # set the CPU frequency to 240 MHz
 print("freq: %u" % (machine.freq() ))
 
+def task_mem():
+    #gc.collect()
+    g.bc.add_task(5000, task_mem)
+    print("mem: %d" % (gc.mem_free()))
 
-bc.run()
+task_mem()
+
+g.bc.run()

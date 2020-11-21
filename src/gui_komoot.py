@@ -38,12 +38,10 @@ class GuiKomoot(GuiBase):
 
     def show(self, redraw_all):
         if redraw_all:
-            self.main.clear()
             self.cache.reset()
 
         data = self.main.get_komoot_data()
-        csc = self.main.get_csc_data()
-        data.distance = csc.sim * 100
+        #data.distance = csc.sim * 100
         #data.street = "abcdef0ghi0jklmno0p0qrx0yz"
 
         if self.cache.changed(0, data.direction) or self.cache.changed(1, self.get_color_from_dist(data)):
@@ -57,14 +55,20 @@ class GuiKomoot(GuiBase):
             self.show_street(data, self.y_street)
 
     
-    def handle(self, id, long_click):
-        if long_click:
-            if id == Button.right:
-                self.main.go_menu_main()
-            elif id == Button.left:
-                self.main.action_go_csc()
+    def handle(self, event):
+
+        if event == Event.toggle_komoot:
+            self.main.gui_stack_pop_all()
         else:
-            if id == const.Button.left:
-                self.main.action_go_csc()
-            elif id == const.Button.right:
-                self.main.action_go_csc()
+            GuiBase.handle(self, event)
+
+        #if long_click:
+        #    if id == Button.right:
+        #        self.main.go_menu_main()
+        #    elif id == Button.left:
+        #        self.main.gui_stack_pop_all()
+        #else:
+        #    if id == const.Button.left:
+        #        self.main.gui_stack_pop_all()
+        #    elif id == const.Button.right:
+        #        self.main.gui_stack_pop_all()

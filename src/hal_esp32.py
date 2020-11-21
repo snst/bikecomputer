@@ -2,6 +2,7 @@ import machine
 import utime
 import ujson
 import time
+import gc
 
 
 class Hal_esp32:
@@ -59,6 +60,9 @@ class Hal_esp32:
 
     def read_bat(self):
         return self._vbat
+
+    def gc(self):
+        gc.collect()
 
     def update_bat(self):
         vref = 1100

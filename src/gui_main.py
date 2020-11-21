@@ -1,5 +1,6 @@
 from gui_edit_value import *
 from gui_csc import *
+from gui_csc_stat import *
 from gui_menu import *
 from gui_komoot import *
 from data_goal import *
@@ -9,23 +10,37 @@ from const import *
 import fonts 
 import math
 import data_global as g
+from gui_altitude import *
+from item_list import *
 
-class GuiMain:
-    def __init__(self, settings, csc_data, komoot_data):
+class GuiMain(GuiBase):
+    def __init__(self, settings, list_csc_data, komoot_data):
         self.callback_repaint = None
         self.settings = settings
-        self.csc_data = csc_data
+        self._list_csc_data = list_csc_data
         self._komoot_data = komoot_data
-        self.csc_index = 0
         self.active_gui = None
         self.gui_stack = []
+        self._gui_list = ItemList()
         self.clear()
-        self._gui_komoot = GuiKomoot(self)
-        self.add_to_gui_stack(GuiCsc(self))
+        #self._gui_komoot = GuiKomoot(self)
+        #self._gui_csc = GuiCsc(self)
+        #self._gui_csc_stat = GuiCscStat(self)
+        #self._gui_alt = GuiAltitude(self)
+        #self.add_to_gui_stack(self._gui_csc)
+
+        #self._gui_list.add(self._gui_csc)
+        #self._gui_list.add(self._gui_csc_stat)
+        #self._gui_list.add(self._gui_alt)
+        self._gui_index = 0
+        self.add_to_gui_stack(self.create_gui())
         pass
 
-    def get_current_csc_data(self):
-        return self.csc_data[self.csc_index]
+    def add_gui_list(self, gui):
+        self._gui_list.append(gui)
+
+    def get_csc_data(self):
+        return self._list_csc_data.get()
 
     def set_callback_repaint(self, cb):
         self.callback_repaint = cb
@@ -36,14 +51,15 @@ class GuiMain:
 
     def cyclic_update(self):
         #print("update")
-        if isinstance(self.active_gui, GuiCsc) or isinstance(self.active_gui, GuiKomoot):
+        #if isinstance(self.active_gui, GuiCsc) or isinstance(self.active_gui, GuiKomoot):
+        if len(self.gui_stack) == 1:
             self.active_gui.show(False)
             self.repaint()
-        self.update_state()
+        self.gui_update_state()
 
     def show(self):
         #print("show")
-        #self.clear()
+        self.clear()
         self.active_gui.show(True)
         self.repaint()
 
@@ -51,7 +67,7 @@ class GuiMain:
         if self.callback_repaint:
             self.callback_repaint()
         #self.tft.update()
-        #self.update_state()
+        #self.gui_update_state()
         pass
 
     def activate_gui(self, gui):
@@ -59,7 +75,8 @@ class GuiMain:
         self.show()
 
     def handle_click(self, id, long_click):
-        self.active_gui.handle(id, long_click)
+        event = id | (Button.long if long_click else Button.short)
+        self.active_gui.handle(event)
 
     def get_breadcrum(self):
         val = ""
@@ -72,14 +89,14 @@ class GuiMain:
           #  val = gui.breadcrum + ">" + gui.title
         return val
 
-    def go_menu_main(self):
+    def gui_show_main_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuMain()))
 
-    def go_menu_meter(self):
+    def gui_show_meter_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuMeter()))
 
-    def go_menu_goal(self):
-        csc_data = self.get_current_csc_data()
+    def gui_show_goal_menu(self):
+        csc_data = self.get_csc_data()
         if csc_data.goal == None:
             csc_data.goal = DataGoal()
             csc_data.goal.load()
@@ -91,7 +108,7 @@ class GuiMain:
         m.led_off.set_value_changed_callback(self.callback_display_brightness_changed)
         self.add_to_gui_stack(GuiMenu(self, m))
 
-    def action_go_csc(self):
+    def gui_stack_pop_all(self):
         while len(self.gui_stack) > 1:
             self.gui_stack.pop()
         self.activate_gui(self.gui_stack[0])
@@ -99,7 +116,29 @@ class GuiMain:
     def action_go_edit_setting_value(self, item):
         self.add_to_gui_stack(GuiEditValue(self, item))
 
-    def action_go_back(self):
+    def gui_next_old(self):
+        gui = self._gui_list.next()
+        self.gui_stack[0] = gui
+        self.activate_gui(gui)
+
+    def create_gui(self):
+        i = self._gui_index
+        if i == 0:
+            return GuiCsc(self)
+        elif i == 1:
+            return GuiCscStat(self)
+        elif i == 2:
+            return GuiAltitude(self)
+
+    def gui_next(self):
+        self._gui_index = (self._gui_index + 1) % 3
+        gui = self.create_gui()
+        self.gui_stack[0] = gui
+        self.activate_gui(gui)
+        pass
+
+
+    def gui_stack_pop(self):
         self.gui_stack.pop()
         self.activate_gui(self.gui_stack[-1])
 
@@ -111,67 +150,66 @@ class GuiMain:
         #print("do action:" + action)
         getattr(self, action)()
 
-    def do_add_meter(self):
-        #print("do_add_meter")
-        n = len(self.csc_data) + 1
-        self.csc_data.append(DataCsc(n))
-        self.csc_index = n - 1
-        self.action_go_csc()
+    def add_meter(self):
+        #print("add_meter")
+        n = self._list_csc_data.count() + 1
+        self._list_csc_data.add(DataCsc(n))
+        self._list_csc_data.select_last()
+        self.gui_stack_pop_all()
 
-    def do_reset_meter(self):
-        #print("do_reset_meter")
+    def reset_meter(self):
+        #print("reset_meter")
         self.get_csc_data().reset()
-        self.action_go_csc()
+        self.gui_stack_pop_all()
 
-    def do_start_goal(self):
-        csc_data = self.get_current_csc_data()
+    def start_goal(self):
+        csc_data = self.get_csc_data()
         csc_data.goal.is_started = True
         csc_data.goal.calculate_progress(csc_data)
-        self.action_go_csc()
+        self.gui_stack_pop_all()
 
-    def do_stop_goal(self):
-        csc_data = self.get_current_csc_data()
+    def stop_goal(self):
+        csc_data = self.get_csc_data()
         csc_data.goal.is_started = False
-        self.action_go_csc()
+        self.gui_stack_pop_all()
 
-    def do_save_settings(self):
-        self.action_go_csc()
-        #print("do_save_settings")
+    def save_settings(self):
+        self.gui_stack_pop_all()
+        #print("save_settings")
         self.settings.save()
 
-    def do_reconnect(self):
+    def ble_reconnect(self):
         g.bt.reconnect_all()
-        self.action_go_csc()
+        self.gui_stack_pop_all()
 
-    def do_save_goal(self):
-        self.get_current_csc_data().goal.save()
+    def save_goal_settings(self):
+        self.get_csc_data().goal.save()
 
-    def do_load_goal(self):
-        self.get_current_csc_data().goal.load()
+    def load_goal_settings(self):
+        self.get_csc_data().goal.load()
 
-    def show_komoot(self):
-        self.add_to_gui_stack(self._gui_komoot)
-        pass
+    def gui_show_komoot(self):
+        self.add_to_gui_stack(GuiKomoot(self))
 
     def get_csc_data(self):
-        return self.csc_data[self.csc_index]
+        return self._list_csc_data.get()
 
-    def next_csc(self):
-        self.csc_index = (self.csc_index + 1) % len(self.csc_data)
-        self.action_go_csc()
+    def gui_show_next_meter(self):
+        self._list_csc_data.next()
+        self.gui_stack_pop_all()
 
-    def prev_csc(self):
-        self.csc_index = (self.csc_index + len(self.csc_data) - 1) % len(self.csc_data)
-        self.action_go_csc()        
+    def gui_show_prev_meter(self):
+        self._list_csc_data.prev()
+        self.gui_stack_pop_all()        
 
     def callback_display_brightness_changed(self, val, closed):
         #print("callback_display_brightness_changed %d" % (val))
         g.hal.set_backlight(val)
 
-    def update_state(self):
+    def gui_update_state(self):
         txt = ""
         txt += "S" if g.bt.is_scanning() else " "
-        txt += "R" if self.get_current_csc_data().is_riding else "  "
+        txt += "R" if self.get_csc_data().is_riding else "  "
         txt += "C" if g.bt.is_csc_connected() else " "
         txt += "K" if g.bt.is_komoot_connected() else " "
 

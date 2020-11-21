@@ -1,11 +1,14 @@
 import math
 from const import *
+import data_global as g
 
 class Display:
     width = 135
     height = 240
     def __init__(self, tft):
         self._tft = tft
+        #self.m = 0
+        self.buffer = bytearray(2900)
 
     def draw_aligned_text_old(self, font, text, x, y, align = Align.left):
     
@@ -93,10 +96,16 @@ class Display:
         for ch in txt:
             data, height, width = font.get_ch(ch)
             n = width * height
-            buffer = bytearray(n*2)
-            self._tft.map_bitarray_to_rgb565(data, buffer, width, fg, bg)
-            self._tft.blit_buffer(buffer, x, y, width, height)
+            #buffer = bytearray(n*2)
+            #if n*2 > self.m:
+            #    self.m = n*2
+            #    print("max %u" % (self.m))
+            self._tft.map_bitarray_to_rgb565(data, self.buffer, width, fg, bg)
+            self._tft.blit_buffer(self.buffer, x, y, width, height)
             x += width            
+            #buffer = None
+            #g.hal.gc()
+
 
     def draw_text_multi(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left):
         w = 0

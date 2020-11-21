@@ -222,7 +222,7 @@ class BleCentral:
     # Find a device advertising the environmental sensor service.
     def scan(self, callback=None):
         if not self._is_scanning:
-            print("scan")
+            #print("scan")
             self._is_scanning = True
             self._ble.gap_scan(2000, 30000, 30000)
 

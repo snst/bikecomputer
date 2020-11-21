@@ -31,30 +31,29 @@ class GuiEditValue:
             g.display.draw_text(fonts.pf_normal, "  %3d  " %(self.edit_val), 0, Layout.y_setting_val, Color.red, align=Align.center)
 
 
-    def handle(self, id, long_click):
+    def handle(self, event):
         #print("handler_edit_setting_value")
-        if long_click:
-            if id == Button.right:
-                if (self.item.type == MenuItem.FLOAT_ITEM) and not self.edit_decimal_place:
-                    self.edit_decimal_place = True
-                    self.main.show()
-                else:
-                    self.item.data.value = self.edit_val
-                    #print("set val %f" % (self.edit_val))
-                    if self.item.callback_changed:
-                        self.item.callback_changed(self.edit_val, True)
-                    self.main.action_go_back()
-            elif id == Button.left:
-                if (self.item.type == MenuItem.FLOAT_ITEM) and self.edit_decimal_place:
-                    self.edit_decimal_place = False
-                    self.main.show()
-                else:
-                    self.main.action_go_back()
+        if event == Event.menu_next:
+            if (self.item.type == MenuItem.FLOAT_ITEM) and not self.edit_decimal_place:
+                self.edit_decimal_place = True
+                self.main.show()
+            else:
+                self.item.data.value = self.edit_val
+                #print("set val %f" % (self.edit_val))
+                if self.item.callback_changed:
+                    self.item.callback_changed(self.edit_val, True)
+                self.main.gui_stack_pop()
+        elif event == Event.menu_prev:
+            if (self.item.type == MenuItem.FLOAT_ITEM) and self.edit_decimal_place:
+                self.edit_decimal_place = False
+                self.main.show()
+            else:
+                self.main.gui_stack_pop()
         else:
             step = 0.1 if self.edit_decimal_place  else 1
-            if Button.left == id:
+            if event == Event.val_dec:
                 self.edit_val = self.edit_val - step if self.edit_val > self.item.data.min else self.item.data.max
-            elif Button.right == id:
+            elif event == Event.val_inc:
                 self.edit_val = self.edit_val + step if self.edit_val < self.item.data.max else self.item.data.min
             self.edit_val = round(self.edit_val,2)
             if self.item.callback_changed:

@@ -14,16 +14,19 @@ class Scheduler:
 
     def run(self):
         if len(self._tasks) > 0:
-            first = self._tasks.pop(0)
-            cb = first[1]
+            first = self._tasks[0]
             t = first[0]
+            cb = first[1]
             now = self._hal.ticks_ms()
             delta = t - now
-            if delta > 0:
+            if delta <= 0:
+                self._tasks.pop(0)
+                cb()
+            else:
+                if delta > 10:
+                    delta = 10
                 self._hal.sleep_ms(delta)
 
-            if cb:
-                cb()
         else:
             self._hal.sleep_ms(10)
 

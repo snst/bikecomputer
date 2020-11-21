@@ -4,9 +4,9 @@ from menu_item import *
 class MenuMain:
     def __init__(self):
         self.title = "Menu"
-        self.items = [ MenuItem("Goal", "go_menu_goal"),
+        self.items = [ MenuItem("Goal", "gui_show_goal_menu"),
                        MenuItem("Settings", "go_menu_settings"),
-                       MenuItem("Meter", "go_menu_meter")
+                       MenuItem("Meter", "gui_show_meter_menu")
         ]
         pass
 
@@ -15,8 +15,8 @@ class MenuMeter:
     def __init__(self):
         self.title = "Reset"
         self.items = [ 
-                       MenuItem("Add", "do_add_meter"),
-                       MenuItem("Reset", "do_reset_meter"),
+                       MenuItem("Add", "add_meter"),
+                       MenuItem("Reset", "reset_meter"),
         ]
         pass    
 
@@ -41,8 +41,8 @@ class MenuSettings:
                        self.touch_ignore,
                        self.long_click,
                        self.bluetooth,
-                       MenuItem("BLE scan", "do_reconnect"),
-                       MenuItem("Save", "do_save_settings"),
+                       MenuItem("BLE scan", "ble_reconnect"),
+                       MenuItem("Save", "save_settings"),
         ]
         pass        
 
@@ -54,10 +54,10 @@ class MenuGoal:
         self.dist = MenuValueItem("Dist", data.target_dist_km, data.calculate_time)
         self.avg = MenuValueItem("Avg", data.target_average_km_h, data.calculate_time)
         self.time = MenuValueItem("Time", data.target_time_min, data.calculate_avg)
-        self.save = MenuItem("Save", "do_save_goal")
-        self.load = MenuItem("Load", "do_load_goal")
-        self.stop = MenuItem("Stop", "do_stop_goal")
-        self.start = MenuItem("Start", "do_start_goal")
+        self.save = MenuItem("Save", "save_goal_settings")
+        self.load = MenuItem("Load", "load_goal_settings")
+        self.stop = MenuItem("Stop", "stop_goal")
+        self.start = MenuItem("Start", "start_goal")
         self.items = [ self.dist,
                        self.avg,
                        self.time,

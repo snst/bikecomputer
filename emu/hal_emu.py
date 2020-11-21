@@ -54,6 +54,9 @@ class Hal_emu:
     def update_bat(self):
         pass
 
+    def gc(self):
+        pass
+
     def mainloop(self):
         while True:
 

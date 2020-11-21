@@ -9,6 +9,18 @@ class Layout:
 class Button:
     left = 0
     right = 1
+    short = 1 << 8 
+    long = 1 << 9
+
+class Event:
+    go_main_menu = Button.right | Button.long
+    toggle_komoot = Button.left | Button.short
+    go_next_view = Button.right | Button.short
+    go_next_meter = Button.left | Button.long
+    menu_next = Button.right | Button.long
+    menu_prev = Button.left | Button.long
+    val_inc = Button.right | Button.short
+    val_dec = Button.left | Button.short
     
 class Color:
     black = st7789.color565(0, 0, 0)

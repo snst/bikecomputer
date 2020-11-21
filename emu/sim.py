@@ -9,7 +9,7 @@ import math
 class Sim:
     def __init__(self, bike_computer):
         self.gui = bike_computer.gui
-        self.csc_data = bike_computer.csc_data
+        self._list_csc_data = bike_computer._list_csc_data
         #self.set_demo_data(self.data)
         self.bc = bike_computer
         self.wheel_counter = 0

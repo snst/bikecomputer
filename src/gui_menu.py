@@ -18,8 +18,7 @@ class GuiMenu:
         return self.menu.title
 
     def show(self, redraw_all):
-        #print("gui_menu")
-        self.main.clear()
+        #self.main.clear()
         item = self.get_selected_item()
         g.display.draw_text(fonts.pf_small, self.breadcrum, 8, Layout.y_breadcrum)
         g.display.draw_text(fonts.pf_text, item.name, 0, Layout.y_setting_text, align=Align.center)
@@ -29,38 +28,31 @@ class GuiMenu:
         elif item.type == MenuItem.FLOAT_ITEM:
             g.display.draw_text(fonts.pf_normal, "%5.1f" %(item.data.value), 0, Layout.y_setting_val, align=Align.center)
 
+    def handle(self, event):
+        if event == Event.menu_prev:
+            self.main.gui_stack_pop()
+        elif event == Event.menu_next:
+            self.handle_select()
+        elif event == Event.val_inc:
+            self.handle_inc()
+        elif event == Event.val_dec:
+            self.handle_dec()
 
-    def handle(self, id, long_click):
-        #print("handler_menu")
-        if long_click:
-            if id == Button.left:
-                self.long_click_left()
-            else:
-                self.long_click_right()
-        else:
-            if id == Button.left:
-                self.short_click_left()
-            else:
-                self.short_click_right()
-
-    def long_click_left(self):
-        self.main.action_go_back()
-
-    def long_click_right(self):
+    def handle_select(self):
         item = self.get_selected_item()
         if item.type == MenuItem.INT_ITEM or item.type == MenuItem.FLOAT_ITEM:
             self.main.action_go_edit_setting_value(item)
         else:
             self.main.do_action(item.action)
 
-    def short_click_left(self):
+    def handle_dec(self):
         if self.menu_selected_item > 0:
             self.menu_selected_item -= 1
         else:
             self.menu_selected_item = len(self.menu.items)-1
         self.main.show()
 
-    def short_click_right(self):
+    def handle_inc(self):
         if self.menu_selected_item < len(self.menu.items)-1:
             self.menu_selected_item += 1
         else:
