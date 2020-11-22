@@ -13,12 +13,13 @@ class Altimeter_bmp280:
 
     
 
-    #def update(self):
+    def update(self):
         #print('Temperature: {} degrees C'.format(self._sensor.temperature)) 
         #print('Pressure: {}hPa'.format(self._sensor.pressure))
         #print('Altitude: {} meters'.format(self._sensor.altitude))
 
         #print("Temp=%f°C, Pressure=%fhPa, Alt=%fm" % (self._sensor.temperature, self._sensor.pressure, self._sensor.altitude))
+        pass
     
     @property
     def temperature(self):
@@ -31,3 +32,4 @@ class Altimeter_bmp280:
     @property
     def pressure(self):
         return self._sensor.pressure
+

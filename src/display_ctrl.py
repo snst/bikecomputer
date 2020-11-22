@@ -3,7 +3,7 @@ import data_global as g
 class DisplayCtrl:
     def __init__(self, settings):
         self.display_on = False
-        self.settings = settings
+        self._settings = settings
         self.t = None
         self.callback = None
         self.set_display_on()
@@ -13,21 +13,21 @@ class DisplayCtrl:
 
     def set_display_off(self, tim=None):
         #print("set_display_off")
-        g.hal.set_backlight(self.settings.led_off.value)
+        g.hal.set_backlight(self._settings.led_off.value)
         self.display_on = False
         if self.callback != None:
             self.callback(self.display_on)
 
     def set_display_on(self):
-        g.hal.set_backlight(self.settings.led_on.value)
+        g.hal.set_backlight(self._settings.led_on.value)
         self.display_on = True
         if self.callback != None:
             self.callback(self.display_on)
 
         g.hal.cancel_timer(self.t)
 
-        if self.settings.led_time.value > 0:
-            self.t = g.hal.start_timer(-1, (int)(self.settings.led_time.value*1000), self.set_display_off)
+        if self._settings.led_time.value > 0:
+            self.t = g.hal.start_timer(-1, (int)(self._settings.led_time.value*1000), self.set_display_off)
 
     def set_callback(self, cb):
         self.callback = cb

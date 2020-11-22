@@ -1,23 +1,23 @@
 from gui_edit_value import *
-from gui_csc import *
+from cycle_gui import *
 from gui_csc_stat import *
 from gui_menu import *
 from komoot_gui import *
-from data_goal import *
+from goal_data import *
 from menu_config import *
-from data_goal import *
+from goal_data import *
 from const import *
 import fonts 
 import math
 import data_global as g
-from gui_altitude import *
+from altimeter_gui import *
 from item_list import *
 
 class GuiMain(GuiBase):
     def __init__(self, settings, list_csc_data, komoot_data):
         self.callback_repaint = None
-        self.settings = settings
-        self._list_csc_data = list_csc_data
+        self._settings = settings
+        self._cycle_data = list_csc_data
         self._komoot_data = komoot_data
         self.active_gui = None
         self.gui_stack = []
@@ -31,7 +31,7 @@ class GuiMain(GuiBase):
         self._gui_list.append(gui)
 
     def get_csc_data(self):
-        return self._list_csc_data.get()
+        return self._cycle_data.get()
 
     def set_callback_repaint(self, cb):
         self.callback_repaint = cb
@@ -42,7 +42,7 @@ class GuiMain(GuiBase):
 
     def cyclic_update(self):
         #print("update")
-        #if isinstance(self.active_gui, GuiCsc) or isinstance(self.active_gui, KomootGui):
+        #if isinstance(self.active_gui, CycleGui) or isinstance(self.active_gui, KomootGui):
         if len(self.gui_stack) == 1:
             self.active_gui.show(False)
             self.repaint()
@@ -89,12 +89,12 @@ class GuiMain(GuiBase):
     def gui_show_goal_menu(self):
         csc_data = self.get_csc_data()
         if csc_data.goal == None:
-            csc_data.goal = DataGoal()
+            csc_data.goal = GoalData()
             csc_data.goal.load()
         self.add_to_gui_stack(GuiMenu(self, MenuGoal(csc_data.goal)))
 
     def go_menu_settings(self):
-        m = MenuSettings(self.settings)
+        m = MenuSettings(self._settings)
         m.led_on.set_value_changed_callback(self.callback_display_brightness_changed)
         m.led_off.set_value_changed_callback(self.callback_display_brightness_changed)
         self.add_to_gui_stack(GuiMenu(self, m))
@@ -115,11 +115,11 @@ class GuiMain(GuiBase):
     def create_gui(self):
         i = self._gui_index
         if i == 0:
-            return GuiCsc(self)
+            return CycleGui(self)
         elif i == 1:
             return GuiCscStat(self)
         elif i == 2:
-            return GuiAltitude(self)
+            return AltimeterGui(self)
 
     def gui_next(self):
         self._gui_index = (self._gui_index + 1) % 3
@@ -143,9 +143,9 @@ class GuiMain(GuiBase):
 
     def add_meter(self):
         #print("add_meter")
-        n = self._list_csc_data.count() + 1
-        self._list_csc_data.add(DataCsc(n))
-        self._list_csc_data.select_last()
+        n = self._cycle_data.count() + 1
+        self._cycle_data.add(CycleData(n))
+        self._cycle_data.select_last()
         self.gui_stack_pop_all()
 
     def reset_meter(self):
@@ -167,7 +167,7 @@ class GuiMain(GuiBase):
     def save_settings(self):
         self.gui_stack_pop_all()
         #print("save_settings")
-        self.settings.save()
+        self._settings.save()
 
     def ble_reconnect(self):
         g.bt.reconnect_all()
@@ -183,14 +183,14 @@ class GuiMain(GuiBase):
         self.add_to_gui_stack(KomootGui(self))
 
     def get_csc_data(self):
-        return self._list_csc_data.get()
+        return self._cycle_data.get()
 
     def gui_show_next_meter(self):
-        self._list_csc_data.next()
+        self._cycle_data.next()
         self.gui_stack_pop_all()
 
     def gui_show_prev_meter(self):
-        self._list_csc_data.prev()
+        self._cycle_data.prev()
         self.gui_stack_pop_all()        
 
     def callback_display_brightness_changed(self, val, closed):

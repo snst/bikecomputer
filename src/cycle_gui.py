@@ -1,4 +1,4 @@
-from data_csc import *
+from cycle_data import *
 import fonts
 import const
 from gui_base import *
@@ -7,7 +7,7 @@ import data_global as g
 from data_cache import *
 
 
-class GuiCsc(GuiBase):
+class CycleGui(GuiBase):
     y_speed = 0
     y_avg = 60
     y_distance = y_avg + 60
@@ -23,7 +23,7 @@ class GuiCsc(GuiBase):
         return "csc"
 
     def show(self, redraw_all):
-        #print("show gui_csc")
+        #print("show cycle_gui")
         if redraw_all:
             self.cache.reset()
 

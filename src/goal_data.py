@@ -4,7 +4,7 @@ from data_store import *
 filename = "goal.cfg"
 
 
-class DataGoal(DataStore):
+class GoalData(DataStore):
     def __init__(self):
         self.target_time_min = SettingVal(60, 1, 500)
         self.target_dist_km = SettingVal(30, 1, 300, True)

@@ -4,14 +4,14 @@ import struct
 class CSC:
 
     def __init__(self, settings):
-        self.settings = settings
+        self._settings = settings
 
     def calc_kmh_from_csc_val(self, wheel_counter, time_counter):
         if time_counter > 0:
             # wheel_counter * wheel_cm     3600
             # ------------------------  *  ---------------
             #         100 * 1000           time_counter / 1024
-            return (self.settings.wheel_cm.value * wheel_counter * 36) / (1000 * time_counter / 1024)
+            return (self._settings.wheel_cm.value * wheel_counter * 36) / (1000 * time_counter / 1024)
         else:
             return 0
 
@@ -24,7 +24,7 @@ class CSC:
 
     def calc_kmh(self, counter_delta, time_delta):
         if time_delta > 0:
-            return (self.settings.wheel_cm.value * counter_delta * 3.6) / time_delta / 100.0
+            return (self._settings.wheel_cm.value * counter_delta * 3.6) / time_delta / 100.0
         else:
             return 0
 
@@ -59,7 +59,7 @@ class CSC:
                 data.cadence_avg = self.calc_cadence_from_csc_val(data.crank_counter.sum, data.crank_time.sum)
 
             valid_speed = data.speed < 100
-            data.is_riding = valid_speed and data.speed > self.settings.min_speed.value
+            data.is_riding = valid_speed and data.speed > self._settings.min_speed.value
 
             if valid_speed:
                 data.speed_max = max(data.speed_max, data.speed)
@@ -71,7 +71,7 @@ class CSC:
     
 
             #print("is_riding=%d, speed=%.2f/%.2f, cadence=%d/%d" % (self.is_riding, self.speed_kmh, self.average_speed_kmh, self.cadence, self.average_cadence))
-            data.trip_distance = data.wheel_counter.get_distance_in_km(self.settings.wheel_cm.value)
+            data.trip_distance = data.wheel_counter.get_distance_in_km(self._settings.wheel_cm.value)
             data.trip_duration_min = data.wheel_time.get_sum_in_min()
 
             if data.goal != None:

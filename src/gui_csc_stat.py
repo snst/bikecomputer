@@ -1,4 +1,4 @@
-from data_csc import *
+from cycle_data import *
 import fonts
 import const
 from gui_base import *
@@ -21,7 +21,7 @@ class GuiCscStat(GuiBase):
         return "stat"
 
     def show(self, redraw_all):
-        #print("show gui_csc")
+        #print("show cycle_gui")
         if redraw_all:
             self.cache.reset()
 

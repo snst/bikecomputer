@@ -6,7 +6,7 @@ import data_global as g
 from data_cache import *
 
 
-class GuiAltitude(GuiBase):
+class AltimeterGui(GuiBase):
     y_speed = 0
     y_avg = 60
     y_distance = y_avg + 60
@@ -21,11 +21,11 @@ class GuiAltitude(GuiBase):
         return "alt"
 
     def show(self, redraw_all):
-        #print("show gui_csc")
+        #print("show cycle_gui")
         if redraw_all:
             self.cache.reset()
 
-        self.clear()
+        #self.clear()
         alt = g.bc._altimeter
 
         self._cnt += 1
@@ -34,6 +34,8 @@ class GuiAltitude(GuiBase):
         g.display.draw_text(fonts.pf_small, "temp %.2f" % (alt.temperature), 0, 40, align=Align.left)
         g.display.draw_text(fonts.pf_small, "pres %.2f" % (alt.pressure), 0, 70, align=Align.left)
         g.display.draw_text(fonts.pf_small, "alt  %.2f" % (alt.altitude), 0, 100, align=Align.left)
-    
+        g.display.draw_text(fonts.pf_small, "altv %.2f" % (alt.altitude_avg), 0, 130, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "sum  %.2f" % (alt.sum), 0, 160, align=Align.left)
+
     def handle(self, event):
         GuiBase.handle(self, event)

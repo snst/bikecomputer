@@ -1,4 +1,4 @@
-from data_csc import *
+from cycle_data import *
 import fonts
 from const import *
 import data_global as g
