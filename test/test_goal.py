@@ -5,12 +5,12 @@ import sys
 site.addsitedir('./src')  # Always appends to end
 import goal_calc
 from data_settings import *
-from data_goal import *
+from goal_data import *
 
 class TestGoal(unittest.TestCase):
 
     def setUp(self):
-        self.goal = DataGoal()
+        self.goal = GoalData()
         self.gc = goal_calc.GoalCalc(self.goal)
 
     def test_1(self):

@@ -162,7 +162,7 @@ class GuiBase:
         elif event == Event.toggle_komoot:
             self.main.gui_show_komoot()
         elif event == Event.go_next_view:
-            self.main.gui_next()
+            self.main.switch_to_next_gui()
         elif event == Event.go_next_meter:
             self.main.gui_show_next_meter()
 

@@ -12,6 +12,7 @@ class Button:
     short = 1 << 8 
     long = 1 << 9
 
+
 class Event:
     go_main_menu = Button.right | Button.long
     toggle_komoot = Button.left | Button.short

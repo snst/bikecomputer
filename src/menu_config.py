@@ -32,7 +32,9 @@ class MenuSettings:
         self.wheel_cm = MenuValueItem("Wheel cm", data.wheel_cm)
         self.min_speed = MenuValueItem("Min km/h", data.min_speed)
         self.long_click = MenuValueItem("Long clk", data.long_click)
-        self.bluetooth = MenuValueItem("BLE on", data.bt)
+        self.csc_on = MenuValueItem("Csc on", data.csc_on)
+        self.komoot_enabled = MenuValueItem("komoot on", data.komoot_enabled)
+        self.altimeter_enabled = MenuValueItem("Alt on", data.altimeter_enabled)
         self.items = [ self.led_on,
                        self.led_off,
                        self.led_time,
@@ -40,7 +42,9 @@ class MenuSettings:
                        self.min_speed,
                        self.touch_ignore,
                        self.long_click,
-                       self.bluetooth,
+                       self.csc_on,
+                       self.komoot_enabled,
+                       self.altimeter_enabled,
                        MenuItem("BLE scan", "ble_reconnect"),
                        MenuItem("Save", "save_settings"),
         ]

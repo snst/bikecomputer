@@ -1,15 +1,16 @@
+from const import *
 
 class ButtonHandler:
-    def __init__(self, hal, pin, callback, longclick_ms):
+    def __init__(self, hal, pin, callback, id, longclick_ms):
         self.pin = pin
+        self.id = id
         self.hal = hal
         self.button = hal.register_button(pin, self.on_button)
         self.t = None
-        self.ignore_touch = False
         self.timestamp = 0
         self.last_state = -1
         self.callback = None
-        self.cnt = 0
+        #self.cnt = 0
         self.set_callback(callback)
         self.longclick_ms = longclick_ms
 
@@ -31,18 +32,18 @@ class ButtonHandler:
                 self.hal.cancel_timer(self.t)
                 self.t = None
                 #print("%d Short    %d" % (self.cnt, delta))
-                self.cnt += 1
+               #self.cnt += 1
                 if self.callback:
-                    self.callback(False)
+                    self.callback(self.id, Button.short)
             
     def on_timer(self, tim=None):
         if self.t != None:
             delta = self.get_delta()
             self.t = None
             #print("%d Long    %d" % (self.cnt, delta))
-            self.cnt += 1
+            #self.cnt += 1
             if self.callback:
-                self.callback(True)
+                self.callback(self.id, Button.long)
 
     def get_delta(self):
         now = self.hal.ticks_ms()

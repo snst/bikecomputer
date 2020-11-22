@@ -1,10 +1,7 @@
 class ItemList:
-    def __init__(self, items = None):
-        self._list = []
+    def __init__(self, init_list = []):
+        self._list = init_list
         self._index = 0
-        if items:
-            for item in items:
-                self.add(item)
 
     def add(self, item):
         self._list.append(item)

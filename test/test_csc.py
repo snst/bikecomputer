@@ -5,14 +5,14 @@ import sys
 site.addsitedir('./src')  # Always appends to end
 from csc import *
 from data_settings import *
-from data_csc import *
+from cycle_data import *
 
 class TestCSCMethods(unittest.TestCase):
 
     def setUp(self):
-        self.data = DataCsc()
-        self.settings = DataSettings()
-        self.csc = CSC(self.settings)
+        self.data = CycleData()
+        self._settings = DataSettings()
+        self.csc = CSC(self._settings)
 
     def test_uninit(self):
         self.assertFalse(self.data.init)
@@ -52,7 +52,7 @@ class TestCSCMethods(unittest.TestCase):
     def test_calc_kmh(self):
         cnt = 12
         sec = 13
-        kmh = cnt * self.settings.wheel_cm.value  / 1000 / (sec / 36)
+        kmh = cnt * self._settings.wheel_cm.value  / 1000 / (sec / 36)
         self.assertEqual(kmh, self.csc.calc_kmh(cnt, sec))
 
     def test_cadence(self):
@@ -68,7 +68,7 @@ class TestCSCMethods(unittest.TestCase):
         raw_data = struct.pack("<BIHHH", 0, 1342, 6423, 1231, 323)
         self.csc.process(raw_data, self.data)
         delta_sec = (6423-2213) / 1024
-        dist_km = (1342-1322) * self.settings.wheel_cm.value / 100000
+        dist_km = (1342-1322) * self._settings.wheel_cm.value / 100000
         kmh =  dist_km * 3600 / delta_sec
         self.assertEqual(delta_sec/60, self.data.trip_duration_min)
         self.assertEqual(dist_km, self.data.trip_distance)

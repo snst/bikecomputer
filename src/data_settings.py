@@ -13,7 +13,9 @@ class DataSettings(DataStore):
         self.wheel_cm = SettingVal(214, 200, 230, True)
         self.long_click = SettingVal(30, 20, 50)
         self.min_speed = SettingVal(5, 1, 10)
-        self.bt = SettingVal(0, 0, 1)
+        self.csc_on = SettingVal(0, 0, 1)
+        self.komoot_enabled = SettingVal(0, 0, 1)
+        self.altimeter_enabled = SettingVal(0, 0, 1)
         pass
 
     def save(self):

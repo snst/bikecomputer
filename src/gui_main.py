@@ -17,21 +17,20 @@ class GuiMain(GuiBase):
     def __init__(self, settings, list_csc_data, komoot_data):
         self.callback_repaint = None
         self._settings = settings
-        self._cycle_data = list_csc_data
-        self._komoot_data = komoot_data
+        self._cycle_data_list = ItemList(list_csc_data)
+        self.komoot_data = komoot_data
         self.active_gui = None
         self.gui_stack = []
         self._gui_list = ItemList()
         self.clear()
         self._gui_index = 0
         self.add_to_gui_stack(self.create_gui())
-        pass
 
     def add_gui_list(self, gui):
         self._gui_list.append(gui)
 
     def get_csc_data(self):
-        return self._cycle_data.get()
+        return self._cycle_data_list.get()
 
     def set_callback_repaint(self, cb):
         self.callback_repaint = cb
@@ -45,8 +44,8 @@ class GuiMain(GuiBase):
         #if isinstance(self.active_gui, CycleGui) or isinstance(self.active_gui, KomootGui):
         if len(self.gui_stack) == 1:
             self.active_gui.show(False)
-            self.repaint()
         self.gui_update_state()
+        self.repaint()
 
     def show(self):
         #print("show")
@@ -57,16 +56,13 @@ class GuiMain(GuiBase):
     def repaint(self):
         if self.callback_repaint:
             self.callback_repaint()
-        #self.tft.update()
-        #self.gui_update_state()
-        pass
 
     def activate_gui(self, gui):
         self.active_gui = gui
         self.show()
 
-    def handle_click(self, id, long_click):
-        event = id | (Button.long if long_click else Button.short)
+    def handle_click(self, btn_id, ev_type):
+        event = btn_id | ev_type
         self.active_gui.handle(event)
 
     def get_breadcrum(self):
@@ -75,9 +71,6 @@ class GuiMain(GuiBase):
         next(itergui)
         for g in itergui:
             val = val + ">" + g.get_title()
-        #if len(self.gui_stack) > 1:
-         #   gui = self.gui_stack[-1]
-          #  val = gui.breadcrum + ">" + gui.title
         return val
 
     def gui_show_main_menu(self):
@@ -87,11 +80,11 @@ class GuiMain(GuiBase):
         self.add_to_gui_stack(GuiMenu(self, MenuMeter()))
 
     def gui_show_goal_menu(self):
-        csc_data = self.get_csc_data()
-        if csc_data.goal == None:
-            csc_data.goal = GoalData()
-            csc_data.goal.load()
-        self.add_to_gui_stack(GuiMenu(self, MenuGoal(csc_data.goal)))
+        data = self.cycle_data
+        if data.goal == None:
+            data.goal = GoalData()
+            data.goal.load()
+        self.add_to_gui_stack(GuiMenu(self, MenuGoal(data.goal)))
 
     def go_menu_settings(self):
         m = MenuSettings(self._settings)
@@ -115,18 +108,23 @@ class GuiMain(GuiBase):
     def create_gui(self):
         i = self._gui_index
         if i == 0:
-            return CycleGui(self)
+            return KomootGui(self)
         elif i == 1:
-            return GuiCscStat(self)
+            return CycleGui(self)
         elif i == 2:
+            return GuiCscStat(self)
+        elif i == 3:
             return AltimeterGui(self)
 
-    def gui_next(self):
-        self._gui_index = (self._gui_index + 1) % 3
+    def switch_to_next_gui(self):
+        index = (self._gui_index + 1) % 4
+        self.switch_to_gui(index)
+
+    def switch_to_gui(self, index):
+        self._gui_index = index
         gui = self.create_gui()
         self.gui_stack[0] = gui
         self.activate_gui(gui)
-        pass
 
 
     def gui_stack_pop(self):
@@ -143,25 +141,24 @@ class GuiMain(GuiBase):
 
     def add_meter(self):
         #print("add_meter")
-        n = self._cycle_data.count() + 1
-        self._cycle_data.add(CycleData(n))
-        self._cycle_data.select_last()
+        n = self._cycle_data_list.count() + 1
+        self._cycle_data_list.add(CycleData(n, self._settings))
+        self._cycle_data_list.select_last()
         self.gui_stack_pop_all()
 
     def reset_meter(self):
         #print("reset_meter")
-        self.get_csc_data().reset()
+        self.cycle_data.reset()
         self.gui_stack_pop_all()
 
     def start_goal(self):
-        csc_data = self.get_csc_data()
-        csc_data.goal.is_started = True
-        csc_data.goal.calculate_progress(csc_data)
+        data = self.cycle_data
+        data.goal.is_started = True
+        data.goal.calculate_progress(data)
         self.gui_stack_pop_all()
 
     def stop_goal(self):
-        csc_data = self.get_csc_data()
-        csc_data.goal.is_started = False
+        self.cycle_data.goal.is_started = False
         self.gui_stack_pop_all()
 
     def save_settings(self):
@@ -174,23 +171,25 @@ class GuiMain(GuiBase):
         self.gui_stack_pop_all()
 
     def save_goal_settings(self):
-        self.get_csc_data().goal.save()
+        self.cycle_data.goal.save()
 
     def load_goal_settings(self):
-        self.get_csc_data().goal.load()
+        self.cycle_data.goal.load()
 
     def gui_show_komoot(self):
-        self.add_to_gui_stack(KomootGui(self))
+        #self.add_to_gui_stack(KomootGui(self))
+        self.switch_to_gui(0)
 
-    def get_csc_data(self):
-        return self._cycle_data.get()
+    @property
+    def cycle_data(self):
+        return self._cycle_data_list.get()
 
     def gui_show_next_meter(self):
-        self._cycle_data.next()
+        self._cycle_data_list.next()
         self.gui_stack_pop_all()
 
     def gui_show_prev_meter(self):
-        self._cycle_data.prev()
+        self._cycle_data_list.prev()
         self.gui_stack_pop_all()        
 
     def callback_display_brightness_changed(self, val, closed):
@@ -200,13 +199,9 @@ class GuiMain(GuiBase):
     def gui_update_state(self):
         txt = ""
         txt += "S" if g.bt.is_scanning() else " "
-        txt += "R" if self.get_csc_data().is_riding else "  "
+        txt += "R" if self.cycle_data.is_riding else "  "
         txt += "C" if g.bt.is_csc_connected() else " "
         txt += "K" if g.bt.is_komoot_connected() else " "
 
         g.display.draw_text(fonts.pf_small, txt, 50, Display.height - fonts.pf_small.height())
         g.display.draw_text(fonts.pf_small, "%.2f" % (g.hal.read_bat()), 0, Display.height - fonts.pf_small.height())
-
-    @property
-    def komoot_data(self):
-        return self._komoot_data
