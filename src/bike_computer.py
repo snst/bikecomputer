@@ -20,8 +20,8 @@ class BikeComputer:
         self._komoot_data = KomootData()
         self._display_ctrl = DisplayCtrl(self._settings)
         self.gui = GuiMain(self._settings, self._cycle_data, self._komoot_data)
-        self._btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.btn_event, Button.left, self._settings.long_click.value*10) 
-        self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value*10)
+        self._btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.btn_event, Button.left, self._settings.long_click.value) 
+        self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
         self._altimeter = Altimeter()
         #self._last_notify_ms = 0
         #self._notify_cnt = 0
@@ -74,9 +74,8 @@ class BikeComputer:
     def task_update_bt(self):
         #print("task_update_bt")
         self.add_task(5000, self.task_update_bt)
-        if self._settings.csc_on.value or self._settings.komoot_enabled.value:
-            if not g.bt.is_csc_connected() or not g.bt.is_komoot_connected():
-                g.bt.scan()
+        if (self._settings.csc_on.value and not g.bt.is_csc_connected()) or (self._settings.komoot_enabled.value and not g.bt.is_komoot_connected()):
+            g.bt.scan(csc_enabled = self._settings.csc_on.value, komoot_enabled = self._settings.komoot_enabled.value)
 
     def task_read_komoot(self):
         #print("task_read_komoot")

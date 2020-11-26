@@ -108,13 +108,18 @@ class Display:
 
 
     def draw_text_multi(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left):
-        w = 0
-        for ch in txt:
-            w += font.get_width(ch)
+        if align == Align.center_sep:
+            txt = txt.split(";")
+            align = Align.center
+        else:
+            w = 0
+            for ch in txt:
+                w += font.get_width(ch)
 
-        lines = math.ceil(w / Display.width)
-        n = int(math.ceil(len(txt) / lines))
-        txt = [txt[i:i+n] for i in range(0, len(txt), n)]
+            lines = math.ceil(w / Display.width)
+            n = int(math.ceil(len(txt) / lines))
+            txt = [txt[i:i+n] for i in range(0, len(txt), n)]
+
         h = 0
         for t in txt:
             self.draw_text(font, t, 0, y + h, fg, bg, align)

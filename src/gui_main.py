@@ -11,6 +11,7 @@ import fonts
 import math
 import data_global as g
 from altimeter_gui import *
+from status_gui import *
 from item_list import *
 
 class GuiMain(GuiBase):
@@ -23,7 +24,8 @@ class GuiMain(GuiBase):
         self.gui_stack = []
         self._gui_list = ItemList()
         self.clear()
-        self._gui_index = 0
+        self._gui_index = 1
+        self._gui_index_last = 1
         self.add_to_gui_stack(self.create_gui())
 
     def add_gui_list(self, gui):
@@ -79,6 +81,12 @@ class GuiMain(GuiBase):
     def gui_show_meter_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuMeter()))
 
+    def gui_show_komoot_menu(self):
+        self.add_to_gui_stack(GuiMenu(self, MenuKomoot(self._settings)))
+
+    def gui_show_csc_menu(self):
+        self.add_to_gui_stack(GuiMenu(self, MenuCSC(self._settings)))
+
     def gui_show_goal_menu(self):
         data = self.cycle_data
         if data.goal == None:
@@ -115,9 +123,13 @@ class GuiMain(GuiBase):
             return GuiCscStat(self)
         elif i == 3:
             return AltimeterGui(self)
+        elif i == 4:
+            return StatusGui(self)
 
     def switch_to_next_gui(self):
-        index = (self._gui_index + 1) % 4
+        index = (self._gui_index + 1) % 5
+        if index == 0:
+            index += 1
         self.switch_to_gui(index)
 
     def switch_to_gui(self, index):
@@ -176,9 +188,12 @@ class GuiMain(GuiBase):
     def load_goal_settings(self):
         self.cycle_data.goal.load()
 
-    def gui_show_komoot(self):
-        #self.add_to_gui_stack(KomootGui(self))
-        self.switch_to_gui(0)
+    def gui_toggle_komoot(self):
+        if 0 == self._gui_index:
+            self.switch_to_gui(self._gui_index_last)
+        else:
+            self._gui_index_last = self._gui_index
+            self.switch_to_gui(0)
 
     @property
     def cycle_data(self):

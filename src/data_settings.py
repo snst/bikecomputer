@@ -11,10 +11,15 @@ class DataSettings(DataStore):
         self.led_off = SettingVal(3, 0, 10)
         self.touch_ignore = SettingVal(0, 0, 1)
         self.wheel_cm = SettingVal(214, 200, 230, True)
-        self.long_click = SettingVal(30, 20, 50)
+        self.long_click = SettingVal(300, 200, 500, False, 10)
         self.min_speed = SettingVal(5, 1, 10)
+        self.min_cadence = SettingVal(10, 1, 50)
         self.csc_on = SettingVal(0, 0, 1)
         self.komoot_enabled = SettingVal(0, 0, 1)
+        self.komoot_flash_on = SettingVal(500, 100, 1000, False, 25)
+        self.komoot_all_on = SettingVal(500, 100, 1000)
+        self.komoot_auto_on = SettingVal(1, 0, 1)
+        self.komoot_red_color = SettingVal(300, 25, 2000, False, 25)
         self.altimeter_enabled = SettingVal(0, 0, 1)
         pass
 

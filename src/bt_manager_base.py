@@ -5,17 +5,17 @@ class BtManagerBase:
     def read_komoot(self):
         pass
 
-    def scan(self):
+    def scan(self, csc_enabled, komoot_enabled):
         pass
 
     def reconnect_all(self):
         pass
 
     def is_csc_connected(self):
-        return True
+        return False
 
     def is_komoot_connected(self):
-        return True
+        return False
 
     def is_scanning(self):
         return True

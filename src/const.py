@@ -36,6 +36,7 @@ class Align:
     left = 0
     center = 1
     right = 2
+    center_sep = 3
 
 
 class ConnState:

@@ -9,7 +9,7 @@ import math
 class Sim:
     def __init__(self, bike_computer):
         self.gui = bike_computer.gui
-        self._cycle_data = bike_computer._list_csc_data
+        self._cycle_data = bike_computer._cycle_data
         #self.set_demo_data(self.data)
         self.bc = bike_computer
         self.wheel_counter = 0
@@ -113,15 +113,15 @@ class Sim:
     def btn_callback(self, btn):
         if btn == 120: #x
             self.speed += 1#0.5
-            self.bc.csc_data[0].sim += 1
+            self.bc._komoot_data.distance += 25
             pass
         elif btn == 121: #y
             if self.speed > 1:
                 self.speed -= 1#0.5
-            self.bc.csc_data[0].sim -= 1
+            self.bc._komoot_data.distance -= 25
             pass
         elif btn == 32: #space
             self.paused = not self.paused
             pass
 
-        print("sim_speed %f, paused=%d" % (self.speed, self.paused))
+        #print("sim_speed %f, paused=%d" % (self.speed, self.paused))

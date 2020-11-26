@@ -72,7 +72,7 @@ class CycleData:
 
             self.cadence = self.calc_cadence_from_csc_val(self.crank_counter.delta, self.crank_time.delta)
 
-            if self.cadence > 10 and self.cadence < 200:
+            if self.cadence >= self._settings.min_cadence.value and self.cadence < 200:
                 self.crank_counter.add_delta()
                 self.crank_time.add_delta()
                 self.cadence_avg = self.calc_cadence_from_csc_val(self.crank_counter.sum, self.crank_time.sum)

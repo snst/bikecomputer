@@ -20,7 +20,10 @@ class GuiEditValue:
     def show(self, redraw_all):
         #print("gui_edit_setting_value")
         g.display.draw_text(fonts.pf_small, self.breadcrum, 8, Layout.y_breadcrum)
-        g.display.draw_text(fonts.pf_text, self.item.name, 0, Layout.y_setting_text, align=Align.center)
+        #g.display.draw_text(fonts.pf_text, self.item.name, 0, Layout.y_setting_text, align=Align.center)
+        font = fonts.pf_small if self.item.type == MenuItem.INT_ITEM or self.item.type == MenuItem.FLOAT_ITEM else fonts.pf_text
+        g.display.draw_text_multi(font, self.item.name, 0, Layout.y_setting_text, align=Align.center_sep)
+
         if self.item.type == MenuItem.FLOAT_ITEM:
             #x = self.main.get_text_center_pos(fonts.huge, 5)
             x = 75
@@ -50,7 +53,7 @@ class GuiEditValue:
             else:
                 self.main.gui_stack_pop()
         else:
-            step = 0.1 if self.edit_decimal_place  else 1
+            step = self.item.data.min/10 if self.edit_decimal_place  else self.item.data.step
             if event == Event.val_dec:
                 self.edit_val = self.edit_val - step if self.edit_val > self.item.data.min else self.item.data.max
             elif event == Event.val_inc:

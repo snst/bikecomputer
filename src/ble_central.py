@@ -57,6 +57,7 @@ class ConnData:
         self._csc_desc = csc_desc
         self._on_read = on_read
         self._on_notify = on_notify
+        self.enabled = True
         self.reset()
         pass
 
@@ -114,7 +115,7 @@ class BleCentral:
                 #print(s)
                 conn = self.find_client_by_service(s)
 
-            if conn and conn._conn_handle == None:
+            if conn and conn.enabled and conn._conn_handle == None:
                 conn._addr_type = addr_type
                 conn._addr = bytes(addr)
                 #self._ble.gap_scan(None)

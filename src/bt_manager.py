@@ -21,7 +21,9 @@ class BtManager(BtManagerBase):
     def read_komoot(self):
         self._bt.read(self._con_komoot)
 
-    def scan(self):
+    def scan(self, csc_enabled, komoot_enabled):
+        self._con_csc.enabled = csc_enabled
+        self._con_komoot.enabled = komoot_enabled
         self._bt.scan()
 
     def reconnect_all(self):

@@ -17,7 +17,7 @@ class Hal_emu:
         pass
 
     def set_backlight(self, val):
-        print("hal: set_backlight %d" % (val))
+        #print("hal: set_backlight %d" % (val))
         self.tft.set_brightness(val)
 
     def start_timer(self, id, ms, cb):

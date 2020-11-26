@@ -78,8 +78,10 @@ class ST7789:
     def set_brightness(self, val):
         repaint = self.display_brightness != val
         self.display_brightness = val
-        if repaint and self.gui != None:
-            self.gui.show()
+        if repaint:
+            print("LED %d" % (val))
+        #if repaint and self.gui != None:
+        #    self.gui.show()
 
     def set_gui(self, gui):
         self.gui = gui
@@ -108,7 +110,9 @@ class ST7789:
 
     def fill(self, color):
         #self.w.create_rectangle(0, 0, self.width, self.height, fill=convert_color(color))
-        self.screen.fill(BLACK)
+        #self.screen.fill(BLACK)
+        c = 20 - (20 / 10 * self.display_brightness)
+        self.screen.fill((c,c,c))
         pass
 
     def pixel(self, x, y, color):

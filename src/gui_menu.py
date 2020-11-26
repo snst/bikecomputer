@@ -21,7 +21,9 @@ class GuiMenu:
         #self.main.clear()
         item = self.get_selected_item()
         g.display.draw_text(fonts.pf_small, self.breadcrum, 8, Layout.y_breadcrum)
-        g.display.draw_text(fonts.pf_text, item.name, 0, Layout.y_setting_text, align=Align.center)
+        
+        font = fonts.pf_small if item.type == MenuItem.INT_ITEM or item.type == MenuItem.FLOAT_ITEM else fonts.pf_text
+        g.display.draw_text_multi(font, item.name, 0, Layout.y_setting_text, align=Align.center_sep)
 
         if item.type == MenuItem.INT_ITEM:
             g.display.draw_text(fonts.pf_normal, "%3d" %(item.data.value), 0, Layout.y_setting_val, align=Align.center)
