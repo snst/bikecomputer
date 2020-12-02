@@ -23,6 +23,7 @@ class BikeComputer:
         self._btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.btn_event, Button.left, self._settings.long_click.value) 
         self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
         self._altimeter = Altimeter()
+        #g.hal.gc()
         #self._last_notify_ms = 0
         #self._notify_cnt = 0
 
@@ -84,7 +85,7 @@ class BikeComputer:
             g.bt.read_komoot()
 
     def task_update_altimeter(self):
-        self._scheduler.insert(1000, self.task_update_altimeter)
+        self._scheduler.insert(100, self.task_update_altimeter)
         if self._settings.altimeter_enabled.value:
             self._altimeter.update()
 

@@ -750,3 +750,14 @@ class ST7789:
                 buffer[k] = (col >> 8) & 0xFF
                 buffer[k+1] = (col) & 0xFF
                 k += 2
+
+    def blit_bitarray(self, bitarray, width, x, y, fg, bg):
+        l = len(bitarray)
+        r = width % 8
+        if r>0:
+            width += (8-r)
+        height = (l * 8) / width
+        height = (int) (height)
+        buffer = bytearray(width*height*2)
+        self.map_bitarray_to_rgb565(bitarray, buffer, width, fg, bg)
+        self.blit_buffer(buffer, x, y, width, height)

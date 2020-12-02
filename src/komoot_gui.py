@@ -24,13 +24,23 @@ class KomootGui(GuiBase):
         #print("d %u" % (data.distance))
         if data.distance < 1000:
             str = "%3d" % data.distance
-            g.display.draw_text(fonts.pf_normal, str, g.display.width, y, align=Align.right)
+            g.display.draw_text(fonts.pf_text, str, g.display.width, y, align=Align.right)
         else:
             str = "%.1f" % (data.distance / 1000)
-            g.display.draw_text(fonts.pf_normal, str, g.display.width, y, align=Align.right)
+            g.display.draw_text(fonts.pf_text, str, g.display.width, y, align=Align.right)
 
     def show_direction(self, data, y):
-        g.display.text(fonts.font_komoot, "%c" % (chr(46+data.direction)), 0, 0, fg=self.get_color_from_dist(data))
+        dir = None
+        d = data.direction
+        if d >= 1 and d <= 12:
+            dir = d
+        elif d >= 15 and d <= 30:
+            dir = d - 2
+
+        if dir == None:
+            g.display.fill_rect(0, 0, fonts.font_komoot.HEIGHT, fonts.font_komoot.HEIGHT, Color.black)
+        else:
+            g.display.text(fonts.font_komoot, "%c" % (chr(45+dir)), 0, 0, fg=self.get_color_from_dist(data))
 
     def show_street(self, data, y):
         g.display.fill_rect(0, y, g.display.width, fonts.pf_text.height() * 2, Color.black)

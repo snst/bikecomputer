@@ -111,14 +111,17 @@ class Sim:
 
 
     def btn_callback(self, btn):
+        #self.bc._komoot_data.distance = 999
         if btn == 120: #x
             self.speed += 1#0.5
-            self.bc._komoot_data.distance += 25
+            #self.bc._komoot_data.distance += 25
+            self.bc._komoot_data.direction += 1
             pass
         elif btn == 121: #y
             if self.speed > 1:
                 self.speed -= 1#0.5
-            self.bc._komoot_data.distance -= 25
+            #self.bc._komoot_data.distance -= 25
+            self.bc._komoot_data.direction -= 1
             pass
         elif btn == 32: #space
             self.paused = not self.paused

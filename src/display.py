@@ -8,7 +8,7 @@ class Display:
     def __init__(self, tft):
         self._tft = tft
         #self.m = 0
-        self.buffer = bytearray(2900)
+        #self.buffer = bytearray(2900)
 
     def draw_aligned_text_old(self, font, text, x, y, align = Align.left):
     
@@ -95,13 +95,11 @@ class Display:
 
         for ch in txt:
             data, height, width = font.get_ch(ch)
-            n = width * height
+            #n = width * height
             #self.buffer = bytearray(n*2)
-            #if n*2 > self.m:
-            #    self.m = n*2
-            #    print("max %u" % (self.m))
-            self._tft.map_bitarray_to_rgb565(data, self.buffer, width, fg, bg)
-            self._tft.blit_buffer(self.buffer, x, y, width, height)
+            #self._tft.map_bitarray_to_rgb565(data, self.buffer, width, fg, bg)
+            #self._tft.blit_buffer(self.buffer, x, y, width, height)
+            self._tft.blit_bitarray(data, width, x, y, fg, bg)
             x += width            
             #buffer = None
             #g.hal.gc()

@@ -50,7 +50,7 @@ print("freq: %u" % (machine.freq() ))
 def task_mem():
     #gc.collect()
     g.bc.add_task(5000, task_mem)
-    print("mem: %d" % (gc.mem_free()))
+    #print("mem: %d" % (gc.mem_free()))
 
 task_mem()
 

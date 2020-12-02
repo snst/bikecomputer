@@ -34,8 +34,11 @@ class AltimeterGui(GuiBase):
         g.display.draw_text(fonts.pf_small, "temp %.2f" % (alt.temperature), 0, 40, align=Align.left)
         g.display.draw_text(fonts.pf_small, "pres %.2f" % (alt.pressure), 0, 70, align=Align.left)
         g.display.draw_text(fonts.pf_small, "alt  %.2f" % (alt.altitude), 0, 100, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "altv %.2f" % (alt.altitude_avg), 0, 130, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "sum  %.2f" % (alt.sum), 0, 160, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "altv %.2f %.2f" % (alt.alt_avg.alt, alt.alt_kalman.alt), 0, 130, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "sum  %.2f %.2f" % (alt.alt_avg.sum, alt.alt_kalman.sum), 0, 160, align=Align.left)
 
     def handle(self, event):
-        GuiBase.handle(self, event)
+        if event == (Button.left | Button.long):
+            g.bc._altimeter.reset_alt()
+        else:
+            GuiBase.handle(self, event)
