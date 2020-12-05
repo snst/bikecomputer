@@ -47,26 +47,69 @@ _CSC_SERVICE = (
     (_CSC_CHAR,),
 )
 
-class ConnData:
-    def __init__(self, name, fix_addr = None, service_uuid = None, char_uuid = None, csc_desc = None, on_read = None, on_notify = None):
-        self._name = name
-        self._addr_type = None
-        self._addr = fix_addr
+
+class ServiceData:
+    NOTIFY_ENABLE = const(1)
+    INDICATE_ENABLE = const(2)
+    def __init__(self, name, service_uuid = None, char_uuid = None, notify = 0, on_read = None, on_notify = None):
+        #self._name = name
         self._service_uuid = service_uuid
         self._char_uuid = char_uuid
-        self._csc_desc = csc_desc
+        self._csc_desc = None #csc_desc
+        self._notify = notify
         self._on_read = on_read
         self._on_notify = on_notify
-        self.enabled = True
         self.reset()
         pass
 
     def reset(self):
-        self._conn_handle = None
-        self._start_handle = None
-        self._end_handle = None
         self._value_handle = None
         self._dsc_handle = None
+        self._def_handle = None
+        self._start_handle = None
+        self._end_handle = None
+        self._requested_notify = False
+
+class ConnData:
+    def __init__(self, name, fix_addr = None):
+        self._name = name
+        self._addr_type = None
+        self._addr = fix_addr
+        self.enabled = True
+        self.reset()
+        self.services = []
+        pass
+
+    def reset(self):
+        self._conn_handle = None
+        self.scan_cnt = 0
+
+    def add_service(self, service):
+        self.services.append(service)
+
+    def find_service(self, uuid):
+        for s in self.services:
+            if s._service_uuid == uuid:
+                return s
+        return None
+
+    def find_char(self, uuid):
+        for s in self.services:
+            if s._char_uuid == uuid:
+                return s
+        return None
+
+    def find_desc(self, uuid):
+        for s in self.services:
+            if s._csc_desc == uuid:
+                return s
+        return None
+
+    def find_value_handle(self, handle):
+        for s in self.services:
+            if s._value_handle == handle:
+                return s
+        return None
 
 
 class BleCentral:
@@ -84,12 +127,11 @@ class BleCentral:
                 return conn
         return None
 
-    def find_client_by_service(self, services):
+    def find_client_by_service(self, service):
         for conn in self.connections:
-            if conn._service_uuid in services:
+            if conn.find_service(service):
                 return conn
         return None
-
 
     def add_connection(self, conn):
         self.connections.append(conn)
@@ -111,9 +153,10 @@ class BleCentral:
             conn = self.find_client_by_addr(addr)
 
             if None == conn:
-                s = decode_services(adv_data)
+                services = decode_services(adv_data)
                 #print(s)
-                conn = self.find_client_by_service(s)
+                for s in services:
+                    conn = self.find_client_by_service(s)
 
             if conn and conn.enabled and conn._conn_handle == None:
                 conn._addr_type = addr_type
@@ -129,10 +172,10 @@ class BleCentral:
             #self.print_ble("_IRQ_PERIPHERAL_CONNECT")
             conn_handle, addr_type, addr = data
             conn = self.find_client_by_addr(addr)
-            #if addr_type == self._addr_type and addr == self._addr:
             if conn:
-                print("connected: " + conn._name)
+                #print("connected: " + conn._name)
                 conn._conn_handle = conn_handle
+                conn.scan_cnt = 1
                 self._ble.gattc_discover_services(conn._conn_handle)
 
         elif event == _IRQ_PERIPHERAL_DISCONNECT:
@@ -140,7 +183,7 @@ class BleCentral:
             conn_handle, addr_type, addr = data
             conn = self.find_conn(conn_handle)
             if conn:
-                print("disconnected: " + conn._name)
+                #print("disconnected: " + conn._name)
                 conn.reset()
 
         elif event == _IRQ_GATTC_SERVICE_RESULT:
@@ -148,48 +191,78 @@ class BleCentral:
             conn_handle, start_handle, end_handle, uuid = data
             #self.print_ble(uuid)
             conn = self.find_conn(conn_handle)
-            if conn and uuid == conn._service_uuid:
-                conn._start_handle, conn._end_handle = start_handle, end_handle
-                self._ble.gattc_discover_characteristics(
-                    conn._conn_handle, conn._start_handle, conn._end_handle
-                )
+            if conn:
+                srv = conn.find_service(uuid)
+                if srv:
+                    srv._start_handle, srv._end_handle = start_handle, end_handle
+                    #self.print_ble("BLE: found srv! %s:%s" % (conn._name, srv._name))
+                    conn.scan_cnt += 1
+                    self._ble.gattc_discover_characteristics(
+                        conn._conn_handle, srv._start_handle, srv._end_handle
+                    )
 
         elif event == _IRQ_GATTC_SERVICE_DONE:
             #self.print_ble("_IRQ_GATTC_SERVICE_DONE")
             conn_handle, status = data
             conn = self.find_conn(conn_handle)
-            if conn and None == conn._start_handle:
-                self.disconnect(conn)
+            if conn:
+                conn.scan_cnt -= 1
+            #if conn and None == conn._start_handle:
+            #    self.disconnect(conn)
 
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_RESULT:
             #self.print_ble("_IRQ_GATTC_CHARACTERISTIC_RESULT")
             conn_handle, def_handle, value_handle, properties, uuid = data
+            #print("ch %x, dh %x, vh %x, p %x" % (conn_handle, def_handle, value_handle, properties))
+            #self.print_ble(uuid)
             conn = self.find_conn(conn_handle)
-            if conn and uuid == conn._char_uuid:
-                conn._value_handle = value_handle
+            srv = conn.find_char(uuid)
+            if conn and srv:
+                srv._value_handle = value_handle
+                srv._def_handle = def_handle
+                #self._ble.gattc_write(conn._conn_handle, conn._value_handle+1, struct.pack('<h', 1), 1)
+
                 #print("found char for " + conn._name)
                 #=>self._ble.gattc_read(conn._conn_handle, conn._value_handle)
-                if conn._csc_desc != None:
-                    self._ble.gattc_discover_descriptors(
-                        conn._conn_handle, conn._start_handle, conn._end_handle)
+                #print("Val handle %d" % (value_handle))
+
+                #if srv._csc_desc != None:
+                #    self._ble.gattc_discover_descriptors(
+                #        conn._conn_handle, srv._start_handle, srv._end_handle)
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_DONE:
             #self.print_ble("_IRQ_GATTC_CHARACTERISTIC_DONE")
             conn_handle, status = data
+            conn = self.find_conn(conn_handle)
+            if conn:
+                conn.scan_cnt -= 1
+
+            #conn = self.find_conn(conn_handle)
+            #if conn:
+            #    for srv in conn.services:
+            #        if srv._notify:
+            #            self._ble.gattc_write(conn._conn_handle, srv._value_handle + 1, struct.pack('<h', _NOTIFY_ENABLE), 1)
+
+#                if srv._notify:
+#                    self._ble.gattc_write(conn._conn_handle, srv._value_handle + 1, struct.pack('<h', _NOTIFY_ENABLE), 1)
+
 
         elif event == _IRQ_GATTC_DESCRIPTOR_RESULT:
             #self.print_ble("_IRQ_GATTC_DESCRIPTOR_RESULT")
             conn_handle, dsc_handle, uuid = data
             #print(uuid)
             conn = self.find_conn(conn_handle)
-            if conn and uuid == conn._csc_desc:
-                conn._dsc_handle = dsc_handle
-                print("found desc: %s : %u" % (conn._name, dsc_handle))
+            srv = conn.find_desc(uuid)
+            if conn and srv:
+                srv._dsc_handle = dsc_handle
+                #print("found desc: %s : %u" % (conn._name, dsc_handle))
                 #self._ble.gattc_write(conn._conn_handle, conn._dsc_handle, struct.pack("<H", int(1)))
-                _NOTIFY_ENABLE = const(1)
-                _INDICATE_ENABLE = const(2)
-                self._ble.gattc_write(conn._conn_handle, dsc_handle, struct.pack('<h', _NOTIFY_ENABLE), 1)
+                #_NOTIFY_ENABLE = const(1)
+                #_INDICATE_ENABLE = const(2)
+                #print("dsc handle %d" % (dsc_handle))
+                #self._ble.gattc_write(conn._conn_handle, srv._dsc_handle, struct.pack('<h', _NOTIFY_ENABLE), 1)
+                #self._ble.gattc_write(conn._conn_handle, srv._value_handle+1, struct.pack('<H', _NOTIFY_ENABLE), 1)
 
         elif event == _IRQ_GATTC_DESCRIPTOR_DONE:
             #self.print_ble("_IRQ_GATTC_DESCRIPTOR_DONE")
@@ -201,8 +274,10 @@ class BleCentral:
             #self.print_ble("_IRQ_GATTC_READ_RESULT")
             conn_handle, value_handle, char_data = data
             conn = self.find_conn(conn_handle)
-            if conn and value_handle == conn._value_handle and None != conn._on_read:
-                conn._on_read(char_data)
+            if conn:
+                srv = conn.find_value_handle(value_handle)
+                if srv and None != srv._on_read:
+                    srv._on_read(char_data)
 
         elif event == _IRQ_GATTC_READ_DONE:
             conn_handle, value_handle, status = data
@@ -211,14 +286,30 @@ class BleCentral:
             #self.print_ble("_IRQ_GATTC_NOTIFY")
             conn_handle, value_handle, notify_data = data
             conn = self.find_conn(conn_handle)
-            if conn and value_handle == conn._value_handle and None != conn._on_notify:
-                conn._on_notify(notify_data)
+            if conn:
+                srv = conn.find_value_handle(value_handle)
+                if srv and None != srv._on_notify:
+                    srv._on_notify(notify_data)
+
+        elif event == _IRQ_GATTC_INDICATE:
+            #self.print_ble("_IRQ_GATTC_INDICATE")
+            # A server has sent an indicate request.
+            conn_handle, value_handle, notify_data = data
 
     def find_conn(self, conn_handle):
         for conn in self.connections:
             if conn_handle == conn._conn_handle:
                 return conn
         return None
+
+    def enable_notify(self, conn, service):
+        #print("enable cnt %d" % (conn.scan_cnt))
+        if conn._conn_handle != None and service._value_handle != None and not service._requested_notify:
+            #print("req notify %d" % (service._notify))
+            #print("not cnt=%d %d" % (conn.scan_cnt, service._value_handle + 1))
+            self._ble.gattc_write(conn._conn_handle, service._value_handle + 1, struct.pack('<h', service._notify), 1)
+            service._requested_notify = True
+
 
     # Find a device advertising the environmental sensor service.
     def scan(self, callback=None):
@@ -229,12 +320,12 @@ class BleCentral:
 
     # Connect to the specified device (otherwise use cached address from a scan).
     def connect(self, conn):
-        print("connect to " +  conn._name)
+        #print("connect to " +  conn._name)
         self._ble.gap_connect(conn._addr_type, conn._addr)
 
     def disconnect(self, conn):
         if None != conn._conn_handle:
-            print("disconnect " +  conn._name)
+            #print("disconnect " +  conn._name)
             self._ble.gap_disconnect(conn._conn_handle)
 
 
@@ -242,12 +333,10 @@ class BleCentral:
         for conn in self.connections:
             self.disconnect(conn)
 
-    def read(self, conn):
-        #print(conn._conn_handle)
-        #print(conn._value_handle)
-        if None != conn._conn_handle and None != conn._value_handle:
-            #print("read!!!!")
-            self._ble.gattc_read(conn._conn_handle, conn._value_handle)
+    def read(self, conn, srv):
+        if None != conn._conn_handle and None != srv._value_handle:
+            #print("READ %d %d" % (conn._conn_handle, srv._value_handle))
+            self._ble.gattc_read(conn._conn_handle, srv._value_handle)
 
 
 def demo():

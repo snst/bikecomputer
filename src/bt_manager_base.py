@@ -20,8 +20,8 @@ class BtManagerBase:
     def is_scanning(self):
         return True
 
-    def set_on_csc(self, cb):
+    def register_cycle_callback(self, cb):
         pass
 
-    def set_on_komoot(self, cb):
+    def register_komoot_callback(self, cb):
         pass

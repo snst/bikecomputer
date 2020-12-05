@@ -92,11 +92,13 @@ class MenuKomoot:
         self.komoot_flash_on = MenuValueItem("Warn LED;before m", data.komoot_flash_on)
         self.komoot_all_on = MenuValueItem("Steady LED;before m", data.komoot_all_on)
         self.komoot_red_color = MenuValueItem("Red color;before m", data.komoot_red_color)
+        self.komoot_req_interval = MenuValueItem("BLE update ms", data.komoot_req_interval)
         self.items = [ self.komoot_enabled,
                        self.komoot_auto_on,
                        self.komoot_flash_on,
                        self.komoot_all_on,
                        self.komoot_red_color,
+                       self.komoot_req_interval,
                        MenuItem("Save", "save_settings"),
 
         ]

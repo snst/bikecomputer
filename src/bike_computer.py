@@ -23,11 +23,13 @@ class BikeComputer:
         self._btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.btn_event, Button.left, self._settings.long_click.value) 
         self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
         self._altimeter = Altimeter()
+        self.sensor_bat = 0
+        self.computer_bat = 0
         #g.hal.gc()
         #self._last_notify_ms = 0
         #self._notify_cnt = 0
 
-    def on_data_csc(self, raw_data):
+    def on_cycle_data(self, raw_data):
         #now = g.hal.ticks_ms()
         #diff = now - self._last_notify_ms
         #self._last_notify_ms = now
@@ -35,6 +37,11 @@ class BikeComputer:
         #print("on %u %ums" % (self._notify_cnt, diff))
         for data in self._cycle_data:
             data.process(raw_data)
+
+    def on_cycle_bat(self, raw_data):
+        self.sensor_bat = raw_data[0]
+        #print("CSC BAT %d" % (self.sensor_bat))
+        pass
 
     def on_data_komoot(self, raw_data):
         self._komoot_data.on_data(raw_data)
@@ -80,9 +87,10 @@ class BikeComputer:
 
     def task_read_komoot(self):
         #print("task_read_komoot")
-        self.add_task(4000, self.task_read_komoot)
+        self.add_task(self._settings.komoot_req_interval.value, self.task_read_komoot)
         if self._settings.komoot_enabled.value:
             g.bt.read_komoot()
+            pass
 
     def task_update_altimeter(self):
         self._scheduler.insert(100, self.task_update_altimeter)
@@ -91,12 +99,18 @@ class BikeComputer:
 
     def task_read_bat(self):
         self.add_task(5000, self.task_read_bat)
-        g.hal.update_bat()
+        self.request_sensor_bat()
+        self.request_computer_bat()
 
+    def request_sensor_bat(self):
+        g.bt.request_sensor_bat()
+
+    def request_computer_bat(self):
+        self.computer_bat = g.hal.update_bat()
 
     def run(self):
-        g.bt.set_on_csc(self.on_data_csc)
-        g.bt.set_on_komoot(self.on_data_komoot)
+        g.bt.register_cycle_callback(cycle_cb = self.on_cycle_data, bat_cb = self.on_cycle_bat)
+        g.bt.register_komoot_callback(self.on_data_komoot)
         self.task_update_bt()
         self.task_read_komoot()
         self.task_read_bat()

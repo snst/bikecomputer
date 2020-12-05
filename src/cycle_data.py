@@ -94,6 +94,6 @@ class CycleData:
             self.trip_duration_min = self.wheel_time.get_sum_in_min()
 
             if self.goal != None:
-                self.goal.calculate_progress(data)
+                self.goal.calculate_progress(self)
 
         self.init = True

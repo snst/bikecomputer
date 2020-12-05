@@ -58,8 +58,8 @@ class Altimeter:
             self._altitude = g.altimeter.altitude
             self.alt_avg.update(self._altitude)
             self.alt_kalman.update(self._altitude)
-            print("%.2f %.2f , %.2f %.2f" % (self.alt_avg.alt, self.alt_kalman.alt, self.alt_avg.sum, self.alt_kalman.sum))
-        #print("Temp=%.2f°C, Pressure=%.2fhPa, Alt=%.2fm" % (self._temperature, self._pressure, self._altitude))
+            #print("%.2f %.2f , %.2f %.2f" % (self.alt_avg.alt, self.alt_kalman.alt, self.alt_avg.sum, self.alt_kalman.sum))
+            #print("Temp=%.2f°C, Pressure=%.2fhPa, Alt=%.2fm" % (self._temperature, self._pressure, self._altitude))
             #print("%f," % (self._altitude))
 
     def reset_alt(self):
