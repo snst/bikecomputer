@@ -25,3 +25,9 @@ class BtManagerBase:
 
     def register_komoot_callback(self, cb):
         pass
+
+    def register_cycle_callback(self, cycle_cb, bat_cb):
+        pass
+
+    def request_sensor_bat(self):
+        pass

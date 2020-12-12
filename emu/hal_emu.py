@@ -52,7 +52,7 @@ class Hal_emu:
         return 3.21
 
     def update_bat(self):
-        pass
+        return 2.33
 
     def gc(self):
         pass

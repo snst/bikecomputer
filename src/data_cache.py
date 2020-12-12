@@ -1,8 +1,13 @@
 class DataCache:
-    def __init__(self, n):
-        self._items = [None] * n
+    def __init__(self):
+        #self._items = [None] * n
+        self._items = []
+        pass
     
     def changed(self, index, value):
+        while len(self._items) <= index:
+            self._items.append(None)
+
         if self._items[index] != value:
             self._items[index] = value
             return True

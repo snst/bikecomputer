@@ -16,6 +16,7 @@ class Button:
 class Event:
     go_main_menu = Button.right | Button.long
     toggle_komoot = Button.left | Button.short
+    go_prev_view = Button.left | Button.short
     go_next_view = Button.right | Button.short
     go_next_meter = Button.left | Button.long
     menu_next = Button.right | Button.long

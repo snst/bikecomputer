@@ -67,6 +67,7 @@ class Hal_esp32:
     def update_bat(self):
         vref = 1100
         adc = machine.ADC(machine.Pin(34))
+        adc.atten(machine.ADC.ATTN_11DB)
         val = adc.read() 
         self._vbat = (val / 4095.0) * 2.0 * 3.3 * (vref / 1000.0)
         #print("vbat: %.2f" % (self._vbat))

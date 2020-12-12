@@ -93,7 +93,7 @@ class BikeComputer:
             pass
 
     def task_update_altimeter(self):
-        self._scheduler.insert(100, self.task_update_altimeter)
+        self._scheduler.insert(self._settings.altimeter_time_ms.value, self.task_update_altimeter)
         if self._settings.altimeter_enabled.value:
             self._altimeter.update()
 

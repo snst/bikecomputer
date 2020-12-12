@@ -15,7 +15,7 @@ class GuiCscStat(GuiBase):
 
     def __init__(self, main):
         GuiBase.__init__(self, main)
-        self.cache = DataCache(8)
+        self.cache = DataCache()
 
     def get_title(self):
         return "stat"

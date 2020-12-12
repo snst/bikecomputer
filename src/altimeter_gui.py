@@ -14,7 +14,7 @@ class AltimeterGui(GuiBase):
 
     def __init__(self, main):
         GuiBase.__init__(self, main)
-        self.cache = DataCache(8)
+        self.cache = DataCache()
         self._cnt = 0
 
     def get_title(self):
@@ -34,8 +34,11 @@ class AltimeterGui(GuiBase):
         g.display.draw_text(fonts.pf_small, "temp %.2f" % (alt.temperature), 0, 40, align=Align.left)
         g.display.draw_text(fonts.pf_small, "pres %.2f" % (alt.pressure), 0, 70, align=Align.left)
         g.display.draw_text(fonts.pf_small, "alt  %.2f" % (alt.altitude), 0, 100, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "altv %.2f %.2f" % (alt.alt_avg.alt, alt.alt_kalman.alt), 0, 130, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "sum  %.2f %.2f" % (alt.alt_avg.sum, alt.alt_kalman.sum), 0, 160, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "alt min %.2f" % (alt.altitude_min), 0, 130, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "alt max %.2f" % (alt.altitude_max), 0, 160, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "alt sum %.2f" % (alt.altitude_sum), 0, 190, align=Align.left)
+        #g.display.draw_text(fonts.pf_small, "altv %.2f %.2f" % (alt.alt_avg.alt, alt.alt_kalman.alt), 0, 130, align=Align.left)
+        #g.display.draw_text(fonts.pf_small, "sum  %.2f %.2f" % (alt.alt_avg.sum, alt.alt_kalman.sum), 0, 160, align=Align.left)
 
     def handle(self, event):
         if event == (Button.left | Button.long):

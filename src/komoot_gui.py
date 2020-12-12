@@ -12,7 +12,7 @@ class KomootGui(GuiBase):
 
     def __init__(self, main):
         GuiBase.__init__(self, main)
-        self.cache = DataCache(5)
+        self.cache = DataCache()
 
     def get_title(self):
         return "komoot"

@@ -94,54 +94,9 @@ class GuiBase:
         g.display.draw_text(fonts.pf_normal, "%d" % (dval), x-mw, y, fg=color, bg=Color.black, align=Align.left)
 
 
-    def show_id(self, data):
-        if self.cache.changed(0, data.id):
-            g.display.draw_text(fonts.pf_small, "%d"%data.id, g.display.width - 25, g.display.height-fonts.pf_small.height())
 
-    def show_speed(self, data, y):
-        if self.cache.changed(1, data.speed):
-            col = Color.white
-            if data.goal and data.goal.is_started:
-                col = Color.red if data.goal.calc_required_average_km_h > data.speed else Color.green
 
-            self.show_big_speed(data.speed, g.display.width, y, col)
 
-    def show_cadence(self, data, y):
-        if self.cache.changed(2, data.cadence):
-            g.display.draw_text(fonts.pf_normal, "%2d" % (data.cadence), 0, y, align=Align.left)
-
-    def show_speed_avg(self, data, y):
-        if self.cache.changed(3, data.speed_avg):
-            col = Color.white
-            if data.goal and data.goal.is_started:
-                col = Color.red if data.goal.is_behind(data) else Color.green
-
-            self.show_float_speed(data.speed_avg, g.display.width, y, color = col)
-
-    def show_speed_goal(self, goal, data, y):
-        #col = Color.green if goal.calc_required_average_km_h < data.speed_avg else Color.red
-        col = Color.white
-        self.show_float_speed(goal.calc_required_average_km_h, 0, y, color=col, align = Align.left)
-
-    def show_speed_final(self, goal, y):
-        self.show_float_speed(goal.calc_required_average_km_h, 0, y, color=Color.blue, align = Align.left)
-
-    def show_distance_goal(self, data, y):
-        self.show_float_speed(data.remaining_distance_km, 0, y, align = Align.left)
-
-    def show_progress_goal(self, goal, y):
-        self.show_progress(y - 12, 8, goal.target_dist_km.value, goal.target_dist_km.value-goal.remaining_distance_km, goal.optimal_distance_km)
-
-    def show_time_goal(self, goal, y):
-        self.show_float_time(goal.remaining_time_min, 0, y, align = Align.left)
-
-    def show_trip_distance(self, data, y):
-        if self.cache.changed(4, data.trip_distance):
-            self.show_float_speed(data.trip_distance, g.display.width, y)
-
-    def show_trip_duration(self, data, y):
-        if self.cache.changed(5, data.trip_duration_min):
-            self.show_float_time(data.trip_duration_min, g.display.width, y)
 
     def show_speed_max(self, data, y):
         if self.cache.changed(6, data.speed_max):
@@ -156,11 +111,20 @@ class GuiBase:
 
 
     def handle(self, event = 0):
+        #if self.main.is_kommot_gui_active():
+        #    print("komoot")
+        
         #print("handler_csc")
         if event == Event.go_main_menu:
             self.main.gui_show_main_menu()
-        elif event == Event.toggle_komoot:
-            self.main.gui_toggle_komoot()
+        #elif event == Event.toggle_komoot:
+        #    if self.main.is_kommot_gui_active():
+        #        self.main.switch_to_next_gui()
+        #    else:
+        #        self.main.switch_to_prev_gui()
+            #self.main.gui_toggle_komoot()
+        elif event == Event.go_prev_view:
+            self.main.switch_to_prev_gui()
         elif event == Event.go_next_view:
             self.main.switch_to_next_gui()
         elif event == Event.go_next_meter:

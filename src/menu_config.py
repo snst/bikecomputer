@@ -9,6 +9,7 @@ class MenuMain:
                        MenuItem("Meter", "gui_show_meter_menu"),
                        MenuItem("CSC", "gui_show_csc_menu"),
                        MenuItem("Komoot", "gui_show_komoot_menu"),
+                       MenuItem("Altimeter", "gui_show_altimeter_menu"),
         ]
         pass
 
@@ -32,14 +33,28 @@ class MenuSettings:
         self.led_time = MenuValueItem("LED;duration on",  data.led_time)
         self.touch_ignore = MenuValueItem("Ignore click;when LED off", data.touch_ignore)
         self.long_click = MenuValueItem("Long click;duration ms", data.long_click)
-        self.altimeter_enabled = MenuValueItem("Enabled;altimeter", data.altimeter_enabled)
         self.items = [ self.led_on,
                        self.led_off,
                        self.led_time,
                        self.touch_ignore,
                        self.long_click,
-                       self.altimeter_enabled,
                        MenuItem("BLE scan", "ble_reconnect"),
+                       MenuItem("Save", "save_settings"),
+        ]
+        pass        
+
+class MenuAltimeter:
+    def __init__(self, data):
+        self.title = "alt"
+        self.data = data
+        self.altimeter_enabled = MenuValueItem("Enabled;altimeter", data.altimeter_enabled)
+        self.altimeter_values = MenuValueItem("Number of;avg values", data.altimeter_values)
+        self.altimeter_time_ms = MenuValueItem("Scan interval;ms", data.altimeter_time_ms)
+        self.altimeter_step = MenuValueItem("Step cm", data.altimeter_step)
+        self.items = [ self.altimeter_enabled,
+                       self.altimeter_values,
+                       self.altimeter_time_ms,
+                       self.altimeter_step,
                        MenuItem("Save", "save_settings"),
         ]
         pass        

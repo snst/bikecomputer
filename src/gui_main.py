@@ -26,6 +26,7 @@ class GuiMain(GuiBase):
         self.clear()
         self._gui_index = 1
         self._gui_index_last = 1
+        self._max_views = 4
         self.add_to_gui_stack(self.create_gui())
 
     def add_gui_list(self, gui):
@@ -46,7 +47,8 @@ class GuiMain(GuiBase):
         #if isinstance(self.active_gui, CycleGui) or isinstance(self.active_gui, KomootGui):
         if len(self.gui_stack) == 1:
             self.active_gui.show(False)
-        self.gui_update_state()
+        if isinstance(self.active_gui, CycleGui) or isinstance(self.active_gui, KomootGui):
+            self.gui_update_state()
         self.repaint()
 
     def show(self):
@@ -84,6 +86,9 @@ class GuiMain(GuiBase):
     def gui_show_komoot_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuKomoot(self._settings)))
 
+    def gui_show_altimeter_menu(self):
+        self.add_to_gui_stack(GuiMenu(self, MenuAltimeter(self._settings)))
+
     def gui_show_csc_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuCSC(self._settings)))
 
@@ -118,18 +123,24 @@ class GuiMain(GuiBase):
         if i == 0:
             return KomootGui(self)
         elif i == 1:
-            return CycleGui(self)
+            return CycleGui(self, 0)
+#        elif i == 2:
+#            return CycleGui(self, 1)
         elif i == 2:
-            return GuiCscStat(self)
-        elif i == 3:
             return AltimeterGui(self)
-        elif i == 4:
+        elif i == 3:
             return StatusGui(self)
 
     def switch_to_next_gui(self):
-        index = (self._gui_index + 1) % 5
-        if index == 0:
-            index += 1
+        index = (self._gui_index + 1) % self._max_views
+        #if index == 0:
+        #    index += 1
+        self.switch_to_gui(index)
+
+    def switch_to_prev_gui(self):
+        index = (self._gui_index - 1) 
+        if index < 0:
+            index = 1
         self.switch_to_gui(index)
 
     def switch_to_gui(self, index):
@@ -220,3 +231,6 @@ class GuiMain(GuiBase):
 
         g.display.draw_text(fonts.pf_small, txt, 50, Display.height - fonts.pf_small.height())
         g.display.draw_text(fonts.pf_small, "%.2f" % (g.hal.read_bat()), 0, Display.height - fonts.pf_small.height())
+
+    def is_kommot_gui_active(self):
+        return isinstance(self.active_gui, KomootGui)
