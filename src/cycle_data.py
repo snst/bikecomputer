@@ -66,6 +66,9 @@ class CycleData:
         self.crank_counter.calc_delta(crank_counter)
         self.crank_time.calc_delta(crank_time)
 
+        if self.goal and not self.goal.is_started:
+            return
+
         if self.init:
 
             self.speed = self.calc_kmh_from_csc_val(self.wheel_counter.delta, self.wheel_time.delta)
@@ -89,9 +92,10 @@ class CycleData:
                     self.speed_avg = self.calc_kmh_from_csc_val(self.wheel_counter.sum, self.wheel_time.sum)
     
 
-            #print("is_riding=%d, speed=%.2f/%.2f, cadence=%d/%d" % (self.is_riding, self.speed_kmh, self.average_speed_kmh, self.cadence, self.average_cadence))
-            self.trip_distance = self.wheel_counter.get_distance_in_km(self._settings.wheel_cm.value)
-            self.trip_duration_min = self.wheel_time.get_sum_in_min()
+            if self.goal == None or not self.goal.has_distance_reached:
+                #print("is_riding=%d, speed=%.2f/%.2f, cadence=%d/%d" % (self.is_riding, self.speed_kmh, self.average_speed_kmh, self.cadence, self.average_cadence))
+                self.trip_distance = self.wheel_counter.get_distance_in_km(self._settings.wheel_cm.value)
+                self.trip_duration_min = self.wheel_time.get_sum_in_min()
 
             if self.goal != None:
                 self.goal.calculate_progress(self)

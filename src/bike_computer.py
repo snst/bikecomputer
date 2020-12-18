@@ -10,41 +10,35 @@ import data_global as g
 from scheduler import *
 from item_list import *
 from altimeter import *
+from meter_data import *
+from env_data import *
 
 class BikeComputer:
     def __init__(self):
         self._settings = DataSettings()
         self._settings.load()
         self._scheduler = Scheduler(g.hal)
-        self._cycle_data = [CycleData(1, self._settings)]
-        self._komoot_data = KomootData()
+        self.env_data = EnvData()
+        self.meter_list = []
+        self.add_meter_instance()
+        self.komoot_data = KomootData()
         self._display_ctrl = DisplayCtrl(self._settings)
-        self.gui = GuiMain(self._settings, self._cycle_data, self._komoot_data)
+        self.gui = GuiMain(self._settings, self.meter_list, self.komoot_data)
         self._btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.btn_event, Button.left, self._settings.long_click.value) 
         self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
         self._altimeter = Altimeter()
-        self.sensor_bat = 0
-        self.computer_bat = 0
-        #g.hal.gc()
-        #self._last_notify_ms = 0
-        #self._notify_cnt = 0
+        self._goal_meter = MeterData(0, self.env_data, self._settings)
+        self._goal_meter.cycle_data.goal = GoalData()
+        self._goal_meter.cycle_data.goal.load()
 
     def on_cycle_data(self, raw_data):
-        #now = g.hal.ticks_ms()
-        #diff = now - self._last_notify_ms
-        #self._last_notify_ms = now
-        #self._notify_cnt += 1
-        #print("on %u %ums" % (self._notify_cnt, diff))
-        for data in self._cycle_data:
-            data.process(raw_data)
+        for meter in self.meter_list:
+            meter.cycle_data.process(raw_data)
+        self._goal_meter.cycle_data.process(raw_data)
 
-    def on_cycle_bat(self, raw_data):
-        self.sensor_bat = raw_data[0]
-        #print("CSC BAT %d" % (self.sensor_bat))
-        pass
-
-    def on_data_komoot(self, raw_data):
-        self._komoot_data.on_data(raw_data)
+    def on_altitude_data(self, altitude):
+        for meter in self.meter_list:
+            meter.alt_data.process(altitude, self._settings.altimeter_step.value / 100)
 
     def ignore_click(self, is_long):
         display_off = not self._display_ctrl.is_display_on()
@@ -72,7 +66,6 @@ class BikeComputer:
                 self._scheduler.insert(1, self.btn_right_long if is_long else self.btn_right_short)
 
     def task_update_gui(self):
-        #print("task_update_gui")
         self._scheduler.insert(500, self.task_update_gui)
         self.gui.cyclic_update()
 
@@ -80,22 +73,20 @@ class BikeComputer:
         self._scheduler.insert(ms, task)
 
     def task_update_bt(self):
-        #print("task_update_bt")
         self.add_task(5000, self.task_update_bt)
         if (self._settings.csc_on.value and not g.bt.is_csc_connected()) or (self._settings.komoot_enabled.value and not g.bt.is_komoot_connected()):
             g.bt.scan(csc_enabled = self._settings.csc_on.value, komoot_enabled = self._settings.komoot_enabled.value)
 
     def task_read_komoot(self):
-        #print("task_read_komoot")
         self.add_task(self._settings.komoot_req_interval.value, self.task_read_komoot)
         if self._settings.komoot_enabled.value:
             g.bt.read_komoot()
-            pass
 
     def task_update_altimeter(self):
         self._scheduler.insert(self._settings.altimeter_time_ms.value, self.task_update_altimeter)
         if self._settings.altimeter_enabled.value:
             self._altimeter.update()
+            self.on_altitude_data(self._altimeter.altitude)
 
     def task_read_bat(self):
         self.add_task(5000, self.task_read_bat)
@@ -106,11 +97,11 @@ class BikeComputer:
         g.bt.request_sensor_bat()
 
     def request_computer_bat(self):
-        self.computer_bat = g.hal.update_bat()
+        self.env_data.computer_bat_volt = g.hal.update_bat()
 
     def run(self):
-        g.bt.register_cycle_callback(cycle_cb = self.on_cycle_data, bat_cb = self.on_cycle_bat)
-        g.bt.register_komoot_callback(self.on_data_komoot)
+        g.bt.register_cycle_callback(cycle_cb = self.on_cycle_data, bat_cb = self.env_data.on_sensor_bat)
+        g.bt.register_komoot_callback(self.komoot_data.on_data)
         self.task_update_bt()
         self.task_read_komoot()
         self.task_read_bat()
@@ -121,3 +112,31 @@ class BikeComputer:
                 self._scheduler.run()
             except OSError:
                 print("OSError")
+
+    def get_current_meter(self):
+        return self.gui.get_current_meter()
+
+    def get_current_cycle_data(self):
+        return self.gui.get_current_meter().cycle_data
+
+    def reset_current_altimeter(self):
+        self.get_current_meter().alt_data.reset()
+
+    def reset_current_meter(self):
+        self.get_current_cycle_data().reset()
+
+    def add_meter_instance(self):
+        id = len(self.meter_list) + 1
+        meter = MeterData(id, self.env_data, self._settings)
+        self.meter_list.append(meter)
+        return meter
+
+    def enable_goal(self, enable):
+        data = self._goal_meter.cycle_data
+        data.goal.is_started = enable
+        if enable:
+            data.goal.calculate_progress(data)
+
+        
+    def get_goal(self):
+        return self._goal_meter.cycle_data

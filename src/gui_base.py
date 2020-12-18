@@ -75,8 +75,8 @@ class GuiBase:
             mw -= font.get_width(':')
         else:
             mw *= 2
-        g.display.draw_text(font, "%d:" % (h), x-mw, y, align = Align.right)
-        g.display.draw_text(font, "%.2d" % (m), x-mw, y, align = Align.left)
+        g.display.draw_text(font, "%d:" % (h), x-mw, y, align = Align.right, htrim=True)
+        g.display.draw_text(font, "%.2d" % (m), x-mw, y, align = Align.left, htrim=True)
 
 
     def show_float_time_old(self, val, x, y, align = Align.right):

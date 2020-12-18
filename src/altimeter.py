@@ -1,30 +1,5 @@
 import data_global as g
 
-class AltSum:
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self._sum = 0
-        self._last_val = None
-
-    def add(self, val, delta):
-        if self._last_val == None:
-            self._last_val = val
-        else:
-            diff = val - self._last_val
-            if diff > delta:
-                self._sum += diff
-            if abs(diff) > delta:
-                self._last_val = val
-        
-    @property
-    def value(self):
-        return self._sum
-    
-    def show(self):
-        print("Alt %f" % (self._sum))
-
 
 class CalcAvg:
     def __init__(self, n=10):
@@ -56,10 +31,8 @@ class Altimeter:
         self._temperature = 0
         self._pressure = 0
         self._altitude = 0
-        self.alt_avg = CalcAvg()
-        self.alt_sum = AltSum()
+        self.filter = CalcAvg()
         self._alt_avg = 0
-        self.reset_alt()
 
     def update(self):
         #print('Temperature: {} degrees C'.format(self._sensor.temperature)) 
@@ -71,18 +44,7 @@ class Altimeter:
             self._temperature = g.altimeter.temperature
             self._pressure = g.altimeter.pressure
             self._altitude = g.altimeter.altitude
-            self._alt_avg = self.alt_avg.add(self._altitude, g.bc._settings.altimeter_values.value)
-            self.alt_sum.add(self._alt_avg, g.bc._settings.altimeter_step.value/100)
-            self._alt_min = min(self._alt_min, self._alt_avg)
-            self._alt_max = max(self._alt_max, self._alt_avg)
-            #print("%.2f %.2f , %.2f %.2f" % (self.alt_avg.alt, self.alt_kalman.alt, self.alt_avg.sum, self.alt_kalman.sum))
-            #print("Temp=%.2f°C, Pressure=%.2fhPa, Alt=%.2fm" % (self._temperature, self._pressure, self._altitude))
-            #print("%f," % (self._altitude))
-
-    def reset_alt(self):
-        self.alt_sum.reset()
-        self._alt_min = 5000
-        self._alt_max = 0
+            self._alt_avg = self.filter.add(self._altitude, g.bc._settings.altimeter_values.value)
 
     @property
     def temperature(self):
@@ -91,18 +53,6 @@ class Altimeter:
     @property
     def altitude(self):
         return self._alt_avg
-
-    @property
-    def altitude_min(self):
-        return self._alt_min
-
-    @property
-    def altitude_max(self):
-        return self._alt_max
-
-    @property
-    def altitude_sum(self):
-        return self.alt_sum.value
 
     @property
     def pressure(self):

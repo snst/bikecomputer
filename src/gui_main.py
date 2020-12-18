@@ -13,12 +13,13 @@ import data_global as g
 from altimeter_gui import *
 from status_gui import *
 from item_list import *
+from goal_gui import *
 
 class GuiMain(GuiBase):
-    def __init__(self, settings, list_csc_data, komoot_data):
+    def __init__(self, settings, meter_list, komoot_data):
         self.callback_repaint = None
         self._settings = settings
-        self._cycle_data_list = ItemList(list_csc_data)
+        self._meter_list = ItemList(meter_list)
         self.komoot_data = komoot_data
         self.active_gui = None
         self.gui_stack = []
@@ -26,14 +27,17 @@ class GuiMain(GuiBase):
         self.clear()
         self._gui_index = 1
         self._gui_index_last = 1
-        self._max_views = 4
+        self._max_views = 5
         self.add_to_gui_stack(self.create_gui())
 
     def add_gui_list(self, gui):
         self._gui_list.append(gui)
 
     def get_csc_data(self):
-        return self._cycle_data_list.get()
+        return self.get_current_meter().cycle_data
+
+    def get_current_meter(self):
+        return self._meter_list.get()
 
     def set_callback_repaint(self, cb):
         self.callback_repaint = cb
@@ -93,10 +97,7 @@ class GuiMain(GuiBase):
         self.add_to_gui_stack(GuiMenu(self, MenuCSC(self._settings)))
 
     def gui_show_goal_menu(self):
-        data = self.cycle_data
-        if data.goal == None:
-            data.goal = GoalData()
-            data.goal.load()
+        data = g.bc._goal_meter.cycle_data
         self.add_to_gui_stack(GuiMenu(self, MenuGoal(data.goal)))
 
     def go_menu_settings(self):
@@ -123,12 +124,12 @@ class GuiMain(GuiBase):
         if i == 0:
             return KomootGui(self)
         elif i == 1:
-            return CycleGui(self, 0)
-#        elif i == 2:
-#            return CycleGui(self, 1)
+            return CycleGui(self)
         elif i == 2:
-            return AltimeterGui(self)
+            return GoalGui(self)
         elif i == 3:
+            return AltimeterGui(self)
+        elif i == 4:
             return StatusGui(self)
 
     def switch_to_next_gui(self):
@@ -163,30 +164,33 @@ class GuiMain(GuiBase):
         getattr(self, action)()
 
     def add_meter(self):
-        #print("add_meter")
-        n = self._cycle_data_list.count() + 1
-        self._cycle_data_list.add(CycleData(n, self._settings))
-        self._cycle_data_list.select_last()
+        meter = g.bc.add_meter_instance()
+        self._meter_list.select_last()
         self.gui_stack_pop_all()
 
-    def reset_meter(self):
-        #print("reset_meter")
-        self.cycle_data.reset()
+    def reset_cycle_meter(self):
+        g.bc.reset_current_meter()
+        self.gui_stack_pop_all()
+
+    def reset_altimeter(self):
+        g.bc.reset_current_altimeter()
         self.gui_stack_pop_all()
 
     def start_goal(self):
-        data = self.cycle_data
-        data.goal.is_started = True
-        data.goal.calculate_progress(data)
+        g.bc.enable_goal(True)
         self.gui_stack_pop_all()
 
+    def reset_goal(self):
+        g.bc.get_goal().reset()
+        self.gui_stack_pop_all()
+
+
     def stop_goal(self):
-        self.cycle_data.goal.is_started = False
+        g.bc.enable_goal(False)
         self.gui_stack_pop_all()
 
     def save_settings(self):
         self.gui_stack_pop_all()
-        #print("save_settings")
         self._settings.save()
 
     def ble_reconnect(self):
@@ -194,10 +198,10 @@ class GuiMain(GuiBase):
         self.gui_stack_pop_all()
 
     def save_goal_settings(self):
-        self.cycle_data.goal.save()
+        self.get_csc_data().goal.save()
 
     def load_goal_settings(self):
-        self.cycle_data.goal.load()
+        self.get_csc_data().goal.load()
 
     def gui_toggle_komoot(self):
         if 0 == self._gui_index:
@@ -206,16 +210,12 @@ class GuiMain(GuiBase):
             self._gui_index_last = self._gui_index
             self.switch_to_gui(0)
 
-    @property
-    def cycle_data(self):
-        return self._cycle_data_list.get()
-
     def gui_show_next_meter(self):
-        self._cycle_data_list.next()
+        self._meter_list.next()
         self.gui_stack_pop_all()
 
     def gui_show_prev_meter(self):
-        self._cycle_data_list.prev()
+        self._meter_list.prev()
         self.gui_stack_pop_all()        
 
     def callback_display_brightness_changed(self, val, closed):
@@ -223,9 +223,10 @@ class GuiMain(GuiBase):
         g.hal.set_backlight(val)
 
     def gui_update_state(self):
+        return
         txt = ""
         txt += "S" if g.bt.is_scanning() else " "
-        txt += "R" if self.cycle_data.is_riding else "  "
+        txt += "R" if self.get_csc_data().is_riding else "  "
         txt += "C" if g.bt.is_csc_connected() else " "
         txt += "K" if g.bt.is_komoot_connected() else " "
 
@@ -234,3 +235,6 @@ class GuiMain(GuiBase):
 
     def is_kommot_gui_active(self):
         return isinstance(self.active_gui, KomootGui)
+
+    def show_goal_menu(self):
+        self.add_to_gui_stack(GuiMenu(self, MenuGoal(g.bc._goal_meter.cycle_data.goal)))

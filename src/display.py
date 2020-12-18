@@ -67,7 +67,7 @@ class Display:
             self.fill_rect(x+cx, y, w, font.HEIGHT, bg)
             cx += w
 
-    def draw_text(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left):
+    def draw_text(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left, htrim=True):
         text_width = 0
         chw0 = font.get_width('0')
         w0 = 0
@@ -90,8 +90,13 @@ class Display:
             x0 = x + text_width
             pass
 
+        hm = 0
+        if htrim:
+            if font.height() == 54:
+                hm = 9
+
         if None != x0 and 0 < w0:
-            self._tft.fill_rect(x0, y, w0, font.height(), bg)
+            self._tft.fill_rect(x0, y, w0, font.height() - hm, bg)
 
         for ch in txt:
             data, height, width = font.get_ch(ch)
@@ -99,7 +104,7 @@ class Display:
             #self.buffer = bytearray(n*2)
             #self._tft.map_bitarray_to_rgb565(data, self.buffer, width, fg, bg)
             #self._tft.blit_buffer(self.buffer, x, y, width, height)
-            self._tft.blit_bitarray(data, width, x, y, fg, bg)
+            self._tft.blit_bitarray(data, width, height-hm, x, y, fg, bg)
             x += width            
             #buffer = None
             #g.hal.gc()

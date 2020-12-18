@@ -20,28 +20,25 @@ class AltimeterGui(GuiBase):
     def get_title(self):
         return "alt"
 
-    def show(self, redraw_all):
-        #print("show cycle_gui")
-        if redraw_all:
+    def show(self, redraw):
+        if redraw:
             self.cache.reset()
 
-        #self.clear()
-        alt = g.bc._altimeter
+        altimeter = g.bc._altimeter
+        alt = self.main.get_current_meter().alt_data
 
         self._cnt += 1
 
         g.display.draw_text(fonts.pf_small, "cnt  %2d" % (self._cnt), 0, 10, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "temp %.2f" % (alt.temperature), 0, 40, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "pres %.2f" % (alt.pressure), 0, 70, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "alt  %.2f" % (alt.altitude), 0, 100, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "alt min %.2f" % (alt.altitude_min), 0, 130, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "alt max %.2f" % (alt.altitude_max), 0, 160, align=Align.left)
-        g.display.draw_text(fonts.pf_small, "alt sum %.2f" % (alt.altitude_sum), 0, 190, align=Align.left)
-        #g.display.draw_text(fonts.pf_small, "altv %.2f %.2f" % (alt.alt_avg.alt, alt.alt_kalman.alt), 0, 130, align=Align.left)
-        #g.display.draw_text(fonts.pf_small, "sum  %.2f %.2f" % (alt.alt_avg.sum, alt.alt_kalman.sum), 0, 160, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "temp %.2f" % (altimeter.temperature), 0, 40, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "pres %.2f" % (altimeter.pressure), 0, 70, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "alt  %.2f" % (altimeter.altitude), 0, 100, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "alt min %.2f" % (alt.min), 0, 130, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "alt max %.2f" % (alt.max), 0, 160, align=Align.left)
+        g.display.draw_text(fonts.pf_small, "alt sum %.2f" % (alt.sum), 0, 190, align=Align.left)
 
     def handle(self, event):
         if event == (Button.left | Button.long):
-            g.bc._altimeter.reset_alt()
+            g.bc.reset_current_altimeter()
         else:
             GuiBase.handle(self, event)

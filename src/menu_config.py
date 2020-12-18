@@ -18,8 +18,8 @@ class MenuMeter:
     def __init__(self):
         self.title = "Reset"
         self.items = [ 
+                       MenuItem("Reset", "reset_cycle_meter"),
                        MenuItem("Add", "add_meter"),
-                       MenuItem("Reset", "reset_meter"),
         ]
         pass    
 
@@ -51,7 +51,9 @@ class MenuAltimeter:
         self.altimeter_values = MenuValueItem("Number of;avg values", data.altimeter_values)
         self.altimeter_time_ms = MenuValueItem("Scan interval;ms", data.altimeter_time_ms)
         self.altimeter_step = MenuValueItem("Step cm", data.altimeter_step)
-        self.items = [ self.altimeter_enabled,
+        self.items = [ 
+                       MenuItem("Reset", "reset_altimeter"),
+                       self.altimeter_enabled,
                        self.altimeter_values,
                        self.altimeter_time_ms,
                        self.altimeter_step,
@@ -87,13 +89,15 @@ class MenuGoal:
         self.load = MenuItem("Load", "load_goal_settings")
         self.stop = MenuItem("Stop", "stop_goal")
         self.start = MenuItem("Start", "start_goal")
-        self.items = [ self.dist,
+        self.reset = MenuItem("Reset", "reset_goal")
+        start_stop = self.stop if data.is_started else self.start
+        self.items = [ start_stop,
+                       self.reset,
+                       self.dist,
                        self.avg,
                        self.time,
                        self.save,
                        self.load,
-                       self.stop,
-                       self.start
         ]
         pass    
 
