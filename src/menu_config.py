@@ -9,6 +9,7 @@ class MenuMain:
                        MenuItem("Altimeter", "gui_show_altimeter_menu"),
                        MenuItem("Komoot", "gui_show_komoot_menu"),
                        MenuItem("BLE scan", "ble_reconnect"),
+                       LambdaMenuItem("Display off", lambda: g.bc._display_ctrl.set_display_complete_off),
                        MenuItem("Save", "save_settings"),
         ]
         pass
@@ -18,12 +19,14 @@ class MenuMeter:
     def __init__(self, main, data):
         self.title = "Reset"
         self.items = [ 
-                       LambdaMenuItem("Reset", lambda : main.reset_meter(data)),
                        LambdaMenuItem("Stop" if data.cycle_data.is_started else "Start", lambda : main.enable_meter(data, not data.cycle_data.is_started)),
-                       MenuItem("Add", "add_meter"),
+                       LambdaMenuItem("Reset", lambda : main.reset_meter(data)),
+                       MenuItem("Add meter", "add_meter"),
         ]
         if data.id != 1:
-            self.items.append(MenuItem("Del", "del_meter"))
+            self.items.append(MenuItem("Del meter", "del_meter"))
+        if not main._goal_visible:
+            self.items.append(LambdaMenuItem("Show goal", lambda: main.show_goal_meter(True)))
         pass    
 
 
@@ -91,6 +94,7 @@ class MenuGoal:
                        self.dist,
                        self.avg,
                        self.time,
+                       LambdaMenuItem("Hide", lambda: main.show_goal_meter(False)),
                        MenuItem("Save", "save_goal_settings"),
                        MenuItem("Load", "load_goal_settings"),
         ]

@@ -23,12 +23,12 @@ class BikeComputer:
         self.add_meter_instance()
         self.komoot_data = KomootData()
         self._display_ctrl = DisplayCtrl(self._settings)
-        self.gui = GuiMain(self._settings, self.meter_list, self.komoot_data)
+        self._goal_data = GoalData(self._settings)
+        self._goal_data.load()
+        self.gui = GuiMain(self._settings, self.meter_list, self.komoot_data, self._goal_data)
         self._btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.btn_event, Button.left, self._settings.long_click.value) 
         self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
         self._altimeter = Altimeter()
-        self._goal_data = GoalData(self._settings)
-        self._goal_data.load()
 
     def on_cycle_data(self, raw_data):
         for meter in self.meter_list:
@@ -37,7 +37,7 @@ class BikeComputer:
 
     def on_altitude_data(self, altitude):
         for meter in self.meter_list:
-            meter.alt_data.process(altitude, self._settings.altimeter_step.value / 100)
+            meter.alt_data.process(altitude, self._settings.altimeter_step.value / 100, meter.cycle_data.is_riding)
 
     def ignore_click(self, is_long):
         display_off = not self._display_ctrl.is_display_on()

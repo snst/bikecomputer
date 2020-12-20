@@ -9,8 +9,8 @@ class AltitudeSum:
         self.min = 9999
         self.max = 0000
 
-    def process(self, val, delta):
-        if self._last_val == None or not self._enabled:
+    def process(self, val, delta, is_riding):
+        if self._last_val == None or not self._enabled or not is_riding:
             self._last_val = val
         else:
             diff = val - self._last_val

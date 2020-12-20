@@ -18,6 +18,13 @@ class DisplayCtrl:
         if self.callback != None:
             self.callback(self.display_on)
 
+    def set_display_complete_off(self):
+        g.hal.set_backlight(0)
+        self.display_on = False
+        if self.callback != None:
+            self.callback(self.display_on)
+
+
     def set_display_on(self):
         g.hal.set_backlight(self._settings.led_on.value)
         self.display_on = True

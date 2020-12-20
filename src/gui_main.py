@@ -16,11 +16,12 @@ from item_list import *
 from goal_gui import *
 
 class GuiMain(GuiBase):
-    def __init__(self, settings, meter_list, komoot_data):
+    def __init__(self, settings, meter_list, komoot_data, goal_data):
         self.callback_repaint = None
         self._settings = settings
         self._meter_list = ItemList(meter_list)
         self.komoot_data = komoot_data
+        self._goal_data = goal_data
         self.active_gui = None
         self.gui_stack = []
         self._gui_list = ItemList()
@@ -29,6 +30,7 @@ class GuiMain(GuiBase):
         self._gui_index_last = 1
         self._max_views = 5
         self.add_to_gui_stack(self.create_gui())
+        self._goal_visible = False
 
     def add_gui_list(self, gui):
         self._gui_list.append(gui)
@@ -132,14 +134,18 @@ class GuiMain(GuiBase):
             return StatusGui(self)
 
     def switch_to_next_gui(self):
-        index = (self._gui_index + 1) % self._max_views
-
+        index = min(self._gui_index + 1, 4)
+        #index = (self._gui_index + 1) % self._max_views
         if index == 0 and self._settings.komoot_enabled.value == 0: #skip komoot if not enabled
+            index += 1
+        if not self._goal_visible and index == 2:
             index += 1
         self.switch_to_gui(index)
 
     def switch_to_prev_gui(self):
         index = (self._gui_index - 1) 
+        if not self._goal_visible and index == 2:
+            index -= 1
         if self._settings.komoot_enabled.value == 1:
             if index < 0:
                 index = 1
@@ -152,7 +158,6 @@ class GuiMain(GuiBase):
         gui = self.create_gui()
         self.gui_stack[0] = gui
         self.activate_gui(gui)
-
 
     def gui_stack_pop(self):
         self.gui_stack.pop()
@@ -181,7 +186,6 @@ class GuiMain(GuiBase):
         meter.reset()
         meter.enable(True)
         self.gui_stack_pop_all()
-
 
     def reset_altimeter(self):
         g.bc.reset_current_altimeter()
@@ -253,3 +257,10 @@ class GuiMain(GuiBase):
 
     def show_cycle_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_current_meter())))
+
+    def show_goal_meter(self, visible):
+        self._goal_visible = visible
+        self._goal_data.enable(visible)
+        self.switch_to_gui(2 if visible else 1)
+        self.gui_stack_pop_all()
+        

@@ -50,9 +50,9 @@ class AltimeterGui(GuiBase):
         self.show_val(redraw, y + i*ys, "Alt max", "%.1f m" % (alt.max), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Alt sum", "%.1f m" % (alt.sum), i)
-
-    #def handle(self, event):
-    #    if event == (Button.left | Button.long):
-    #        g.bc.reset_current_altimeter()
-    #    else:
-    #        GuiBase.handle(self, event)
+        
+    def handle(self, event = 0):
+        if event == (Button.right | Button.long):
+            self.main.show_cycle_menu()
+        else:
+            GuiBase.handle(self, event)
