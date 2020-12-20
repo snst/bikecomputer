@@ -47,7 +47,10 @@ class CycleGui(GuiBase):
         self.show_desc("hm", y_alt)
 
     def handle(self, event = 0):
-        GuiBase.handle(self, event)
+        if event == (Button.right | Button.long):
+            self.main.show_cycle_menu()
+        else:
+            GuiBase.handle(self, event)
 
     def show_speed_big(self, data, y):
         speed = round(data.speed, 1)
@@ -77,7 +80,7 @@ class CycleGui(GuiBase):
         speed = round(data.speed_avg, 1)
         col = Color.white
         if data.goal and data.goal.is_started:
-            col = Color.red if data.goal.is_behind(data) else Color.green
+            col = Color.red if data.goal.is_behind() else Color.green
         if self.cache.changed(4, speed) or self.cache.changed(5, col):
             self.show_float_speed(speed, g.display.width, y, color = col, font = self._font)
 

@@ -26,9 +26,7 @@ class StatusGui(GuiBase):
     def show(self, redraw):
         y = 0
         ys = fonts.pf_small.height()
-        data = self.main.get_csc_data()
         altimter = g.bc._altimeter
-        alt = self.main.get_current_meter().alt_data
         if redraw:
             self.cache.reset()
         i = 0
@@ -36,21 +34,11 @@ class StatusGui(GuiBase):
         i += 1
         self.show_val(redraw, y + i*ys, "Bike bat", "%d %%" % (g.bc.env_data.sensor_bat_percent), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Max km/h", "%.1f" % (round(data.speed_max, 1)), i)
-        i += 1
-        self.show_val(redraw, y + i*ys, "Avg cadence", "%d" % (data.cadence_avg), i)
-        i += 1
         self.show_val(redraw, y + i*ys, "Temp", "%.1f C" % (altimter.temperature), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Pressure", "%.1f hPa" % (altimter.pressure), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Alt", "%.1f m" % (altimter.altitude), i)
-        i += 1
-        self.show_val(redraw, y + i*ys, "Alt min", "%.1f m" % (alt.min), i)
-        i += 1
-        self.show_val(redraw, y + i*ys, "Alt max", "%.1f m" % (alt.max), i)
-        i += 1
-        self.show_val(redraw, y + i*ys, "Alt sum", "%.1f m" % (alt.sum), i)
 
 
     def handle(self, event):

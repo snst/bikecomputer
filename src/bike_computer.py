@@ -27,14 +27,13 @@ class BikeComputer:
         self._btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.btn_event, Button.left, self._settings.long_click.value) 
         self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
         self._altimeter = Altimeter()
-        self._goal_meter = MeterData(0, self.env_data, self._settings)
-        self._goal_meter.cycle_data.goal = GoalData()
-        self._goal_meter.cycle_data.goal.load()
+        self._goal_data = GoalData(self._settings)
+        self._goal_data.load()
 
     def on_cycle_data(self, raw_data):
         for meter in self.meter_list:
             meter.cycle_data.process(raw_data)
-        self._goal_meter.cycle_data.process(raw_data)
+        self._goal_data.process(raw_data)
 
     def on_altitude_data(self, altitude):
         for meter in self.meter_list:
@@ -122,21 +121,11 @@ class BikeComputer:
     def reset_current_altimeter(self):
         self.get_current_meter().alt_data.reset()
 
-    def reset_current_meter(self):
-        self.get_current_cycle_data().reset()
-
     def add_meter_instance(self):
         id = len(self.meter_list) + 1
         meter = MeterData(id, self.env_data, self._settings)
         self.meter_list.append(meter)
         return meter
-
-    def enable_goal(self, enable):
-        data = self._goal_meter.cycle_data
-        data.goal.is_started = enable
-        if enable:
-            data.goal.calculate_progress(data)
-
-        
+     
     def get_goal(self):
-        return self._goal_meter.cycle_data
+        return self._goal_data

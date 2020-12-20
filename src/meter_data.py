@@ -12,3 +12,12 @@ class MeterData:
         self.env_data = env_data
         self.settings = settings
         pass
+
+    def enable(self, enabled):
+        self.cycle_data.enable(enabled)
+        self.alt_data.enable(enabled)
+
+    def reset(self):
+        self.cycle_data.reset()
+        self.alt_data.reset()
+

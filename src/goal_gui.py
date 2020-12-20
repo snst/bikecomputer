@@ -19,12 +19,12 @@ class GoalGui(CycleGui):
         return "goal"
 
     def show(self, redraw):
+
+        data = g.bc._goal_data
+        goal = data        
+
         if redraw:
             self.cache.reset()
-
-        alt_data = self.main.get_current_meter().alt_data
-        data = g.bc._goal_meter.cycle_data
-        goal = data.goal        
 
         yd = 48
         y_speed = 0
@@ -34,7 +34,7 @@ class GoalGui(CycleGui):
         y_alt = y_time + yd
         y_goal = y_avg
 
-        goal.calculate_progress(data)
+        goal.calculate_progress()
 
         self.show_id(data)
         self.show_speed_big(data, y_speed)
@@ -47,9 +47,12 @@ class GoalGui(CycleGui):
 
         if not goal.has_distance_reached:
             self.show_speed_goal(goal, data, y_goal)
-            pass
-        else:
-            self.show_speed_final(goal, y_goal)
+
+        if self.cache.changed(15, goal.has_distance_reached):
+            if goal.has_distance_reached:
+                g.display.fill_rect(0, y_goal, (int)(g.display.width/2), self._font.height(), Color.black)
+
+
         self.show_distance_goal(goal, y_distance)
         self.show_progress_goal(goal, y_distance-3)
         self.show_time_goal(goal, y_time)
@@ -66,9 +69,6 @@ class GoalGui(CycleGui):
         if self.cache.changed(8, speed):
             self.show_float_speed(speed, 0, y, color=Color.white, align = Align.left, font = self._font)
 
-    def show_speed_final(self, goal, y):
-        if self.cache.changed(9, goal.calc_required_average_km_h):
-            self.show_float_speed(goal.calc_required_average_km_h, 0, y, color=Color.blue, align = Align.left, font = self._font)
 
     def show_distance_goal(self, data, y):
         distance = round(data.remaining_distance_km, 1)

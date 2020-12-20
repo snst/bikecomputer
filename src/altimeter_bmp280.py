@@ -9,6 +9,7 @@ class Altimeter_bmp280:
         self._sensor.iir_filter = adafruit_bmp280.IIR_FILTER_X16
         self._sensor.overscan_pressure = adafruit_bmp280.OVERSCAN_X16
         self._sensor.overscan_temperature = adafruit_bmp280.OVERSCAN_X2
+        self._altitude = 0
         # The sensor will need a moment to gather inital readings
 
     
@@ -17,8 +18,8 @@ class Altimeter_bmp280:
         #print('Temperature: {} degrees C'.format(self._sensor.temperature)) 
         #print('Pressure: {}hPa'.format(self._sensor.pressure))
         #print('Altitude: {} meters'.format(self._sensor.altitude))
-
         #print("Temp=%f°C, Pressure=%fhPa, Alt=%fm" % (self._sensor.temperature, self._sensor.pressure, self._sensor.altitude))
+        self._altitude = self._sensor.altitude
         pass
     
     @property
@@ -27,7 +28,8 @@ class Altimeter_bmp280:
 
     @property
     def altitude(self):
-        return self._sensor.altitude
+        return self._altitude
+        #return self._sensor.altitude
 
     @property
     def pressure(self):

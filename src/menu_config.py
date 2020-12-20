@@ -1,32 +1,35 @@
 from menu_item import *
-
+from goal_data import *
 
 class MenuMain:
     def __init__(self):
         self.title = "Menu"
-        self.items = [ MenuItem("Goal", "gui_show_goal_menu"),
-                       MenuItem("Settings", "go_menu_settings"),
-                       MenuItem("Meter", "gui_show_meter_menu"),
+        self.items = [ MenuItem("Display", "go_menu_settings"),
                        MenuItem("CSC", "gui_show_csc_menu"),
-                       MenuItem("Komoot", "gui_show_komoot_menu"),
                        MenuItem("Altimeter", "gui_show_altimeter_menu"),
+                       MenuItem("Komoot", "gui_show_komoot_menu"),
+                       MenuItem("BLE scan", "ble_reconnect"),
+                       MenuItem("Save", "save_settings"),
         ]
         pass
 
 
 class MenuMeter:
-    def __init__(self):
+    def __init__(self, main, data):
         self.title = "Reset"
         self.items = [ 
-                       MenuItem("Reset", "reset_cycle_meter"),
+                       LambdaMenuItem("Reset", lambda : main.reset_meter(data)),
+                       LambdaMenuItem("Stop" if data.cycle_data.is_started else "Start", lambda : main.enable_meter(data, not data.cycle_data.is_started)),
                        MenuItem("Add", "add_meter"),
         ]
+        if data.id != 1:
+            self.items.append(MenuItem("Del", "del_meter"))
         pass    
 
 
 class MenuSettings:
     def __init__(self, data):
-        self.title = "Setting"
+        self.title = "Display"
         self.data = data
         self.led_on = MenuValueItem("LED;brightness on", data.led_on)
         self.led_off = MenuValueItem("LED;brightness off", data.led_off)
@@ -38,13 +41,12 @@ class MenuSettings:
                        self.led_time,
                        self.touch_ignore,
                        self.long_click,
-                       MenuItem("BLE scan", "ble_reconnect"),
                        MenuItem("Save", "save_settings"),
         ]
         pass        
 
 class MenuAltimeter:
-    def __init__(self, data):
+    def __init__(self, main, meter, data):
         self.title = "alt"
         self.data = data
         self.altimeter_enabled = MenuValueItem("Enabled;altimeter", data.altimeter_enabled)
@@ -52,7 +54,6 @@ class MenuAltimeter:
         self.altimeter_time_ms = MenuValueItem("Scan interval;ms", data.altimeter_time_ms)
         self.altimeter_step = MenuValueItem("Step cm", data.altimeter_step)
         self.items = [ 
-                       MenuItem("Reset", "reset_altimeter"),
                        self.altimeter_enabled,
                        self.altimeter_values,
                        self.altimeter_time_ms,
@@ -79,25 +80,19 @@ class MenuCSC:
         pass        
 
 class MenuGoal:
-    def __init__(self, data):
+    def __init__(self, main, data):
         self.title = "Goal"
         self.data = data
         self.dist = MenuValueItem("Distance km", data.target_dist_km, data.calculate_time)
         self.avg = MenuValueItem("Average km/h", data.target_average_km_h, data.calculate_time)
         self.time = MenuValueItem("Time min", data.target_time_min, data.calculate_avg)
-        self.save = MenuItem("Save", "save_goal_settings")
-        self.load = MenuItem("Load", "load_goal_settings")
-        self.stop = MenuItem("Stop", "stop_goal")
-        self.start = MenuItem("Start", "start_goal")
-        self.reset = MenuItem("Reset", "reset_goal")
-        start_stop = self.stop if data.is_started else self.start
-        self.items = [ start_stop,
-                       self.reset,
+        self.items = [ LambdaMenuItem("Stop" if data.is_started else "Start", lambda : main.enable_meter(data, not data.is_started)),
+                       LambdaMenuItem("Reset", lambda : main.reset_meter(data)),
                        self.dist,
                        self.avg,
                        self.time,
-                       self.save,
-                       self.load,
+                       MenuItem("Save", "save_goal_settings"),
+                       MenuItem("Load", "load_goal_settings"),
         ]
         pass    
 

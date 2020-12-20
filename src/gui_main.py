@@ -85,20 +85,19 @@ class GuiMain(GuiBase):
         self.add_to_gui_stack(GuiMenu(self, MenuMain()))
 
     def gui_show_meter_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuMeter()))
+        self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_csc_data())))
 
     def gui_show_komoot_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuKomoot(self._settings)))
 
     def gui_show_altimeter_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuAltimeter(self._settings)))
+        self.add_to_gui_stack(GuiMenu(self, MenuAltimeter(self, None, self._settings)))
 
     def gui_show_csc_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuCSC(self._settings)))
 
     def gui_show_goal_menu(self):
-        data = g.bc._goal_meter.cycle_data
-        self.add_to_gui_stack(GuiMenu(self, MenuGoal(data.goal)))
+        self.add_to_gui_stack(GuiMenu(self, MenuGoal(self, g.bc._goal_data)))
 
     def go_menu_settings(self):
         m = MenuSettings(self._settings)
@@ -134,13 +133,17 @@ class GuiMain(GuiBase):
 
     def switch_to_next_gui(self):
         index = (self._gui_index + 1) % self._max_views
-        #if index == 0:
-        #    index += 1
+
+        if index == 0 and self._settings.komoot_enabled.value == 0: #skip komoot if not enabled
+            index += 1
         self.switch_to_gui(index)
 
     def switch_to_prev_gui(self):
         index = (self._gui_index - 1) 
-        if index < 0:
+        if self._settings.komoot_enabled.value == 1:
+            if index < 0:
+                index = 1
+        elif index < 1:
             index = 1
         self.switch_to_gui(index)
 
@@ -168,25 +171,34 @@ class GuiMain(GuiBase):
         self._meter_list.select_last()
         self.gui_stack_pop_all()
 
-    def reset_cycle_meter(self):
-        g.bc.reset_current_meter()
+    def del_meter(self):
+        meter = self._meter_list.get()
+        self._meter_list.prev()
+        self._meter_list.remove(meter)
         self.gui_stack_pop_all()
+
+    def reset_meter(self, meter):
+        meter.reset()
+        meter.enable(True)
+        self.gui_stack_pop_all()
+
 
     def reset_altimeter(self):
         g.bc.reset_current_altimeter()
         self.gui_stack_pop_all()
 
-    def start_goal(self):
-        g.bc.enable_goal(True)
+    def start_meter(self):
+        meter = self._meter_list.get()
+        meter.enable(True)
         self.gui_stack_pop_all()
 
-    def reset_goal(self):
-        g.bc.get_goal().reset()
+    def stop_meter(self):
+        meter = self._meter_list.get()
+        meter.enable(False)
         self.gui_stack_pop_all()
 
-
-    def stop_goal(self):
-        g.bc.enable_goal(False)
+    def enable_meter(self, meter, enabled):
+        meter.enable(enabled)
         self.gui_stack_pop_all()
 
     def save_settings(self):
@@ -198,7 +210,7 @@ class GuiMain(GuiBase):
         self.gui_stack_pop_all()
 
     def save_goal_settings(self):
-        self.get_csc_data().goal.save()
+        g.bc._goal_data.save()
 
     def load_goal_settings(self):
         self.get_csc_data().goal.load()
@@ -237,4 +249,7 @@ class GuiMain(GuiBase):
         return isinstance(self.active_gui, KomootGui)
 
     def show_goal_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuGoal(g.bc._goal_meter.cycle_data.goal)))
+        self.add_to_gui_stack(GuiMenu(self, MenuGoal(self, g.bc._goal_data)))
+
+    def show_cycle_menu(self):
+        self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_current_meter())))

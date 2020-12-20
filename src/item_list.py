@@ -23,3 +23,6 @@ class ItemList:
     def select_last(self):
         self._index = self.count() - 1
         return self.get()
+
+    def remove(self, item):
+        self._list.remove(item)

@@ -53,7 +53,7 @@ class GuiEditValue:
             else:
                 self.main.gui_stack_pop()
         else:
-            step = self.item.data.min/10 if self.edit_decimal_place  else self.item.data.step
+            step = self.item.data.step/10 if self.edit_decimal_place else self.item.data.step
             if event == Event.val_dec:
                 self.edit_val = self.edit_val - step if self.edit_val > self.item.data.min else self.item.data.max
             elif event == Event.val_inc:

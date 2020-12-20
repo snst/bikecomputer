@@ -44,6 +44,8 @@ class GuiMenu:
         item = self.get_selected_item()
         if item.type == MenuItem.INT_ITEM or item.type == MenuItem.FLOAT_ITEM:
             self.main.action_go_edit_setting_value(item)
+        elif item.type == MenuItem.LAMBDA_ITEM:
+            item.action()
         else:
             self.main.do_action(item.action)
 

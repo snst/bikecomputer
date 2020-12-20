@@ -4,10 +4,16 @@ class MenuItem:
     MENU_ITEM = 0
     INT_ITEM = 1
     FLOAT_ITEM = 2
+    LAMBDA_ITEM = 3
     def __init__(self, name, action):
         self.name = name
         self.action = action
         self.type = self.MENU_ITEM
+
+class LambdaMenuItem(MenuItem):
+    def __init__(self, name, action):
+        MenuItem.__init__(self, name, action)
+        self.type = self.LAMBDA_ITEM
 
 class IntMenuItem(MenuItem):
     def __init__(self, name, default, min, max):

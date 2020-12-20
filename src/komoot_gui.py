@@ -78,3 +78,9 @@ class KomootGui(GuiBase):
     #        self.main.gui_stack_pop_all()
     #    else:
     #        GuiBase.handle(self, event)
+
+    def handle(self, event):
+        if event == (Button.right | Button.long):
+            self.main.gui_show_komoot_menu()
+        else:
+            GuiBase.handle(self, event)

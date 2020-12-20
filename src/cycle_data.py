@@ -23,6 +23,8 @@ class CycleData:
         self.trip_duration_min = 0
         self.is_riding = False
         self.sim = 10
+        self.is_started = True
+
 
 
     def calc_kmh_from_csc_val(self, wheel_counter, time_counter):
@@ -66,15 +68,22 @@ class CycleData:
         self.crank_counter.calc_delta(crank_counter)
         self.crank_time.calc_delta(crank_time)
 
-        if self.goal and not self.goal.is_started:
-            return
+        self.process_data()
 
+    def process_data(self):
+        CycleData.calculate_current_data(self)
+        if self.is_started:
+            self.calculate_accumulated_data()
+
+    def calculate_current_data(self):
         if self.init:
-
             self.speed = self.calc_kmh_from_csc_val(self.wheel_counter.delta, self.wheel_time.delta)
-
             self.cadence = self.calc_cadence_from_csc_val(self.crank_counter.delta, self.crank_time.delta)
+        self.init = True
 
+
+    def calculate_accumulated_data(self):
+        if self.init:
             if self.cadence >= self._settings.min_cadence.value and self.cadence < 200:
                 self.crank_counter.add_delta()
                 self.crank_time.add_delta()
@@ -91,13 +100,8 @@ class CycleData:
                     self.wheel_time.add_delta()
                     self.speed_avg = self.calc_kmh_from_csc_val(self.wheel_counter.sum, self.wheel_time.sum)
     
+            self.trip_distance = self.wheel_counter.get_distance_in_km(self._settings.wheel_cm.value)
+            self.trip_duration_min = self.wheel_time.get_sum_in_min()
 
-            if self.goal == None or not self.goal.has_distance_reached:
-                #print("is_riding=%d, speed=%.2f/%.2f, cadence=%d/%d" % (self.is_riding, self.speed_kmh, self.average_speed_kmh, self.cadence, self.average_cadence))
-                self.trip_distance = self.wheel_counter.get_distance_in_km(self._settings.wheel_cm.value)
-                self.trip_duration_min = self.wheel_time.get_sum_in_min()
-
-            if self.goal != None:
-                self.goal.calculate_progress(self)
-
-        self.init = True
+    def enable(self, val):
+        self.is_started = val
