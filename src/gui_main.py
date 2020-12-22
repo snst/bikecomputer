@@ -30,7 +30,7 @@ class GuiMain(GuiBase):
         self._gui_index_last = 1
         self._max_views = 5
         self.add_to_gui_stack(self.create_gui())
-        self._goal_visible = False
+        self._goal_visible = True #False
 
     def add_gui_list(self, gui):
         self._gui_list.append(gui)

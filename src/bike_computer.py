@@ -33,7 +33,7 @@ class BikeComputer:
     def on_cycle_data(self, raw_data):
         for meter in self.meter_list:
             meter.cycle_data.process(raw_data)
-        self._goal_data.process(raw_data)
+        #self._goal_data.process(raw_data)
 
     def on_altitude_data(self, altitude):
         for meter in self.meter_list:
@@ -83,7 +83,7 @@ class BikeComputer:
 
     def task_update_altimeter(self):
         self._scheduler.insert(self._settings.altimeter_time_ms.value, self.task_update_altimeter)
-        if self._settings.altimeter_enabled.value:
+        if None != self._altimeter and self._settings.altimeter_enabled.value:
             self._altimeter.update()
             self.on_altitude_data(self._altimeter.altitude)
 

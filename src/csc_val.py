@@ -22,6 +22,7 @@ class CscVal:
         self.last_val = val
  
     def add_delta(self):
+        print("add %u" % (self.delta))
         self.sum += self.delta
 
     def get_sum_in_min(self):
@@ -29,3 +30,6 @@ class CscVal:
 
     def get_distance_in_km(self, wheel_cm):
         return self.sum * wheel_cm / 100000
+
+    def print(self, str):
+        print("%s: sum=%u, last=%u, delta=%u" % (str, self.sum, self.last_val, self.delta))

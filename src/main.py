@@ -11,7 +11,7 @@ from machine import I2C
 from komoot_data import *
 import data_global as g
 from bt_manager import *
-from altimeter_bmp280 import *
+#from altimeter_bmp280 import *
 import gc
 
 
@@ -37,7 +37,7 @@ g.hal = Hal_esp32()
 g.bt = BtManager()
 
 i2c = I2C(1, scl=machine.Pin(22), sda=machine.Pin(21), freq=400000)
-g.altimeter = Altimeter_bmp280(i2c)
+#g.altimeter = Altimeter_bmp280(i2c)
 
 
 g.bc = BikeComputer()

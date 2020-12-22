@@ -67,20 +67,24 @@ class CycleData:
         self.wheel_time.calc_delta(wheel_time)
         self.crank_counter.calc_delta(crank_counter)
         self.crank_time.calc_delta(crank_time)
+        self.wheel_counter.print("wc")
+        self.wheel_time.print("wt")
+        self.crank_counter.print("cc")
+        self.crank_time.print("ct")
 
         self.process_data()
 
     def process_data(self):
-        CycleData.calculate_current_data(self)
+        self.calculate_current_data()
         if self.is_started:
             self.calculate_accumulated_data()
+        self.init = True
+
 
     def calculate_current_data(self):
         if self.init:
             self.speed = self.calc_kmh_from_csc_val(self.wheel_counter.delta, self.wheel_time.delta)
             self.cadence = self.calc_cadence_from_csc_val(self.crank_counter.delta, self.crank_time.delta)
-        self.init = True
-
 
     def calculate_accumulated_data(self):
         if self.init:
@@ -90,12 +94,13 @@ class CycleData:
                 self.cadence_avg = self.calc_cadence_from_csc_val(self.crank_counter.sum, self.crank_time.sum)
 
             valid_speed = self.speed < 100
-            self.is_riding = valid_speed and self.speed > self._settings.min_speed.value
+            self.is_riding = valid_speed and self.speed >= self._settings.min_speed.value
 
             if valid_speed:
                 self.speed_max = max(self.speed_max, self.speed)
 
                 if self.is_riding:
+                    print("add wheel")
                     self.wheel_counter.add_delta()
                     self.wheel_time.add_delta()
                     self.speed_avg = self.calc_kmh_from_csc_val(self.wheel_counter.sum, self.wheel_time.sum)

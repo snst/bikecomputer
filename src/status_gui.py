@@ -30,7 +30,7 @@ class StatusGui(GuiBase):
         if redraw:
             self.cache.reset()
         i = 0
-        self.show_val(redraw, y + i*ys, "Comp bat", "%.2f V" % (g.bc.env_data.computer_bat_volt), i)
+        self.show_val(redraw, y + i*ys, "Lipo bat", "%.2f V" % (g.bc.env_data.computer_bat_volt), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Bike bat", "%d %%" % (g.bc.env_data.sensor_bat_percent), i)
         i += 1

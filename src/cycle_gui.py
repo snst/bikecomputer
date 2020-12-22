@@ -41,7 +41,7 @@ class CycleGui(GuiBase):
         self.show_trip_duration(data, y_time)
         self.show_trip_alt(alt_data, y_alt)
 
-        self.show_desc("avg", y_avg)
+        self.show_desc('avg', y_avg)
         self.show_desc("km", y_distance)
         self.show_desc("h:m", y_time)
         self.show_desc("hm", y_alt)

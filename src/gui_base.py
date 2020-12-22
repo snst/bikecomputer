@@ -49,19 +49,23 @@ class GuiBase:
         ival = (int) (val)
         dval = (int)((val - ival)*10)
         mw = font.get_width('0')
+        dotw = font.get_width('.')
+        #blank_width = 3 * mw + dotw
+        #h = font.height()
+        #g.display.fill_rect(x,y,blank_width, h, Color.green)
         if align == Align.left:
             if ival < 10:
-                mw *= -1
+                mw *= -2
             elif ival < 100:
                 mw *= -2
             else:
                 mw *= -3
-            mw -= font.get_width('.')
+            mw -= dotw
         if val < 100:
             g.display.draw_text(font, "%2d." % (ival), x-mw, y, fg=color, align = Align.right)
             g.display.draw_text(font, "%d" % (dval), x-mw, y, fg=color, align = Align.left)
         else:
-            g.display.draw_text(font, "%3d" % (ival), x -mw, y, fg=color, align = Align.right)
+            g.display.draw_text(font, "%3d" % (ival), x-mw, y, fg=color, align = Align.right)
 
     def show_float_time(self, val, x, y, align = Align.right, font = fonts.pf_normal):
         h = (int)(val / 60)
