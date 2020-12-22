@@ -93,7 +93,7 @@ class GuiBase:
     def show_big_speed(self, val, x, y, color):
         ival = (int) (val)
         dval = (int)((val - ival)*10)
-        mw = fonts.pf_normal.get_width('0')
+        mw = fonts.pf_normal.get_width(b'0')
         g.display.draw_text(fonts.pf_huge, " %2d" % (ival), x-mw-3, y, fg=color, bg=Color.black, align=Align.right)
         g.display.draw_text(fonts.pf_normal, "%d" % (dval), x-mw, y, fg=color, bg=Color.black, align=Align.left)
 

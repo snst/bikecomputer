@@ -18,7 +18,7 @@ class AltimeterGui(GuiBase):
         #self._cnt = 0
 
     def get_title(self):
-        return "alt"
+        return b'alt'
 
     def show_val(self, redraw, y, str, val, i):
         if redraw:

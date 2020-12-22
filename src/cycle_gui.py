@@ -15,7 +15,7 @@ class CycleGui(GuiBase):
         self._font = fonts.pf_normal
 
     def get_title(self):
-        return "csc"
+        return b'csc'
 
     def show(self, redraw):
         if redraw:
@@ -41,10 +41,10 @@ class CycleGui(GuiBase):
         self.show_trip_duration(data, y_time)
         self.show_trip_alt(alt_data, y_alt)
 
-        self.show_desc('avg', y_avg)
-        self.show_desc("km", y_distance)
-        self.show_desc("h:m", y_time)
-        self.show_desc("hm", y_alt)
+        self.show_desc(b'avg', y_avg)
+        self.show_desc(b'km', y_distance)
+        self.show_desc(b'h:m', y_time)
+        self.show_desc(b'hm', y_alt)
 
     def handle(self, event = 0):
         if event == (Button.right | Button.long):

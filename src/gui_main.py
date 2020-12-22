@@ -76,33 +76,34 @@ class GuiMain(GuiBase):
         self.active_gui.handle(event)
 
     def get_breadcrum(self):
-        val = ""
+        val = b''
         itergui = iter(self.gui_stack)
         next(itergui)
         for g in itergui:
-            val = val + ">" + g.get_title()
+            t = g.get_title()
+            val = val + b'>' + t
         return val
 
     def gui_show_main_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuMain()))
+        self.add_to_gui_stack(GuiMenu(self, MenuMain(self)))
 
     def gui_show_meter_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_csc_data())))
 
     def gui_show_komoot_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuKomoot(self._settings)))
+        self.add_to_gui_stack(GuiMenu(self, MenuKomoot(self)))
 
     def gui_show_altimeter_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuAltimeter(self, None, self._settings)))
+        self.add_to_gui_stack(GuiMenu(self, MenuAltimeter(self)))
 
     def gui_show_csc_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuCSC(self._settings)))
+        self.add_to_gui_stack(GuiMenu(self, MenuCSC(self)))
 
     def gui_show_goal_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuGoal(self, g.bc._goal_data)))
 
     def go_menu_settings(self):
-        m = MenuSettings(self._settings)
+        m = MenuSettings(self)
         m.led_on.set_value_changed_callback(self.callback_display_brightness_changed)
         m.led_off.set_value_changed_callback(self.callback_display_brightness_changed)
         self.add_to_gui_stack(GuiMenu(self, m))
@@ -169,7 +170,8 @@ class GuiMain(GuiBase):
 
     def do_action(self, action):
         #print("do action:" + action)
-        getattr(self, action)()
+        #getattr(self, action)()
+        action()
 
     def add_meter(self):
         meter = g.bc.add_meter_instance()

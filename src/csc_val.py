@@ -22,7 +22,7 @@ class CscVal:
         self.last_val = val
  
     def add_delta(self):
-        print("add %u" % (self.delta))
+        #print("add %u" % (self.delta))
         self.sum += self.delta
 
     def get_sum_in_min(self):

@@ -15,7 +15,7 @@ class KomootGui(GuiBase):
         self.cache = DataCache()
 
     def get_title(self):
-        return "komoot"
+        return b'komoot'
 
     def get_color_from_dist(self, data):
         return Color.red if data.distance <= self.main._settings.komoot_red_color.value else Color.white

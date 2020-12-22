@@ -18,7 +18,7 @@ class GuiCscStat(GuiBase):
         self.cache = DataCache()
 
     def get_title(self):
-        return "stat"
+        return b'stat'
 
     def show(self, redraw_all):
         #print("show cycle_gui")

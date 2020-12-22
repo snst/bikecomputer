@@ -15,7 +15,7 @@ class StatusGui(GuiBase):
         g.bc.request_computer_bat()
 
     def get_title(self):
-        return "status"
+        return b'status'
 
     def show_val(self, redraw, y, str, val, i):
         if redraw:

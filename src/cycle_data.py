@@ -67,10 +67,10 @@ class CycleData:
         self.wheel_time.calc_delta(wheel_time)
         self.crank_counter.calc_delta(crank_counter)
         self.crank_time.calc_delta(crank_time)
-        self.wheel_counter.print("wc")
-        self.wheel_time.print("wt")
-        self.crank_counter.print("cc")
-        self.crank_time.print("ct")
+        #self.wheel_counter.print("wc")
+        #self.wheel_time.print("wt")
+        #self.crank_counter.print("cc")
+        #self.crank_time.print("ct")
 
         self.process_data()
 
@@ -100,7 +100,6 @@ class CycleData:
                 self.speed_max = max(self.speed_max, self.speed)
 
                 if self.is_riding:
-                    print("add wheel")
                     self.wheel_counter.add_delta()
                     self.wheel_time.add_delta()
                     self.speed_avg = self.calc_kmh_from_csc_val(self.wheel_counter.sum, self.wheel_time.sum)

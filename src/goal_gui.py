@@ -16,7 +16,7 @@ class GoalGui(CycleGui):
         
 
     def get_title(self):
-        return "goal"
+        return b'goal'
 
     def show(self, redraw):
 

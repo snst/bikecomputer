@@ -15,7 +15,7 @@ class GuiEditValue:
         pass
 
     def get_title(self):
-        return "edit"
+        return b'"edit'
 
     def show(self, redraw_all):
         #print("gui_edit_setting_value")

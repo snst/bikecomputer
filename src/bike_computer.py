@@ -33,7 +33,7 @@ class BikeComputer:
     def on_cycle_data(self, raw_data):
         for meter in self.meter_list:
             meter.cycle_data.process(raw_data)
-        #self._goal_data.process(raw_data)
+        self._goal_data.process(raw_data)
 
     def on_altitude_data(self, altitude):
         for meter in self.meter_list:

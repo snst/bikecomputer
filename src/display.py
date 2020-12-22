@@ -68,10 +68,13 @@ class Display:
             cx += w
 
     def draw_text(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left, htrim=True):
+
         text_width = 0
-        chw0 = font.get_width('0')
+        chw0 = font.get_width(b'0')
         w0 = 0
         for ch in txt:
+            if isinstance(ch, int):
+                ch = chr(ch)
             width = font.get_width(ch)
             text_width += width
             if (ch >= '0' and ch <= '9') or ch == ' ':
@@ -99,6 +102,8 @@ class Display:
             self._tft.fill_rect(x0, y, w0, font.height() - hm, Color.black)
 
         for ch in txt:
+            if isinstance(ch, int):
+                ch = chr(ch)
             data, height, width = font.get_ch(ch)
             #n = width * height
             #self.buffer = bytearray(n*2)
@@ -112,7 +117,7 @@ class Display:
 
     def draw_text_multi(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left):
         if align == Align.center_sep:
-            txt = txt.split(";")
+            txt = txt.split(b';')
             align = Align.center
         else:
             w = 0
