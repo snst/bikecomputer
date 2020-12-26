@@ -1,7 +1,6 @@
 from ble_central import *
-from bt_manager_base import *
 
-class BtManager(BtManagerBase):
+class BtManager:
     _CSC_ADDR = bytes([0xf4, 0xb8, 0x5e, 0x40, 0xea, 0xe4])
     _CSC_SERVICE_UUID = bluetooth.UUID(0x1816)
     _CSC_MEASUREMENT_UUID = bluetooth.UUID(0x2A5B)

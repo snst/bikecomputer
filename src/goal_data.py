@@ -45,9 +45,8 @@ class GoalData(DataStore, CycleData):
             self.optimal_distance_km = self.target_average_km_h.value * self.trip_duration_min / 60
             pass
 
-    def is_behind(self, data):
+    def is_behind(self):
         return self.trip_distance < self.optimal_distance_km
-
 
     def get_all_attributes(self):
         return [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]

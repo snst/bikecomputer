@@ -20,15 +20,15 @@ class GuiMenu:
     def show(self, redraw_all):
         #self.main.clear()
         item = self.get_selected_item()
-        g.display.draw_text(fonts.pf_small, self.breadcrum, 8, Layout.y_breadcrum)
+        g.display.draw_text(fonts.f_narrow_small, self.breadcrum, 8, Layout.y_breadcrum)
         
-        font = fonts.pf_small if item.type == MenuItem.INT_ITEM or item.type == MenuItem.FLOAT_ITEM else fonts.pf_text
+        font = fonts.f_narrow_small if item.type == MenuItem.INT_ITEM or item.type == MenuItem.FLOAT_ITEM else fonts.f_narrow_text
         g.display.draw_text_multi(font, item.name, 0, Layout.y_setting_text, align=Align.center_sep)
 
         if item.type == MenuItem.INT_ITEM:
-            g.display.draw_text(fonts.pf_normal, "%3d" %(item.data.value), 0, Layout.y_setting_val, align=Align.center)
+            g.display.draw_text(fonts.f_wide_normal, "%3d" %(item.data.value), 0, Layout.y_setting_val, align=Align.center)
         elif item.type == MenuItem.FLOAT_ITEM:
-            g.display.draw_text(fonts.pf_normal, "%5.1f" %(item.data.value), 0, Layout.y_setting_val, align=Align.center)
+            g.display.draw_text(fonts.f_wide_normal, "%5.1f" %(item.data.value), 0, Layout.y_setting_val, align=Align.center)
 
     def handle(self, event):
         if event == Event.menu_prev:
@@ -44,10 +44,8 @@ class GuiMenu:
         item = self.get_selected_item()
         if item.type == MenuItem.INT_ITEM or item.type == MenuItem.FLOAT_ITEM:
             self.main.action_go_edit_setting_value(item)
-        elif item.type == MenuItem.LAMBDA_ITEM:
-            item.action()
         else:
-            self.main.do_action(item.action)
+            item.action()
 
     def handle_dec(self):
         if self.menu_selected_item > 0:

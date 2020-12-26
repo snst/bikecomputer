@@ -1,9 +1,8 @@
 
 import komoot_96 as font_komoot
-import f_main_b as pf_huge
-import f_main_n as pf_normal
-#import f_narrow_n as pf_huge
-#import f_narrow_n as pf_normal
-import f_narrow_n
-import pf_small
-import pf_text
+import f_wide_big 
+import f_wide_normal
+import f_wide_smaller
+import f_narrow_normal
+import f_narrow_small
+import f_narrow_text

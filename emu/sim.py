@@ -123,6 +123,10 @@ class Sim:
             #self.bc.komoot_data.distance -= 25
             self.bc.komoot_data.direction -= 1
             pass
+        elif btn == 99: #c
+            self.bc.komoot_data.distance -= 50
+        elif btn == 118: #v
+            self.bc.komoot_data.distance += 50
         elif btn == 32: #space
             self.paused = not self.paused
             pass

@@ -19,19 +19,19 @@ class GuiEditValue:
 
     def show(self, redraw_all):
         #print("gui_edit_setting_value")
-        g.display.draw_text(fonts.pf_small, self.breadcrum, 8, Layout.y_breadcrum)
-        #g.display.draw_text(fonts.pf_text, self.item.name, 0, Layout.y_setting_text, align=Align.center)
-        font = fonts.pf_small if self.item.type == MenuItem.INT_ITEM or self.item.type == MenuItem.FLOAT_ITEM else fonts.pf_text
+        g.display.draw_text(fonts.f_narrow_small, self.breadcrum, 8, Layout.y_breadcrum)
+        #g.display.draw_text(fonts.f_narrow_text, self.item.name, 0, Layout.y_setting_text, align=Align.center)
+        font = fonts.f_narrow_small if self.item.type == MenuItem.INT_ITEM or self.item.type == MenuItem.FLOAT_ITEM else fonts.f_narrow_text
         g.display.draw_text_multi(font, self.item.name, 0, Layout.y_setting_text, align=Align.center_sep)
 
         if self.item.type == MenuItem.FLOAT_ITEM:
             #x = self.main.get_text_center_pos(fonts.huge, 5)
             x = 75
-            g.display.draw_text(fonts.pf_normal, "  %3d" %(self.edit_val), x, Layout.y_setting_val, Color.white if self.edit_decimal_place else Color.red, align=Align.right)
-            g.display.draw_text(fonts.pf_normal, ".", x, Layout.y_setting_val, align=Align.left)
-            g.display.draw_text(fonts.pf_normal, "%1d  " %(self.edit_val*10%10), x + 5, Layout.y_setting_val, Color.red if self.edit_decimal_place else Color.white, align=Align.left)
+            g.display.draw_text(fonts.f_wide_normal, "  %3d" %(self.edit_val), x, Layout.y_setting_val, Color.white if self.edit_decimal_place else Color.red, align=Align.right)
+            g.display.draw_text(fonts.f_wide_normal, ".", x, Layout.y_setting_val, align=Align.left)
+            g.display.draw_text(fonts.f_wide_normal, "%1d  " %(self.edit_val*10%10), x + 5, Layout.y_setting_val, Color.red if self.edit_decimal_place else Color.white, align=Align.left)
         elif self.item.type == MenuItem.INT_ITEM:
-            g.display.draw_text(fonts.pf_normal, "  %3d  " %(self.edit_val), 0, Layout.y_setting_val, Color.red, align=Align.center)
+            g.display.draw_text(fonts.f_wide_normal, "  %3d  " %(self.edit_val), 0, Layout.y_setting_val, Color.red, align=Align.center)
 
 
     def handle(self, event):

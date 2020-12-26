@@ -1,6 +1,5 @@
 from gui_edit_value import *
 from cycle_gui import *
-from gui_csc_stat import *
 from gui_menu import *
 from komoot_gui import *
 from goal_data import *
@@ -30,7 +29,8 @@ class GuiMain(GuiBase):
         self._gui_index_last = 1
         self._max_views = 5
         self.add_to_gui_stack(self.create_gui())
-        self._goal_visible = True #False
+        #self._goal_visible = True
+        self._goal_visible = False
 
     def add_gui_list(self, gui):
         self._gui_list.append(gui)
@@ -116,11 +116,6 @@ class GuiMain(GuiBase):
     def action_go_edit_setting_value(self, item):
         self.add_to_gui_stack(GuiEditValue(self, item))
 
-    def gui_next_old(self):
-        gui = self._gui_list.next()
-        self.gui_stack[0] = gui
-        self.activate_gui(gui)
-
     def create_gui(self):
         i = self._gui_index
         if i == 0:
@@ -167,11 +162,6 @@ class GuiMain(GuiBase):
     def add_to_gui_stack(self, gui):
         self.gui_stack.append(gui)
         self.activate_gui(gui)
-
-    def do_action(self, action):
-        #print("do action:" + action)
-        #getattr(self, action)()
-        action()
 
     def add_meter(self):
         meter = g.bc.add_meter_instance()
@@ -229,8 +219,11 @@ class GuiMain(GuiBase):
             self.switch_to_gui(0)
 
     def gui_show_next_meter(self):
-        self._meter_list.next()
-        self.gui_stack_pop_all()
+        if self._meter_list.count() > 1:
+            self._meter_list.next()
+            self.gui_stack_pop_all()
+        else:
+            self.add_meter()
 
     def gui_show_prev_meter(self):
         self._meter_list.prev()
@@ -241,15 +234,20 @@ class GuiMain(GuiBase):
         g.hal.set_backlight(val)
 
     def gui_update_state(self):
-        return
-        txt = ""
-        txt += "S" if g.bt.is_scanning() else " "
-        txt += "R" if self.get_csc_data().is_riding else "  "
-        txt += "C" if g.bt.is_csc_connected() else " "
-        txt += "K" if g.bt.is_komoot_connected() else " "
+        #return
+        #txt = ""
+        #txt += "S" if g.bt.is_scanning() else " "
+        #txt += "R" if self.get_csc_data().is_riding else "  "
+        #txt += "C" if g.bt.is_csc_connected() else " "
+        #txt += "K" if g.bt.is_komoot_connected() else " "
 
-        g.display.draw_text(fonts.pf_small, txt, 50, Display.height - fonts.pf_small.height())
-        g.display.draw_text(fonts.pf_small, "%.2f" % (g.hal.read_bat()), 0, Display.height - fonts.pf_small.height())
+        #g.display.draw_text(fonts.f_narrow_small, txt, 50, Display.height - fonts.f_narrow_small.height())
+        #g.display.draw_text(fonts.f_narrow_small, "%.2f" % (g.hal.read_bat()), 0, Display.height - fonts.f_narrow_small.height())
+        h = 4
+        w = 10
+        g.display.fill_rect(0, g.display.height-h, w-1, h, Color.yellow if g.bt.is_scanning() else Color.black)
+        g.display.fill_rect(w, g.display.height-h, w-1, h, Color.green if g.bt.is_csc_connected() else Color.black)
+        g.display.fill_rect(2*w, g.display.height-h, w-1, h, Color.green if g.bt.is_komoot_connected() else Color.black)
 
     def is_kommot_gui_active(self):
         return isinstance(self.active_gui, KomootGui)
@@ -266,3 +264,6 @@ class GuiMain(GuiBase):
         self.switch_to_gui(2 if visible else 1)
         self.gui_stack_pop_all()
         
+    def enable_komoot(self):
+        self._settings.komoot_enabled.value = 1
+        self.gui_stack_pop_all()

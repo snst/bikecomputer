@@ -48,7 +48,6 @@ class Hal_esp32:
     def ticks_ms(self):
         return utime.ticks_ms()
 
-
     def json_load(self, x):
         return ujson.loads(x)
 
@@ -61,9 +60,6 @@ class Hal_esp32:
     def read_bat(self):
         return self._vbat
 
-    def gc(self):
-        gc.collect()
-
     def update_bat(self):
         vref = 1100
         adc = machine.ADC(machine.Pin(34))
@@ -72,3 +68,9 @@ class Hal_esp32:
         self._vbat = (val / 4095.0) * 2.0 * 3.3 * (vref / 1000.0)
         #print("vbat: %.2f" % (self._vbat))
         return self._vbat
+
+    def gc_collect(self):
+        gc.collect()
+
+    def gc_mem_free(self):
+        return gc.mem_free()

@@ -21,12 +21,14 @@ class MenuMeter:
         self.items = [ 
                        LambdaMenuItem(b'Stop' if data.cycle_data.is_started else b'Start', lambda : main.enable_meter(data, not data.cycle_data.is_started)),
                        LambdaMenuItem(b'Reset', lambda : main.reset_meter(data)),
-                       MenuItem(b'Add meter', lambda : main.add_meter()),
+                       MenuItem(b'+ Meter', lambda : main.add_meter()),
         ]
         if data.id != 1:
-            self.items.append(MenuItem(b'Del meter', lambda : main.del_meter()))
+            self.items.append(MenuItem(b'- Meter', lambda : main.del_meter()))
         if not main._goal_visible:
-            self.items.append(LambdaMenuItem(b'Show goal', lambda: main.show_goal_meter(True)))
+            self.items.append(LambdaMenuItem(b'Goal', lambda: main.show_goal_meter(True)))
+        if main._settings.komoot_enabled.value == 0:
+            self.items.append(MenuItem(b'Komoot', lambda : main.enable_komoot()))
         pass    
 
 
@@ -111,12 +113,14 @@ class MenuKomoot:
         self.komoot_all_on = MenuValueItem(b'Steady LED;before m', self.data.komoot_all_on)
         self.komoot_red_color = MenuValueItem(b'Red color;before m', self.data.komoot_red_color)
         self.komoot_req_interval = MenuValueItem(b'BLE update ms', self.data.komoot_req_interval)
+        self.komoot_street_dist = MenuValueItem(b'Street:dist m', self.data.komoot_street_dist)
         self.items = [ self.komoot_enabled,
                        self.komoot_auto_on,
                        self.komoot_flash_on,
                        self.komoot_all_on,
                        self.komoot_red_color,
                        self.komoot_req_interval,
+                       self.komoot_street_dist,
                        MenuItem(b'Save', lambda : main.save_settings()),
 
         ]

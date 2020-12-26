@@ -54,8 +54,11 @@ class Hal_emu:
     def update_bat(self):
         return 2.33
 
-    def gc(self):
+    def gc_collect(self):
         pass
+
+    def gc_mem_free(self):
+        return 1234
 
     def mainloop(self):
         while True:

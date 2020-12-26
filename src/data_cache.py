@@ -17,3 +17,6 @@ class DataCache:
     def reset(self):
         for i in range(0, len(self._items)):
             self._items[i] = None
+
+    def reset_val(self, index):
+        self._items[index] = None

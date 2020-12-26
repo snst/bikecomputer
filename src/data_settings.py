@@ -21,6 +21,7 @@ class DataSettings(DataStore):
         self.komoot_auto_on = SettingVal(1, 0, 1)
         self.komoot_red_color = SettingVal(300, 25, 2000, False, 25)
         self.komoot_req_interval = SettingVal(2000, 500, 4000, False, 500)
+        self.komoot_street_dist = SettingVal(1000, 0, 5000, False, 250)
         self.altimeter_enabled = SettingVal(0, 0, 1)
         self.altimeter_values = SettingVal(5, 1, 10)
         self.altimeter_time_ms = SettingVal(500, 500, 10000, False, 500)

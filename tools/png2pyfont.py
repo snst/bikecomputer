@@ -53,7 +53,7 @@ if __name__ == '__main__':
     args = sys.argv
     #if len(args) != 2: usage()
     #in_path = args[1]
-    na = "f_24_54"
+    na = "komoot_96"
     in_path = "/media/stsc/data/work/micropython/apps/bikecomputer/newfont/"+na+".png"
     if os.path.exists(in_path) == False: error('not exists: ' + in_path)
     
@@ -64,4 +64,4 @@ if __name__ == '__main__':
     img = Image.open(in_path).convert('RGB')
     out_path = "/media/stsc/data/work/micropython/apps/bikecomputer/src/"+na+".py"
     with open(out_path, 'w') as f:
-        write_bin(filename, f, img, 46, 13)
+        write_bin(filename, f, img, 46, 28)

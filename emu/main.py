@@ -9,7 +9,7 @@ from bike_computer import *
 from hal_emu import *
 from display import *
 import data_global as g
-from bt_manager_base import *
+from bt_manager_emu import *
 from altimeter_emu import *
 
 
@@ -17,7 +17,7 @@ from altimeter_emu import *
 tft = st7789.ST7789(None, Display.width, Display.height)
 g.display = Display(tft)
 g.hal = Hal_emu(tft)
-g.bt = BtManagerBase()
+g.bt = BtManagerEmu()
 g.altimeter = Altimeter_emu()
 
 g.bc = BikeComputer()

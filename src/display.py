@@ -68,7 +68,6 @@ class Display:
             cx += w
 
     def draw_text(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left, htrim=True):
-
         text_width = 0
         chw0 = font.get_width(b'0')
         w0 = 0
@@ -132,3 +131,7 @@ class Display:
         for t in txt:
             self.draw_text(font, t, 0, y + h, fg, bg, align)
             h += font.height()        
+
+    def bitmap_blit(self, x, y, bitmap, fg=Color.white, bg=Color.black):
+        self._tft.blit_bitarray(bitmap.BITMAP, bitmap.WIDTH, x, y, fg, bg)
+        pass

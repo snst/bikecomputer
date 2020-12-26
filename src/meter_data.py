@@ -1,4 +1,3 @@
-from altitude_data import *
 from cycle_data import *
 from env_data import *
 from altitude_sum import *

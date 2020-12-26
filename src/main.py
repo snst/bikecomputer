@@ -4,29 +4,14 @@ import st7789
 import time
 from machine import Timer
 from machine import I2C
-import gc
 from const import *
 from button_handler import *
 from bike_computer import *
 from hal_esp32 import *
-print("1mem: %d" % (gc.mem_free()))
-gc.collect()
-print("1mem: %d" % (gc.mem_free()))
-
 from komoot_data import *
 import data_global as g
 from bt_manager import *
-
-
-print("2mem: %d" % (gc.mem_free()))
-gc.collect()
-print("2mem: %d" % (gc.mem_free()))
-
 from altimeter_bmp280 import *
-
-print("3mem: %d" % (gc.mem_free()))
-gc.collect()
-print("3mem: %d" % (gc.mem_free()))
 
 
 #https://github.com/palto42/komoot-navi/blob/master/src/main.cpp
