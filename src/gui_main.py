@@ -79,9 +79,10 @@ class GuiMain(GuiBase):
         val = b''
         itergui = iter(self.gui_stack)
         next(itergui)
+        t = b''
         for g in itergui:
             t = g.get_title()
-            val = val + b'>' + t
+            val = val + b'>'# + t
         return val
 
     def gui_show_main_menu(self):
@@ -118,16 +119,19 @@ class GuiMain(GuiBase):
 
     def create_gui(self):
         i = self._gui_index
+        gui = None
         if i == 0:
-            return KomootGui(self)
+            gui = KomootGui(self)
         elif i == 1:
-            return CycleGui(self)
+            gui = CycleGui(self)
         elif i == 2:
-            return GoalGui(self)
+            gui = GoalGui(self)
         elif i == 3:
-            return AltimeterGui(self)
+            gui = AltimeterGui(self)
         elif i == 4:
-            return StatusGui(self)
+            gui = StatusGui(self)
+        g.hal.gc_collect()
+        return gui
 
     def switch_to_next_gui(self):
         index = min(self._gui_index + 1, 4)

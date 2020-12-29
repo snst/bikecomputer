@@ -29,16 +29,24 @@ class GuiBase:
             g.display.fill_rect(0, y, m, h, Color.red)
             g.display.fill_rect(0, y, p, h, Color.green)
 
-    def show_float_speed(self, val, x, y, font = fonts.f_wide_normal, color = Color.white, align = Align.right, short = False):
+    def show_float_speed(self, val, x, y, color = Color.white, align = Align.right, narrow = False):
+        font_normal = fonts.f_narrow_normal if narrow else fonts.f_wide_normal
+        font_small = fonts.f_narrow_small if False else fonts.f_wide_smaller
         val = limit(val, 0, 999)
         ival = (int) (val)
         dval = (int)((val - ival)*10)
-        mw = fonts.f_wide_smaller.get_width('0')
-        if not short or ival < 100:
-            g.display.draw_text(fonts.f_wide_normal, "%2d" % (ival), x-mw, y, fg=color, align = Align.right)
-            g.display.draw_text(fonts.f_wide_smaller, "%d" % (dval), x-mw, y, fg=color, align = Align.left)
+        if ival < 100:
+            if align == Align.left:
+                x += 2 * font_normal.get_width('0')
+            else:
+                x -= font_small.get_width('0')
+
+            g.display.draw_text(font_normal, "%2d" % (ival), x, y, fg=color, align = Align.right)
+            g.display.draw_text(font_small, "%d" % (dval), x, y, fg=color, align = Align.left)
         else:
-            g.display.draw_text(fonts.f_wide_normal, "%3d" % (ival), x, y, fg=color, align = Align.right)
+            if align == Align.left:
+                x += 3 * font_normal.get_width('0')
+            g.display.draw_text(font_normal, "%3d" % (ival), x, y, fg=color, align = Align.right)
 
     def show_float_time(self, val, x, y, align = Align.right, font = fonts.f_wide_normal):
         h = (int)(val / 60)
@@ -96,3 +104,9 @@ class GuiBase:
 
     def clear(self):
         self.main.clear()
+
+    def show_val(self, redraw, y, str, val, i):
+        if redraw:
+            g.display.draw_text(fonts.f_narrow_small, str , 0, y+8, align=Align.left)
+        if self.cache.changed(i, val):
+            g.display.draw_text(fonts.f_wide_smaller, val, g.display.width, y, align=Align.right)

@@ -9,7 +9,7 @@ class GuiMenu:
         self.main = main
         self.menu = menu
         self.menu_selected_item = 0
-        self.breadcrum = self.main.get_breadcrum() + b'>' + self.get_title()
+        self.breadcrum = self.main.get_breadcrum() + b'> ' + self.get_title()
 
     def get_selected_item(self):
         return self.menu.items[self.menu_selected_item]

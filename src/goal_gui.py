@@ -9,7 +9,7 @@ from cycle_gui import *
 
 
 class GoalGui(CycleGui):
-    goal_x = 65
+    goal_x = 0
     def __init__(self, main):
         CycleGui.__init__(self, main)
 
@@ -39,7 +39,7 @@ class GoalGui(CycleGui):
         if data.is_started:
             col = Color.red if data.is_behind() else Color.green
         self.show_speed_avg(data, y_avg, col)
-        self.show_trip_distance(data, y_distance)
+        self.show_trip_distance(data, y_distance, narrow = True)
         self.show_trip_duration(data, g.display.width, y_time, font = fonts.f_narrow_text)
 
         if not data.has_distance_reached:
@@ -64,13 +64,13 @@ class GoalGui(CycleGui):
     def show_speed_goal(self, data, y):
         speed = round(data.calc_required_average_km_h, 1)
         if self.cache.changed(8, speed):
-            self.show_float_speed(speed, self.goal_x, y, color=Color.white, align = Align.right)
+            self.show_float_speed(speed, self.goal_x, y, color=Color.white, align = Align.left, narrow = True)
 
 
     def show_distance_goal(self, data, y):
         distance = round(data.remaining_distance_km, 1)
         if self.cache.changed(10, distance):
-            self.show_float_speed(distance, self.goal_x, y, align = Align.right)
+            self.show_float_speed(distance, self.goal_x, y, align = Align.left, narrow = True)
 
     def show_time_goal(self, data, y):
         if self.cache.changed(11, data.remaining_time_min):

@@ -4,13 +4,13 @@ from goal_data import *
 class MenuMain:
     def __init__(self, main):
         self.title = b'Menu'
-        self.items = [ LambdaMenuItem(b'Display', lambda : main.go_menu_settings()),
-                       LambdaMenuItem(b'CSC', lambda : main.gui_show_csc_menu()),
-                       LambdaMenuItem(b'Altimeter', lambda : main.gui_show_altimeter_menu()),
-                       LambdaMenuItem(b'Komoot', lambda : main.gui_show_komoot_menu()),
-                       LambdaMenuItem(b'BLE scan', lambda : main.ble_reconnect()),
-                       LambdaMenuItem(b'Display off', lambda: g.bc._display_ctrl.set_display_complete_off()),
-                       LambdaMenuItem(b'Save', lambda : main.save_settings()),
+        self.items = [ MenuItem(b'Display', lambda : main.go_menu_settings()),
+                       MenuItem(b'CSC', lambda : main.gui_show_csc_menu()),
+                       MenuItem(b'Altimeter', lambda : main.gui_show_altimeter_menu()),
+                       MenuItem(b'Komoot', lambda : main.gui_show_komoot_menu()),
+                       MenuItem(b'BLE;scan', lambda : main.ble_reconnect()),
+                       MenuItem(b'Display;off', lambda: g.bc._display_ctrl.set_display_complete_off()),
+                       MenuItem(b'Save', lambda : main.save_settings()),
         ]
         pass
 
@@ -19,14 +19,14 @@ class MenuMeter:
     def __init__(self, main, data):
         self.title = b'Reset'
         self.items = [ 
-                       LambdaMenuItem(b'Stop' if data.cycle_data.is_started else b'Start', lambda : main.enable_meter(data, not data.cycle_data.is_started)),
-                       LambdaMenuItem(b'Reset', lambda : main.reset_meter(data)),
+                       MenuItem(b'Stop' if data.cycle_data.is_started else b'Start', lambda : main.enable_meter(data, not data.cycle_data.is_started)),
+                       MenuItem(b'Reset', lambda : main.reset_meter(data)),
                        MenuItem(b'+ Meter', lambda : main.add_meter()),
         ]
         if data.id != 1:
             self.items.append(MenuItem(b'- Meter', lambda : main.del_meter()))
         if not main._goal_visible:
-            self.items.append(LambdaMenuItem(b'Goal', lambda: main.show_goal_meter(True)))
+            self.items.append(MenuItem(b'Goal', lambda: main.show_goal_meter(True)))
         if main._settings.komoot_enabled.value == 0:
             self.items.append(MenuItem(b'Komoot', lambda : main.enable_komoot()))
         pass    
@@ -52,7 +52,7 @@ class MenuSettings:
 
 class MenuAltimeter:
     def __init__(self, main):
-        self.title = b'alt'
+        self.title = b'Altimeter'
         self.data = main._settings
         self.altimeter_enabled = MenuValueItem(b'Enabled;altimeter', self.data.altimeter_enabled)
         self.altimeter_values = MenuValueItem(b'Number of;avg values', self.data.altimeter_values)
@@ -70,7 +70,7 @@ class MenuAltimeter:
 
 class MenuCSC:
     def __init__(self, main):
-        self.title = b'csc'
+        self.title = b'CSC'
         self.data = main._settings
         self.csc_on = MenuValueItem(b'Enable BLE', self.data.csc_on)
         self.wheel_cm = MenuValueItem(b'Wheel cm', self.data.wheel_cm)
@@ -91,12 +91,12 @@ class MenuGoal:
         self.dist = MenuValueItem(b'Distance km', data.target_dist_km, data.calculate_time)
         self.avg = MenuValueItem(b'Average km/h', data.target_average_km_h, data.calculate_time)
         self.time = MenuValueItem(b'Time min', data.target_time_min, data.calculate_avg)
-        self.items = [ LambdaMenuItem(b'Stop' if data.is_started else b'Start', lambda : main.enable_meter(data, not data.is_started)),
-                       LambdaMenuItem(b'Reset', lambda : main.reset_meter(data)),
+        self.items = [ MenuItem(b'Stop' if data.is_started else b'Start', lambda : main.enable_meter(data, not data.is_started)),
+                       MenuItem(b'Reset', lambda : main.reset_meter(data)),
                        self.dist,
                        self.avg,
                        self.time,
-                       LambdaMenuItem(b'Hide', lambda: main.show_goal_meter(False)),
+                       MenuItem(b'Hide', lambda: main.show_goal_meter(False)),
                        MenuItem(b'Save', lambda : main.save_goal_settings()),
                        MenuItem(b'Load', lambda : main.load_goal_settings()),
         ]
@@ -108,12 +108,12 @@ class MenuKomoot:
         self.title = b'Komoot'
         self.data = main._settings
         self.komoot_enabled = MenuValueItem(b'Enable BLE', self.data.komoot_enabled)
-        self.komoot_auto_on = MenuValueItem(b'Auto switch on;LED', self.data.komoot_auto_on)
+        self.komoot_auto_on = MenuValueItem(b'Auto switch;on LED', self.data.komoot_auto_on)
         self.komoot_flash_on = MenuValueItem(b'Warn LED;before m', self.data.komoot_flash_on)
         self.komoot_all_on = MenuValueItem(b'Steady LED;before m', self.data.komoot_all_on)
         self.komoot_red_color = MenuValueItem(b'Red color;before m', self.data.komoot_red_color)
         self.komoot_req_interval = MenuValueItem(b'BLE update ms', self.data.komoot_req_interval)
-        self.komoot_street_dist = MenuValueItem(b'Street:dist m', self.data.komoot_street_dist)
+        self.komoot_street_dist = MenuValueItem(b'Street;dist m', self.data.komoot_street_dist)
         self.items = [ self.komoot_enabled,
                        self.komoot_auto_on,
                        self.komoot_flash_on,

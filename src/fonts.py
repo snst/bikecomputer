@@ -1,5 +1,4 @@
 
-import komoot_96 as font_komoot
 import f_wide_big 
 import f_wide_normal
 import f_wide_smaller

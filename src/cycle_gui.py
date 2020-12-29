@@ -77,10 +77,10 @@ class CycleGui(GuiBase):
         if self.cache.changed(4, speed) or self.cache.changed(5, col):
             self.show_float_speed(speed, g.display.width, y, color = col)
 
-    def show_trip_distance(self, data, y, font = fonts.f_wide_normal):
+    def show_trip_distance(self, data, y, narrow = False):
         distance = round(data.trip_distance, 1)
         if self.cache.changed(6, distance):
-            self.show_float_speed(distance, g.display.width, y, font)
+            self.show_float_speed(distance, g.display.width, y, narrow = narrow)
 
     def show_trip_duration(self, data, x, y, font = fonts.f_wide_normal):
         if self.cache.changed(7, data.trip_duration_min):

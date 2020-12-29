@@ -67,7 +67,48 @@ class Display:
             self.fill_rect(x+cx, y, w, font.HEIGHT, bg)
             cx += w
 
+    def get_digit_width(self, font, text):
+        text_width = 0
+        chw0 = font.get_width(b'0')
+        w0 = 0
+        for ch in text:
+            if isinstance(ch, int):
+                ch = chr(ch)
+            width = font.get_width(ch)
+            text_width += width
+            if (ch >= '0' and ch <= '9') or ch == ' ':
+                w0 += chw0
+            else:
+                w0 += width
+        clear_width = w0 - text_width
+        return text_width, clear_width
+
+
     def draw_text(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left, htrim=True):
+        text_width, clear_width = self.get_digit_width(font, txt)
+        x0 = None
+
+        if align == Align.right:
+            x -= text_width
+            x0 = x - clear_width
+        elif align == Align.center:
+            x = int((Display.width - text_width) / 2)
+        else:
+            x0 = x + text_width
+            pass
+
+        if None != x0 and 0 < clear_width:
+            self._tft.fill_rect(x0, y, clear_width, font.height(), Color.black)
+
+        for ch in txt:
+            if isinstance(ch, int):
+                ch = chr(ch)
+            data, height, width = font.get_ch(ch)
+            self._tft.blit_bitarray(data, width, x, y, fg, bg)
+            x += width
+        return text_width  
+
+    def draw_text_old(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left, htrim=True):
         text_width = 0
         chw0 = font.get_width(b'0')
         w0 = 0
@@ -92,26 +133,15 @@ class Display:
             x0 = x + text_width
             pass
 
-        hm = 0
- #       if htrim:
- #           if font.height() == 54:
- #               hm = 9
-
         if None != x0 and 0 < w0:
-            self._tft.fill_rect(x0, y, w0, font.height() - hm, Color.black)
+            self._tft.fill_rect(x0, y, w0, font.height(), Color.black)
 
         for ch in txt:
             if isinstance(ch, int):
                 ch = chr(ch)
             data, height, width = font.get_ch(ch)
-            #n = width * height
-            #self.buffer = bytearray(n*2)
-            #self._tft.map_bitarray_to_rgb565(data, self.buffer, width, fg, bg)
-            #self._tft.blit_buffer(self.buffer, x, y, width, height)
             self._tft.blit_bitarray(data, width, x, y, fg, bg)
             x += width            
-            #buffer = None
-            #g.hal.gc()
 
 
     def draw_text_multi(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left):

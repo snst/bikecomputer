@@ -7,9 +7,9 @@ from data_cache import *
 from signs import *
 
 class KomootGui(CycleGui):
-    y_direction = 45
     y_distance = 0
-    y_street_speed = 130
+    y_direction = 55
+    y_street_speed = 140
     y_time_direction = 190
 
     def __init__(self, main):
@@ -26,10 +26,10 @@ class KomootGui(CycleGui):
         #print("d %u" % (data.distance))
         if data.distance < 1000:
             str = " %3d " % data.distance
-            g.display.draw_text(fonts.f_wide_normal, str, g.display.width, y, align=Align.center)
+            g.display.draw_text(fonts.f_wide_big, str, g.display.width, y, align=Align.center)
         else:
             str = " %.1f " % (data.distance / 1000)
-            g.display.draw_text(fonts.f_wide_normal, str, g.display.width, y, align=Align.center)
+            g.display.draw_text(fonts.f_wide_big, str, g.display.width, y, align=Align.center)
 
     def show_direction(self, data, y):
         W = g.display.width
@@ -87,13 +87,18 @@ class KomootGui(CycleGui):
         if show_street:
             self.show_street(data, self.y_street_speed)
         else:
-            self.show_speed_big(csc, self.y_street_speed)
-            self.show_trip_distance(csc, self.y_time_direction, font=fonts.f_narrow_text)
+            self.show_speed(csc, self.y_street_speed)
+            self.show_trip_distance(csc, self.y_time_direction)
             self.show_trip_duration(csc, 58, self.y_time_direction, font=fonts.f_narrow_text)
-
 
         if settings.komoot_auto_on.value == 1 and (dir_changed or dist_notify):
             g.bc._display_ctrl.set_display_on()
+
+    def show_speed(self, data, y):
+        speed = round(data.speed, 1)
+        if self.cache.changed(1, speed):
+            self.show_float_speed(speed, g.display.width, y)
+
 
     def handle(self, event):
         if event == (Button.right | Button.long):

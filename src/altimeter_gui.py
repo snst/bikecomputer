@@ -20,15 +20,9 @@ class AltimeterGui(GuiBase):
     def get_title(self):
         return b'alt'
 
-    def show_val(self, redraw, y, str, val, i):
-        if redraw:
-            g.display.draw_text(fonts.f_narrow_small, str , 0, y, align=Align.left)
-        if self.cache.changed(i, val):
-            g.display.draw_text(fonts.f_narrow_small, val, g.display.width, y, align=Align.right)
-
     def show(self, redraw):
         y = 0
-        ys = fonts.f_narrow_small.height()
+        ys = fonts.f_wide_smaller.height() + 8
         data = self.main.get_csc_data()
         altimter = g.bc._altimeter
         alt = self.main.get_current_meter().alt_data
@@ -37,7 +31,7 @@ class AltimeterGui(GuiBase):
         i = 0
         self.show_val(redraw, y + i*ys, "Id", "%d" % (data.id), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Max km/h", "%.1f" % (round(data.speed_max, 1)), i)
+        self.show_val(redraw, y + i*ys, "km/h", "%.1f" % (round(data.speed_max, 1)), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Cadence", "%d" % (data.cadence), i)
         i += 1
@@ -49,17 +43,17 @@ class AltimeterGui(GuiBase):
 #        i += 1
 #        self.show_val(redraw, y + i*ys, "Alt max", "%.1f m" % (alt.max), i)
 #        i += 1
-        self.show_val(redraw, y + i*ys, "Alt sum", "%.1f m" % (alt.sum), i)
+        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (alt.sum), i)
         i += 1
         ya = y + i * ys
         if self.cache.changed(i, (int)(alt.min)):
-            g.display.draw_text(fonts.f_narrow_small, "%dm" % (alt.min), (int)(g.display.width/2), ya, align=Align.right)
+            g.display.draw_text(fonts.f_wide_smaller, "%d" % (alt.min), (int)(g.display.width/2), ya, align=Align.right)
         #i += 1
         #if self.cache.changed(i, (int)(altimter.altitude)):
         #    g.display.draw_text(fonts.f_narrow_small, "%d" % (altimter.altitude), (int)(g.display.width/3*2), ya, align=Align.right)
         i += 1
         if self.cache.changed(i, (int)(alt.max)):
-            g.display.draw_text(fonts.f_narrow_small, "%dm" % (alt.max), (int)(g.display.width), ya, align=Align.right)
+            g.display.draw_text(fonts.f_wide_smaller, "%d" % (alt.max), (int)(g.display.width), ya, align=Align.right)
         
     def handle(self, event = 0):
         if event == (Button.right | Button.long):

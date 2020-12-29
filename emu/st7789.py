@@ -78,10 +78,8 @@ class ST7789:
     def set_brightness(self, val):
         repaint = self.display_brightness != val
         self.display_brightness = val
-        if repaint:
-            print("LED %d" % (val))
-        #if repaint and self.gui != None:
-        #    self.gui.show()
+        #if repaint:
+        #    print("LED %d" % (val))
 
     def set_gui(self, gui):
         self.gui = gui
