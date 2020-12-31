@@ -17,10 +17,12 @@ class MenuMain:
 
 class MenuMeter:
     def __init__(self, main, data):
-        self.title = b'Reset'
+        self.title = b'Meter'
         self.items = [ 
                        MenuItem(b'Stop' if data.cycle_data.is_started else b'Start', lambda : main.enable_meter(data, not data.cycle_data.is_started)),
                        MenuItem(b'Reset', lambda : main.reset_meter(data)),
+                       MenuItem(b'Save', lambda : main.save_meter(data)),
+                       MenuItem(b'Load', lambda : main.load_meter(data)),
                        MenuItem(b'+ Meter', lambda : main.add_meter()),
         ]
         if data.id != 1:

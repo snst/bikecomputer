@@ -42,7 +42,7 @@ class StatusGui(GuiBase):
         i += 1
         self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (altimter.altitude), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Mem", "%u" % (g.hal.gc_mem_free()), i)
+        self.show_val(redraw, y + i*ys, "Mem", "%u" % ((int)(g.hal.gc_mem_free() / 1024)), i)
 
 
     def handle(self, event):

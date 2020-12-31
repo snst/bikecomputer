@@ -2,7 +2,7 @@ from data_store import *
 from setting_val import *
 
 
-filename = "settings.cfg"
+filename = b'settings.cfg'
 
 class DataSettings(DataStore):
     def __init__(self):

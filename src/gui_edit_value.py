@@ -11,16 +11,18 @@ class GuiEditValue:
         self.item = item
         self.breadcrum = self.main.get_breadcrum() + b'> ' + self.get_title()
         self.edit_decimal_place = False
-        pass
 
     def get_title(self):
         return b'Edit'
 
-    def show(self, redraw_all):
-        g.display.draw_text(fonts.f_narrow_small, self.breadcrum, 8, Layout.y_breadcrum)
+    def show(self, redraw):
+        if redraw:           
+            g.display.draw_text(fonts.f_narrow_small, self.breadcrum, 8, Layout.y_breadcrum)
         font = fonts.f_narrow_small if self.item.type == MenuItem.INT_ITEM or self.item.type == MenuItem.FLOAT_ITEM else fonts.f_narrow_text
-        g.display.draw_text_multi(font, self.item.name, 0, Layout.y_setting_text, align=Align.center_sep)
+        if redraw:           
+            g.display.draw_text_multi(font, self.item.name, 0, Layout.y_setting_text, align=Align.center_sep)
 
+        g.display.fill_rect(0, Layout.y_setting_val, g.display.width, fonts.f_wide_normal.height(), Color.black)
         if self.item.type == MenuItem.FLOAT_ITEM:
             txt1 = "%3d" %(self.edit_val)
             txt2 = "%1d" %(self.edit_val*10%10)
@@ -38,7 +40,7 @@ class GuiEditValue:
         if event == Event.menu_next:
             if (self.item.type == MenuItem.FLOAT_ITEM) and not self.edit_decimal_place:
                 self.edit_decimal_place = True
-                self.main.show()
+                self.show(False)
             else:
                 self.item.data.value = self.edit_val
                 #print("set val %f" % (self.edit_val))
@@ -48,7 +50,7 @@ class GuiEditValue:
         elif event == Event.menu_prev:
             if (self.item.type == MenuItem.FLOAT_ITEM) and self.edit_decimal_place:
                 self.edit_decimal_place = False
-                self.main.show()
+                self.show(False)
             else:
                 self.main.gui_stack_pop()
         else:
@@ -60,4 +62,4 @@ class GuiEditValue:
             self.edit_val = round(self.edit_val,2)
             if self.item.callback_changed:
                 self.item.callback_changed(self.edit_val, False)
-            self.main.show()
+            self.show(False)

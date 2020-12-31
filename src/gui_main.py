@@ -13,6 +13,7 @@ from altimeter_gui import *
 from status_gui import *
 from item_list import *
 from goal_gui import *
+from trip_store import *
 
 class GuiMain(GuiBase):
     def __init__(self, settings, meter_list, komoot_data, goal_data):
@@ -270,4 +271,15 @@ class GuiMain(GuiBase):
         
     def enable_komoot(self):
         self._settings.komoot_enabled.value = 1
+        self.gui_stack_pop_all()
+
+    def save_meter(self, data):
+        ts = TripStore()
+        ts.save(data)
+        self.gui_stack_pop_all()
+
+    def load_meter(self, data):
+        ts = TripStore()
+        ts.load(data)
+        data.cycle_data.calculate_accumulated_data()
         self.gui_stack_pop_all()
