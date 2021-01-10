@@ -1,13 +1,13 @@
 from data_settings import SettingVal
 from data_store import *
-from cycle_data import *
+from trip_data import *
 
 filename = "goal.cfg"
 
 
-class GoalData(DataStore, CycleData):
+class GoalData(DataStore, TripData):
     def __init__(self, settings):
-        CycleData.__init__(self, 0, settings)
+        TripData.__init__(self, 0, settings)
         self.target_time_min = SettingVal(60, 1, 500)
         self.target_dist_km = SettingVal(30, 1, 300, True)
         self.target_average_km_h = SettingVal(30, 10, 45, True)
@@ -15,7 +15,7 @@ class GoalData(DataStore, CycleData):
         self.remaining_time_min = 0
         self.optimal_distance_km = 0
         self.calc_required_average_km_h = 0
-        self.has_distance_reached = False
+        self.is_finished = False
         self.is_started = False
 
     def calculate_time(self, val, closed):
@@ -35,10 +35,10 @@ class GoalData(DataStore, CycleData):
                     self.calc_required_average_km_h = min(99.9, 60 * self.remaining_distance_km / self.remaining_time_min)
                 else: 
                     self.calc_required_average_km_h = 99.9
-                self.has_distance_reached = False
+                self.is_finished = False
             else:
-                if not self.has_distance_reached:
-                    self.has_distance_reached = True
+                if not self.is_finished:
+                    self.is_finished = True
                     self.calc_required_average_km_h = self.speed_avg
                     self.is_started = False
 
@@ -57,11 +57,11 @@ class GoalData(DataStore, CycleData):
     def load(self):
         DataStore.load(self, filename)
 
-    def process_data(self):
-        CycleData.process_data(self)
+    def process_data(self, cd):
+        TripData.process_data(self, cd)
         self.calculate_progress()
 
     def enable(self, enabled):
-        CycleData.enable(self, enabled)
+        TripData.enable(self, enabled)
         if enabled:
             self.calculate_progress()

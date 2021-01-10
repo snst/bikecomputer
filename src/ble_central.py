@@ -68,7 +68,6 @@ class ServiceData:
         self._def_handle = None
         self._start_handle = None
         self._end_handle = None
-        self._requested_notify = False
 
 class ConnData:
     def __init__(self, name, fix_addr = None):
@@ -169,41 +168,39 @@ class BleCentral:
             self._is_scanning = False
 
         elif event == _IRQ_PERIPHERAL_CONNECT:
-            #self.print_ble("_IRQ_PERIPHERAL_CONNECT")
             conn_handle, addr_type, addr = data
+            #self.print_ble("_IRQ_PERIPHERAL_CONNECT, ch=%u" % (conn_handle))
             conn = self.find_client_by_addr(addr)
             if conn:
                 #print("connected: " + conn._name)
                 conn._conn_handle = conn_handle
                 conn.scan_cnt = 1
-                self._ble.gattc_discover_services(conn._conn_handle)
+               #self._ble.gattc_discover_services(conn._conn_handle)
+                self._ble.gattc_discover_characteristics(conn._conn_handle, 1, 0xFFFF)
 
         elif event == _IRQ_PERIPHERAL_DISCONNECT:
-            #self.print_ble("_IRQ_PERIPHERAL_DISCONNECT")
             conn_handle, addr_type, addr = data
+            #self.print_ble("_IRQ_PERIPHERAL_DISCONNECT, ch=%u" % (conn_handle))
             conn = self.find_conn(conn_handle)
             if conn:
                 #print("disconnected: " + conn._name)
                 conn.reset()
 
         elif event == _IRQ_GATTC_SERVICE_RESULT:
-            #self.print_ble("_IRQ_GATTC_SERVICE_RESULT")
             conn_handle, start_handle, end_handle, uuid = data
-            #self.print_ble(uuid)
+            #self.print_ble("_IRQ_GATTC_SERVICE_RESULT, ch=%u, sh=%u, eh=%u, %s" % (conn_handle, start_handle, end_handle, uuid))
             conn = self.find_conn(conn_handle)
             if conn:
                 srv = conn.find_service(uuid)
                 if srv:
                     srv._start_handle, srv._end_handle = start_handle, end_handle
-                    #self.print_ble("BLE: found srv! %s:%s" % (conn._name, srv._name))
+                    #self.print_ble("Found srv! %s, sh=%u, eh=%u, %s" % (conn._name, srv._start_handle, srv._end_handle, uuid))
                     conn.scan_cnt += 1
-                    self._ble.gattc_discover_characteristics(
-                        conn._conn_handle, srv._start_handle, srv._end_handle
-                    )
+                    #self._ble.gattc_discover_characteristics(conn._conn_handle, srv._start_handle, srv._end_handle)
 
         elif event == _IRQ_GATTC_SERVICE_DONE:
-            #self.print_ble("_IRQ_GATTC_SERVICE_DONE")
             conn_handle, status = data
+            #self.print_ble("_IRQ_GATTC_SERVICE_DONE, ch=%u" % (conn_handle))
             conn = self.find_conn(conn_handle)
             if conn:
                 conn.scan_cnt -= 1
@@ -212,10 +209,8 @@ class BleCentral:
 
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_RESULT:
-            #self.print_ble("_IRQ_GATTC_CHARACTERISTIC_RESULT")
             conn_handle, def_handle, value_handle, properties, uuid = data
-            #print("ch %x, dh %x, vh %x, p %x" % (conn_handle, def_handle, value_handle, properties))
-            #self.print_ble(uuid)
+            #self.print_ble("_IRQ_GATTC_CHARACTERISTIC_RESULT, ch=%u, dh=%u, vh=%u, %s" % (conn_handle, def_handle, value_handle, uuid))
             conn = self.find_conn(conn_handle)
             srv = conn.find_char(uuid)
             if conn and srv:
@@ -223,7 +218,7 @@ class BleCentral:
                 srv._def_handle = def_handle
                 #self._ble.gattc_write(conn._conn_handle, conn._value_handle+1, struct.pack('<h', 1), 1)
 
-                #print("found char for " + conn._name)
+                #print("Found char for " + conn._name)
                 #=>self._ble.gattc_read(conn._conn_handle, conn._value_handle)
                 #print("Val handle %d" % (value_handle))
 
@@ -232,26 +227,27 @@ class BleCentral:
                 #        conn._conn_handle, srv._start_handle, srv._end_handle)
 
         elif event == _IRQ_GATTC_CHARACTERISTIC_DONE:
-            #self.print_ble("_IRQ_GATTC_CHARACTERISTIC_DONE")
             conn_handle, status = data
+            #self.print_ble("_IRQ_GATTC_CHARACTERISTIC_DONE, ch=%u" % (conn_handle))
             conn = self.find_conn(conn_handle)
             if conn:
                 conn.scan_cnt -= 1
 
-            #conn = self.find_conn(conn_handle)
-            #if conn:
-            #    for srv in conn.services:
-            #        if srv._notify:
-            #            self._ble.gattc_write(conn._conn_handle, srv._value_handle + 1, struct.pack('<h', _NOTIFY_ENABLE), 1)
+            conn = self.find_conn(conn_handle)
+            if conn:
+                for srv in conn.services:
+                    if srv._notify == ServiceData.NOTIFY_ENABLE:
+                        self.enable_notify(conn, srv)
+                        #self._ble.gattc_write(conn._conn_handle, srv._value_handle + 1, struct.pack('<h', _NOTIFY_ENABLE), 1)
+                        #notify = ServiceData.NOTIFY_ENABLE
 
 #                if srv._notify:
 #                    self._ble.gattc_write(conn._conn_handle, srv._value_handle + 1, struct.pack('<h', _NOTIFY_ENABLE), 1)
 
 
         elif event == _IRQ_GATTC_DESCRIPTOR_RESULT:
-            #self.print_ble("_IRQ_GATTC_DESCRIPTOR_RESULT")
             conn_handle, dsc_handle, uuid = data
-            #print(uuid)
+            #self.print_ble("_IRQ_GATTC_DESCRIPTOR_RESULT, ch=%u, dh=%u, %s" % (conn_handle, dsc_handle, uuid))
             conn = self.find_conn(conn_handle)
             srv = conn.find_desc(uuid)
             if conn and srv:
@@ -265,9 +261,9 @@ class BleCentral:
                 #self._ble.gattc_write(conn._conn_handle, srv._value_handle+1, struct.pack('<H', _NOTIFY_ENABLE), 1)
 
         elif event == _IRQ_GATTC_DESCRIPTOR_DONE:
-            #self.print_ble("_IRQ_GATTC_DESCRIPTOR_DONE")
              # Note: Status will be zero on success, implementation-specific value otherwise.
             conn_handle, status = data
+            #self.print_ble("_IRQ_GATTC_DESCRIPTOR_DONE, ch=%u" % (conn_handle))
             #self._ble.gattc_write(self._conn_handle, self._dsc_handle, struct.pack("<H", int(1)))
 
         elif event == _IRQ_GATTC_READ_RESULT:
@@ -304,11 +300,9 @@ class BleCentral:
 
     def enable_notify(self, conn, service):
         #print("enable cnt %d" % (conn.scan_cnt))
-        if conn._conn_handle != None and service._value_handle != None and not service._requested_notify:
+        if conn._conn_handle != None and service._value_handle != None:
             #print("req notify %d" % (service._notify))
-            #print("not cnt=%d %d" % (conn.scan_cnt, service._value_handle + 1))
             self._ble.gattc_write(conn._conn_handle, service._value_handle + 1, struct.pack('<h', service._notify), 1)
-            service._requested_notify = True
 
 
     # Find a device advertising the environmental sensor service.

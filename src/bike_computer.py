@@ -1,6 +1,6 @@
 from gui_main import *
 from data_settings import *
-from cycle_data import *
+from trip_data import *
 from goal_data import *
 from komoot_data import *
 from display_ctrl import *
@@ -10,34 +10,34 @@ import data_global as g
 from scheduler import *
 from item_list import *
 from altimeter import *
-from meter_data import *
 from env_data import *
+from cycle_data import *
 
 class BikeComputer:
     def __init__(self):
         self._settings = DataSettings()
         self._settings.load()
         self._scheduler = Scheduler(g.hal)
-        self.env_data = EnvData()
-        self.meter_list = []
-        self.add_meter_instance()
-        self.komoot_data = KomootData()
+        self._env_data = EnvData()
+        self._altimeter = Altimeter()
+        self._cycling = CycleData(self._settings)
+        self._komoot_data = KomootData()
         self._display_ctrl = DisplayCtrl(self._settings)
         self._goal_data = GoalData(self._settings)
         self._goal_data.load()
-        self.gui = GuiMain(self._settings, self.meter_list, self.komoot_data, self._goal_data)
+        self.gui = GuiMain(self._settings, self._komoot_data, self._goal_data, self._cycling, self._env_data)
         self._btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.btn_event, Button.left, self._settings.long_click.value) 
         self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
-        self._altimeter = Altimeter()
 
     def on_cycle_data(self, raw_data):
-        for meter in self.meter_list:
-            meter.cycle_data.process(raw_data)
-        self._goal_data.process(raw_data)
+        if self._cycling.process(raw_data):
+            for trip in self.gui.trip_list:
+                trip.process(self._cycling)
+            self._goal_data.process(self._cycling)
 
     def on_altitude_data(self, altitude):
-        for meter in self.meter_list:
-            meter.alt_data.process(altitude, self._settings.altimeter_step.value / 100, meter.cycle_data.is_riding)
+        for trip in self.gui.trip_list:
+            trip.alt_data.process(altitude, self._settings.altimeter_step.value / 100, self._cycling.is_riding)
 
     def ignore_click(self, is_long):
         display_off = not self._display_ctrl.is_display_on()
@@ -88,7 +88,7 @@ class BikeComputer:
             self.on_altitude_data(self._altimeter.altitude)
 
     def task_read_bat(self):
-        self.add_task(5000, self.task_read_bat)
+        self.add_task(60000, self.task_read_bat)
         self.request_sensor_bat()
         self.request_computer_bat()
 
@@ -96,14 +96,14 @@ class BikeComputer:
         g.bt.request_sensor_bat()
 
     def request_computer_bat(self):
-        self.env_data.computer_bat_volt = g.hal.update_bat()
+        self._env_data.computer_bat_volt = g.hal.update_bat()
 
     def run(self):
-        g.bt.register_cycle_callback(cycle_cb = self.on_cycle_data, bat_cb = self.env_data.on_sensor_bat)
-        g.bt.register_komoot_callback(self.komoot_data.on_data)
+        g.bt.register_cycle_callback(cycle_cb = self.on_cycle_data, bat_cb = self._env_data.on_sensor_bat)
+        g.bt.register_komoot_callback(self._komoot_data.on_data)
         self.task_update_bt()
         self.task_read_komoot()
-        self.task_read_bat()
+        #self.task_read_bat()
         self.task_update_gui()
         self.task_update_altimeter()
         while(True):
@@ -111,21 +111,3 @@ class BikeComputer:
                 self._scheduler.run()
             except OSError:
                 print("OSError")
-
-    def get_current_meter(self):
-        return self.gui.get_current_meter()
-
-    def get_current_cycle_data(self):
-        return self.gui.get_current_meter().cycle_data
-
-    def reset_current_altimeter(self):
-        self.get_current_meter().alt_data.reset()
-
-    def add_meter_instance(self):
-        id = len(self.meter_list) + 1
-        meter = MeterData(id, self.env_data, self._settings)
-        self.meter_list.append(meter)
-        return meter
-     
-    def get_goal(self):
-        return self._goal_data

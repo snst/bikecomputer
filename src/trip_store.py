@@ -1,5 +1,5 @@
 import data_global as g
-from meter_data import *
+from trip_data import *
 
 class TripStore:
     _name = b'meter.dat'
@@ -8,11 +8,11 @@ class TripStore:
         config['altsum'] = data.alt_data.sum
         config['altmin'] = data.alt_data.min
         config['altmax'] = data.alt_data.max
-        config['wc'] = data.cycle_data.wheel_counter.sum
-        config['wt'] = data.cycle_data.wheel_time.sum
-        config['cc'] = data.cycle_data.crank_counter.sum
-        config['ct'] = data.cycle_data.crank_time.sum
-        config['speedmax'] = data.cycle_data.speed_max
+        config['wc'] = data.wheel_counter
+        config['wt'] = data.wheel_time
+        config['cc'] = data.crank_counter
+        config['ct'] = data.crank_time
+        config['speedmax'] = data.speed_max
 
         try:
             f = open(self._name, 'w')
@@ -34,15 +34,15 @@ class TripStore:
                     elif key == 'altmax':
                         data.alt_data.max = val
                     elif key == 'wc':
-                        data.cycle_data.wheel_counter.sum = val
+                        data.wheel_counter = val
                     elif key == 'wt':
-                        data.cycle_data.wheel_time.sum = val
+                        data.wheel_time = val
                     elif key == 'cc':
-                        data.cycle_data.crank_counter.sum = val
+                        data.crank_counter = val
                     elif key == 'ct':
-                        data.cycle_data.crank_time.sum = val
+                        data.crank_time = val
                     elif key == 'speedmax':
-                        data.cycle_data.speed_max = val
+                        data.speed_max = val
                     pass
         except Exception as e:
             print(e)

@@ -16,30 +16,31 @@ from goal_gui import *
 from trip_store import *
 
 class GuiMain(GuiBase):
-    def __init__(self, settings, meter_list, komoot_data, goal_data):
+    def __init__(self, settings, komoot_data, goal_data, cycling, env_data):
+        self._next_trip_id = 1
         self.callback_repaint = None
+        self.cycling = cycling
+        self._goal_visible = False
         self._settings = settings
-        self._meter_list = ItemList(meter_list)
-        self.komoot_data = komoot_data
-        self._goal_data = goal_data
-        self.active_gui = None
-        self.gui_stack = []
-        self._gui_list = ItemList()
-        self.clear()
         self._gui_index = 1
         self._gui_index_last = 1
         self._max_views = 5
+        self._goal_data = goal_data
+        self.komoot_data = komoot_data
+        self.env_data = env_data
+        self.active_gui = None
+        self.gui_stack = []
+        self._meter_list = ItemList()
+        self.add_trip()
         self.add_to_gui_stack(self.create_gui())
+        #self.clear()
         #self._goal_visible = True
-        self._goal_visible = False
 
-    def add_gui_list(self, gui):
-        self._gui_list.append(gui)
+    @property
+    def trip_list(self):
+        return self._meter_list._list
 
-    def get_csc_data(self):
-        return self.get_current_meter().cycle_data
-
-    def get_current_meter(self):
+    def get_trip(self):
         return self._meter_list.get()
 
     def set_callback_repaint(self, cb):
@@ -90,7 +91,7 @@ class GuiMain(GuiBase):
         self.add_to_gui_stack(GuiMenu(self, MenuMain(self)))
 
     def gui_show_meter_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_csc_data())))
+        self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_trip())))
 
     def gui_show_komoot_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuKomoot(self)))
@@ -113,7 +114,8 @@ class GuiMain(GuiBase):
     def gui_stack_pop_all(self):
         while len(self.gui_stack) > 1:
             self.gui_stack.pop()
-        self.activate_gui(self.gui_stack[0])
+        if len(self.gui_stack) > 0:
+            self.activate_gui(self.gui_stack[0])
 
     def action_go_edit_setting_value(self, item):
         self.add_to_gui_stack(GuiEditValue(self, item))
@@ -168,12 +170,15 @@ class GuiMain(GuiBase):
         self.gui_stack.append(gui)
         self.activate_gui(gui)
 
-    def add_meter(self):
-        meter = g.bc.add_meter_instance()
+    def add_trip(self):
+        id = self._next_trip_id 
+        self._next_trip_id += 1
+        trip = TripData(id, self._settings)
+        self._meter_list.add(trip)
         self._meter_list.select_last()
         self.gui_stack_pop_all()
 
-    def del_meter(self):
+    def del_trip(self):
         meter = self._meter_list.get()
         self._meter_list.prev()
         self._meter_list.remove(meter)
@@ -182,10 +187,6 @@ class GuiMain(GuiBase):
     def reset_meter(self, meter):
         meter.reset()
         meter.enable(True)
-        self.gui_stack_pop_all()
-
-    def reset_altimeter(self):
-        g.bc.reset_current_altimeter()
         self.gui_stack_pop_all()
 
     def start_meter(self):
@@ -214,7 +215,7 @@ class GuiMain(GuiBase):
         g.bc._goal_data.save()
 
     def load_goal_settings(self):
-        self.get_csc_data().goal.load()
+        self.get_trip().goal.load()
 
     def gui_toggle_komoot(self):
         if 0 == self._gui_index:
@@ -228,7 +229,7 @@ class GuiMain(GuiBase):
             self._meter_list.next()
             self.gui_stack_pop_all()
         else:
-            self.add_meter()
+            self.add_trip()
 
     def gui_show_prev_meter(self):
         self._meter_list.prev()
@@ -242,7 +243,7 @@ class GuiMain(GuiBase):
         #return
         #txt = ""
         #txt += "S" if g.bt.is_scanning() else " "
-        #txt += "R" if self.get_csc_data().is_riding else "  "
+        #txt += "R" if self.get_trip().is_riding else "  "
         #txt += "C" if g.bt.is_csc_connected() else " "
         #txt += "K" if g.bt.is_komoot_connected() else " "
 
@@ -261,7 +262,7 @@ class GuiMain(GuiBase):
         self.add_to_gui_stack(GuiMenu(self, MenuGoal(self, g.bc._goal_data)))
 
     def show_cycle_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_current_meter())))
+        self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_trip())))
 
     def show_goal_meter(self, visible):
         self._goal_visible = visible
@@ -273,13 +274,13 @@ class GuiMain(GuiBase):
         self._settings.komoot_enabled.value = 1
         self.gui_stack_pop_all()
 
-    def save_meter(self, data):
+    def save_trip(self, trip):
         ts = TripStore()
-        ts.save(data)
+        ts.save(trip)
         self.gui_stack_pop_all()
 
-    def load_meter(self, data):
+    def load_trip(self, trip):
         ts = TripStore()
-        ts.load(data)
-        data.cycle_data.calculate_accumulated_data()
+        ts.load(trip)
+        trip.process(self.cycling)
         self.gui_stack_pop_all()

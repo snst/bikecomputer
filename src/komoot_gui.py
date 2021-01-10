@@ -19,34 +19,41 @@ class KomootGui(CycleGui):
     def get_title(self):
         return b'komoot'
 
-    def get_color_from_dist(self, data):
-        return Color.red if data.distance <= self.main._settings.komoot_red_color.value else Color.white
+    def get_color_from_dist(self, nav):
+        return Color.red if nav.distance <= self.main._settings.komoot_red_color.value else Color.white
 
-    def show_distance(self, data, y):
-        #print("d %u" % (data.distance))
-        if data.distance < 1000:
-            str = " %3d " % data.distance
+    def show_distance(self, nav, y):
+        #print("d %u" % (nav.distance))
+        if nav.distance < 1000:
+            str = " %3d " % nav.distance
             g.display.draw_text(fonts.f_wide_big, str, g.display.width, y, align=Align.center)
         else:
-            str = " %.1f " % (data.distance / 1000)
+            str = " %.1f " % (nav.distance / 1000)
             g.display.draw_text(fonts.f_wide_big, str, g.display.width, y, align=Align.center)
 
-    def show_direction(self, data, y):
+    def show_direction(self, nav, y):
         W = g.display.width
         H = 80
-        d = data.direction
+        d = nav.direction
         sign = get_sign(d)
         g.display.fill_rect((int)((g.display.width-72)/2), y, 72, H, Color.black)
         if sign:
             x = (int)((W - sign.WIDTH)/2)
             y += (int)((H - sign.HEIGHT)/2)
-            g.display.bitmap_blit(x, y, sign, fg=self.get_color_from_dist(data))
+            g.display.bitmap_blit(x, y, sign, fg=self.get_color_from_dist(nav))
 
-    def show_street(self, data, y):
-        if self.cache.changed(9, data.street):
+    def replace_street_str(self, txt):
+        txt = txt.replace("ß", "ss")
+        txt = txt.replace("ä", "a")
+        txt = txt.replace("ö", "o")
+        txt = txt.replace("ü", "u")
+        return txt
+
+    def show_street(self, nav, y):
+        if self.cache.changed(9, nav.street):
             #g.display.fill_rect(0, y, g.display.width, fonts.f_narrow_text.height() * 2, Color.black)
             self.clear_street()
-            g.display.draw_text_multi(fonts.f_narrow_text, "%s" % (data.street), 0, y, align=Align.center)
+            g.display.draw_text_multi(fonts.f_narrow_text, "%s" % (self.replace_street_str(nav.street)), 0, y, align=Align.center)
 
     def clear_street(self):
         g.display.fill_rect(0, self.y_street_speed, g.display.width, g.display.height-self.y_street_speed, Color.black)
@@ -55,23 +62,23 @@ class KomootGui(CycleGui):
         if redraw:
             self.cache.reset()
 
-        data = self.main.komoot_data
-        csc = self.main.get_csc_data()
+        nav = self.main.komoot_data
+        trip = self.main.get_trip()
         settings = self.main._settings
 
-        #data.street = "Schulstraße 77"
+        #nav.street = "Schulstraße 77"
 
         dist_notify = False
-        dir_changed = self.cache.changed(8, data.direction)
+        dir_changed = self.cache.changed(8, nav.direction)
 
-        if dir_changed or self.cache.changed(11, self.get_color_from_dist(data)):
-            self.show_direction(data, self.y_direction)
+        if dir_changed or self.cache.changed(11, self.get_color_from_dist(nav)):
+            self.show_direction(nav, self.y_direction)
 
-        if self.cache.changed(13, data.distance):
-            self.show_distance(data, self.y_distance)
-            dist_notify = data.distance <= settings.komoot_all_on.value or (self.cache.changed(12, (int)(data.distance/100)) and data.distance <= settings.komoot_flash_on.value)
+        if self.cache.changed(13, nav.distance):
+            self.show_distance(nav, self.y_distance)
+            dist_notify = nav.distance <= settings.komoot_all_on.value or (self.cache.changed(12, (int)(nav.distance/100)) and nav.distance <= settings.komoot_flash_on.value)
 
-        show_street = settings.komoot_street_dist.value == 0 or data.distance < settings.komoot_street_dist.value
+        show_street = settings.komoot_street_dist.value == 0 or nav.distance < settings.komoot_street_dist.value
         show_street_changed = self.cache.changed(10, show_street)
 
         if show_street_changed:
@@ -85,17 +92,16 @@ class KomootGui(CycleGui):
                 self.cache.reset_val(7)
 
         if show_street:
-            self.show_street(data, self.y_street_speed)
+            self.show_street(nav, self.y_street_speed)
         else:
-            self.show_speed(csc, self.y_street_speed)
-            self.show_trip_distance(csc, self.y_time_direction)
-            self.show_trip_duration(csc, 58, self.y_time_direction, font=fonts.f_narrow_text)
+            self.show_speed(self.main.cycling.speed, self.y_street_speed)
+            self.show_trip_distance(trip, self.y_time_direction)
+            self.show_trip_duration(trip, 58, self.y_time_direction, font=fonts.f_narrow_text)
 
         if settings.komoot_auto_on.value == 1 and (dir_changed or dist_notify):
             g.bc._display_ctrl.set_display_on()
 
-    def show_speed(self, data, y):
-        speed = round(data.speed, 1)
+    def show_speed(self, speed, y):
         if self.cache.changed(1, speed):
             self.show_float_speed(speed, g.display.width, y)
 

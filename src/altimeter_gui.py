@@ -23,37 +23,36 @@ class AltimeterGui(GuiBase):
     def show(self, redraw):
         y = 0
         ys = fonts.f_wide_smaller.height() + 8
-        data = self.main.get_csc_data()
-        altimter = g.bc._altimeter
-        alt = self.main.get_current_meter().alt_data
+        trip = self.main.get_trip()
+        altimeter = g.bc._altimeter
         if redraw:
             self.cache.reset()
         i = 0
-        self.show_val(redraw, y + i*ys, "Id", "%d" % (data.id), i)
+        self.show_val(redraw, y + i*ys, "Id", "%d" % (trip.id), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "km/h", "%.1f" % (round(data.speed_max, 1)), i)
+        self.show_val(redraw, y + i*ys, "km/h", "%.1f" % (round(trip.speed_max, 1)), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Cadence", "%d" % (data.cadence), i)
+        self.show_val(redraw, y + i*ys, "Cadence", "%d" % (self.main.cycling.cadence), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Avg cad", "%d" % (data.cadence_avg), i)
+        self.show_val(redraw, y + i*ys, "Avg cad", "%d" % (trip.cadence_avg), i)
         i += 1
-#        self.show_val(redraw, y + i*ys, "Alt", "%.1f m" % (altimter.altitude), i)
+#        self.show_val(redraw, y + i*ys, "Alt", "%.1f m" % (altimeter.altitude), i)
 #        i += 1
-#        self.show_val(redraw, y + i*ys, "Alt min", "%.1f m" % (alt.min), i)
+#        self.show_val(redraw, y + i*ys, "Alt min", "%.1f m" % (trip.alt_data.min), i)
 #        i += 1
-#        self.show_val(redraw, y + i*ys, "Alt max", "%.1f m" % (alt.max), i)
+#        self.show_val(redraw, y + i*ys, "Alt max", "%.1f m" % (trip.alt_data.max), i)
 #        i += 1
-        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (alt.sum), i)
+        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (trip.alt_data.sum), i)
         i += 1
         ya = y + i * ys
-        if self.cache.changed(i, (int)(alt.min)):
-            g.display.draw_text(fonts.f_wide_smaller, "%d" % (alt.min), (int)(g.display.width/2), ya, align=Align.right)
+        if self.cache.changed(i, (int)(trip.alt_data.min)):
+            g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.alt_data.min), (int)(g.display.width/2), ya, align=Align.right)
         #i += 1
-        #if self.cache.changed(i, (int)(altimter.altitude)):
-        #    g.display.draw_text(fonts.f_narrow_small, "%d" % (altimter.altitude), (int)(g.display.width/3*2), ya, align=Align.right)
+        #if self.cache.changed(i, (int)(altimeter.altitude)):
+        #    g.display.draw_text(fonts.f_narrow_small, "%d" % (altimeter.altitude), (int)(g.display.width/3*2), ya, align=Align.right)
         i += 1
-        if self.cache.changed(i, (int)(alt.max)):
-            g.display.draw_text(fonts.f_wide_smaller, "%d" % (alt.max), (int)(g.display.width), ya, align=Align.right)
+        if self.cache.changed(i, (int)(trip.alt_data.max)):
+            g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.alt_data.max), (int)(g.display.width), ya, align=Align.right)
         
     def handle(self, event = 0):
         if event == (Button.right | Button.long):

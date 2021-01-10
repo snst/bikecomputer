@@ -19,14 +19,14 @@ class MenuMeter:
     def __init__(self, main, data):
         self.title = b'Meter'
         self.items = [ 
-                       MenuItem(b'Stop' if data.cycle_data.is_started else b'Start', lambda : main.enable_meter(data, not data.cycle_data.is_started)),
+                       MenuItem(b'Stop' if data.is_started else b'Start', lambda : main.enable_meter(data, not data.is_started)),
                        MenuItem(b'Reset', lambda : main.reset_meter(data)),
-                       MenuItem(b'Save', lambda : main.save_meter(data)),
-                       MenuItem(b'Load', lambda : main.load_meter(data)),
-                       MenuItem(b'+ Meter', lambda : main.add_meter()),
+                       MenuItem(b'Save', lambda : main.save_trip(data)),
+                       MenuItem(b'Load', lambda : main.load_trip(data)),
+                       MenuItem(b'+ Meter', lambda : main.add_trip()),
         ]
         if data.id != 1:
-            self.items.append(MenuItem(b'- Meter', lambda : main.del_meter()))
+            self.items.append(MenuItem(b'- Meter', lambda : main.del_trip()))
         if not main._goal_visible:
             self.items.append(MenuItem(b'Goal', lambda: main.show_goal_meter(True)))
         if main._settings.komoot_enabled.value == 0:

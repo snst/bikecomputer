@@ -61,10 +61,16 @@ class Hal_esp32:
         return self._vbat
 
     def update_bat(self):
+        p0 = machine.Pin(14, machine.Pin.OUT)
+        p0.on()
+        self.sleep_ms(1)
         vref = 1100
         adc = machine.ADC(machine.Pin(34))
         adc.atten(machine.ADC.ATTN_11DB)
+#        adc.atten(machine.ADC.ATTN_0DB)
+        adc.width(machine.ADC.WIDTH_12BIT)
         val = adc.read() 
+        p0.off()
         self._vbat = (val / 4095.0) * 2.0 * 3.3 * (vref / 1000.0)
         #print("vbat: %.2f" % (self._vbat))
         return self._vbat

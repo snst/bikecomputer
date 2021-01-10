@@ -28,6 +28,12 @@ class CscVal:
     def get_sum_in_min(self):
         return self.sum / (1024 * 60)
 
+    def get_sum_in_sec(self):
+        return self.sum / 1024
+
+    def get_delta_in_sec(self):
+        return self.delta / 1024
+
     def get_distance_in_km(self, wheel_cm):
         return self.sum * wheel_cm / 100000
 

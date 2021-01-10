@@ -3,22 +3,20 @@ import struct
 import site
 import sys
 site.addsitedir('./src')  # Always appends to end
-from csc import *
 from data_settings import *
-from cycle_data import *
+from trip_data import *
 
 class TestCSCMethods(unittest.TestCase):
 
     def setUp(self):
-        self.data = CycleData()
         self._settings = DataSettings()
-        self.csc = CSC(self._settings)
+        self.data = TripData(1, self._settings)
 
-    def test_uninit(self):
+    def test_not_init(self):
         self.assertFalse(self.data.init)
         self.assertFalse(self.data.is_riding)
 
-    def test_init(self):
+    """def test_init(self):
         raw_data = struct.pack("<BIHHH", 0, 1322, 213, 771, 83)
         self.csc.process(raw_data, self.data)
         self.assertTrue(self.data.init)
@@ -30,7 +28,7 @@ class TestCSCMethods(unittest.TestCase):
         self.assertEqual(self.data.wheel_counter.sum, 0)
         self.assertEqual(self.data.wheel_time.sum, 0)
         self.assertEqual(self.data.crank_counter.sum, 0)
-        self.assertEqual(self.data.crank_time.sum, 0)
+        self.assertEqual(self.data.crank_time.sum, 0)"""
 
     def test_overflow_unit16(self):
         self.data.wheel_time.sum = 0xFFFF1234
@@ -52,17 +50,18 @@ class TestCSCMethods(unittest.TestCase):
     def test_calc_kmh(self):
         cnt = 12
         sec = 13
+        tc = sec * 1024
         kmh = cnt * self._settings.wheel_cm.value  / 1000 / (sec / 36)
-        self.assertEqual(kmh, self.csc.calc_kmh(cnt, sec))
+        self.assertEqual(kmh, self.data.calc_kmh_from_csc_val(cnt, tc))
 
     def test_cadence(self):
-        self.assertEqual(332*60/5, self.csc.calc_cadence(332, 5))
+        self.assertEqual(332*60/5, self.data.calc_cadence(332, 5))
         
 #    def test_average_cadence(self):
  #       self.assertEqual(332*60/5, self.csc.calc_average_cadence(332, 5))
   #      self.assertEqual((332+22)*60/(5+85), self.csc.calc_average_cadence(22, 85))
 
-    def test_kmh(self):
+    """def test_kmh(self):
         raw_data = struct.pack("<BIHHH", 0, 1322, 2213, 771, 83)
         self.csc.process(raw_data, self.data)
         raw_data = struct.pack("<BIHHH", 0, 1342, 6423, 1231, 323)
@@ -73,7 +72,7 @@ class TestCSCMethods(unittest.TestCase):
         self.assertEqual(delta_sec/60, self.data.trip_duration_min)
         self.assertEqual(dist_km, self.data.trip_distance)
         self.assertEqual((int)(kmh*100), (int)(self.data.speed*100))
-        self.assertTrue(self.data.is_riding)
+        self.assertTrue(self.data.is_riding)"""
 
 if __name__ == '__main__':
     unittest.main()

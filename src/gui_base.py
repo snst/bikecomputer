@@ -1,4 +1,4 @@
-from cycle_data import *
+from trip_data import *
 import fonts
 from const import *
 import data_global as g

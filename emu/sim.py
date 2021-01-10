@@ -9,7 +9,7 @@ import math
 class Sim:
     def __init__(self, bike_computer):
         self.gui = bike_computer.gui
-        #self._cycle_data = bike_computer.meter_list[0].
+        #self._cycle_data = bike_computer.trip_list[0].
         #self.set_demo_data(self.data)
         self.bc = bike_computer
         self.wheel_counter = 0
@@ -115,18 +115,18 @@ class Sim:
         if btn == 120: #x
             self.speed += 1#0.5
             #self.bc.komoot_data.distance += 25
-            self.bc.komoot_data.direction += 1
+            self.bc._komoot_data.direction += 1
             pass
         elif btn == 121: #y
             if self.speed > 1:
                 self.speed -= 1#0.5
             #self.bc.komoot_data.distance -= 25
-            self.bc.komoot_data.direction -= 1
+            self.bc._komoot_data.direction -= 1
             pass
         elif btn == 99: #c
-            self.bc.komoot_data.distance -= 50
+            self.bc._komoot_data.distance -= 50
         elif btn == 118: #v
-            self.bc.komoot_data.distance += 50
+            self.bc._komoot_data.distance += 50
         elif btn == 32: #space
             self.paused = not self.paused
             pass

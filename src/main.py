@@ -51,6 +51,6 @@ def task_mem():
     g.bc.add_task(5000, task_mem)
     #print("mem: %d" % (gc.mem_free()))
 
-task_mem()
+#task_mem()
 
 g.bc.run()

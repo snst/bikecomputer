@@ -31,10 +31,11 @@ class StatusGui(GuiBase):
         altimter = g.bc._altimeter
         if redraw:
             self.cache.reset()
+        env = self.main.env_data
         i = 0
-        self.show_val(redraw, y + i*ys, "Lipo V", "%.2f" % (g.bc.env_data.computer_bat_volt), i)
+        self.show_val(redraw, y + i*ys, "Lipo V", "%.2f" % (env.computer_bat_volt), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Bat %", "%d" % (g.bc.env_data.sensor_bat_percent), i)
+        self.show_val(redraw, y + i*ys, "Bat %", "%d" % (env.sensor_bat_percent), i)
         i += 1
         self.show_val(redraw, y + i*ys, "C", "%.1f" % (altimter.temperature), i)
         i += 1

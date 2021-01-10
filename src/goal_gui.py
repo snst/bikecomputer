@@ -1,4 +1,4 @@
-from cycle_data import *
+from trip_data import *
 import fonts
 import const
 from gui_base import *
@@ -18,6 +18,7 @@ class GoalGui(CycleGui):
 
     def show(self, redraw):
         data = g.bc._goal_data
+        cycling = self.main.cycling
 
         if redraw:
             self.cache.reset()
@@ -32,8 +33,8 @@ class GoalGui(CycleGui):
 
         col = Color.white
         if data.is_started:
-            col = Color.red if data.calc_required_average_km_h > data.speed else Color.green
-        self.show_speed_big(data, y_speed, col)
+            col = Color.red if data.calc_required_average_km_h > cycling.speed else Color.green
+        self.show_speed_big(cycling.speed, y_speed, col)
 
         col = Color.white
         if data.is_started:
@@ -42,11 +43,11 @@ class GoalGui(CycleGui):
         self.show_trip_distance(data, y_distance, narrow = True)
         self.show_trip_duration(data, g.display.width, y_time, font = fonts.f_narrow_text)
 
-        if not data.has_distance_reached:
+        if not data.is_finished:
             self.show_speed_goal(data, y_goal)
 
-        if self.cache.changed(15, data.has_distance_reached):
-            if data.has_distance_reached:
+        if self.cache.changed(15, data.is_finished):
+            if data.is_finished:
                 g.display.fill_rect(0, y_goal, (int)(g.display.width/2), fonts.f_wide_normal.height(), Color.black)
 
 
