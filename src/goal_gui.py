@@ -48,7 +48,7 @@ class GoalGui(CycleGui):
 
         if self.cache.changed(15, data.is_finished):
             if data.is_finished:
-                g.display.fill_rect(0, y_goal, (int)(g.display.width/2), fonts.f_wide_normal.height(), Color.black)
+                g.display.fill_rect(0, y_goal, (int)(g.display.width/2), fonts.f_narrow_normal.height(), Color.black)
 
 
         self.show_distance_goal(data, y_distance)

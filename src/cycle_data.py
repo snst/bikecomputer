@@ -1,5 +1,6 @@
 import struct
 from csc_val import *
+from smooth import *
 
 class CycleData:
     def __init__(self, settings):
@@ -13,7 +14,9 @@ class CycleData:
         self.crank_counter = CscVal(Max.uint16)
         self.crank_time = CscVal(Max.uint16)
         self.speed = 0
+        self._smooth_speed = Smooth()
         self.cadence = 0
+        self._smooth_cadence = Smooth()
         self.is_riding = False
         self.sim = 10
         self.has_valid_cadence = False
@@ -54,8 +57,12 @@ class CycleData:
         return self.init
 
     def calculate(self):
-        self.speed = round(self.calc_speed_kmh(self.wheel_counter.delta, self.wheel_time.delta), 1)
-        self.cadence = (int)(self.calc_cadence(self.crank_counter.delta, self.crank_time.delta))
+        #self.speed = round(self.calc_speed_kmh(self.wheel_counter.delta, self.wheel_time.delta), 1)
+        speed = self.calc_speed_kmh(self.wheel_counter.delta, self.wheel_time.delta)
+        self.speed = round(self._smooth_speed.add(speed, self._settings.csc_smooth.value), 1)
+        #self.cadence = (int)(self.calc_cadence(self.crank_counter.delta, self.crank_time.delta))
+        cadence = self.calc_cadence(self.crank_counter.delta, self.crank_time.delta)
+        self.cadence = (int)(self._smooth_cadence.add(cadence, self._settings.csc_smooth.value))
         self.is_riding = self.speed < 100 and self.speed >= self._settings.min_speed.value
         self.has_valid_cadence = self.cadence >= self._settings.min_cadence.value and self.cadence < 140
         #print("r=%d, km/h=%f, cad=%d" % (self.is_riding, self.speed, self.cadence))

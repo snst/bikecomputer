@@ -15,6 +15,7 @@ class DataSettings(DataStore):
         self.min_speed = SettingVal(5, 0, 10)
         self.min_cadence = SettingVal(10, 0, 50)
         self.csc_on = SettingVal(0, 0, 1)
+        self.csc_smooth = SettingVal(3, 1, 20)
         self.komoot_enabled = SettingVal(0, 0, 1)
         self.komoot_flash_on = SettingVal(500, 100, 1000, False, 25)
         self.komoot_all_on = SettingVal(500, 100, 1000)

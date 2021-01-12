@@ -78,10 +78,12 @@ class MenuCSC:
         self.wheel_cm = MenuValueItem(b'Wheel cm', self.data.wheel_cm)
         self.min_speed = MenuValueItem(b'Min km/h', self.data.min_speed)
         self.min_cadence = MenuValueItem(b'Min cadence', self.data.min_cadence)
+        self.csc_smooth = MenuValueItem(b'Smooth n;values', self.data.csc_smooth)
         self.items = [ self.csc_on,
                        self.wheel_cm,
                        self.min_speed,
                        self.min_cadence,
+                       self.csc_smooth,
                        MenuItem(b'Save', lambda : main.save_settings()),
         ]
         pass        
@@ -93,8 +95,7 @@ class MenuGoal:
         self.dist = MenuValueItem(b'Distance km', data.target_dist_km, data.calculate_time)
         self.avg = MenuValueItem(b'Average km/h', data.target_average_km_h, data.calculate_time)
         self.time = MenuValueItem(b'Time min', data.target_time_min, data.calculate_avg)
-        self.items = [ MenuItem(b'Stop' if data.is_started else b'Start', lambda : main.enable_meter(data, not data.is_started)),
-                       MenuItem(b'Reset', lambda : main.reset_meter(data)),
+        self.items = [ MenuItem(b'Reset', lambda : main.reset_meter(data)),
                        self.dist,
                        self.avg,
                        self.time,
@@ -102,6 +103,8 @@ class MenuGoal:
                        MenuItem(b'Save', lambda : main.save_goal_settings()),
                        MenuItem(b'Load', lambda : main.load_goal_settings()),
         ]
+        if not data.is_finished:
+            self.items.insert(0, MenuItem(b'Stop' if data.is_started else b'Start', lambda : main.enable_meter(data, not data.is_started)))
         pass    
 
 
