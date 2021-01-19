@@ -2,7 +2,7 @@ from data_settings import SettingVal
 from data_store import *
 from trip_data import *
 
-filename = "goal.cfg"
+filename = b'goal.cfg'
 
 
 class GoalData(DataStore, TripData):

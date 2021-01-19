@@ -1,6 +1,13 @@
 d="$(dirname $(readlink -f $0))"
 
-A="$d/fonts/libel.ttf"
+mkdir fonts
+cd fonts
+wget https://dl.dafont.com/dl/?f=libel_suit -O libel.zip
+unzip libel.zip
+wget https://fonts.google.com/download?family=Oswald -O oswald.zip
+unzip oswald.zip
+
+A="$d/fonts/libel-suit-rg.ttf"
 B="$d/fonts/Oswald-VariableFont_wght.ttf"
 out="$d/modules"
 gen="$d/tools/font_to_py.py"

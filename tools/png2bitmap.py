@@ -52,8 +52,6 @@ if __name__ == '__main__':
     in_path = args[1]
     out_path = args[2]
     #print("%s %s" %(in_path, out_path))
-    #in_path = "/media/stsc/data/work/micropython/apps/bikecomputer/signs/k3.png"
-    #out_path = "/media/stsc/data/work/micropython/apps/bikecomputer/modules"
 
     if os.path.exists(in_path) == False: error('not exists: ' + in_path)
     

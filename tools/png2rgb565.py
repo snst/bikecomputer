@@ -62,9 +62,9 @@ def write_bin_bit(name, f, img):
 
 if __name__ == '__main__':
     args = sys.argv
-    #if len(args) != 2: usage()
-    #in_path = args[1]
-    in_path = "/media/stsc/data/work/micropython/apps/bikecomputer/tools/k3.png"
+    if len(args) != 2: usage()
+    in_path = args[1]
+    
     if os.path.exists(in_path) == False: error('not exists: ' + in_path)
     
     name, _ = os.path.splitext(in_path)
