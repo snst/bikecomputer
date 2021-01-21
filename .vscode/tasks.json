@@ -32,6 +32,12 @@
             "type": "shell",
             "command": "./make.sh deploy",
             "problemMatcher": []
+        },
+        {
+            "label": "coverage",
+            "type": "shell",
+            "command": "./cov.sh",
+            "problemMatcher": []
         }
     ]
 }

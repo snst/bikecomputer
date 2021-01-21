@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 from komoot_data import *
 import fonts
 import const
