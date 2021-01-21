@@ -4,3 +4,4 @@ esp-idf/*
 toolchain/*
 fonts/*
 venv/*
+micropython/*
