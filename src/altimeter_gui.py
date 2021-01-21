@@ -24,7 +24,6 @@ class AltimeterGui(GuiBase):
         y = 0
         ys = fonts.f_wide_smaller.height() + 8
         trip = self.main.get_trip()
-        altimeter = g.bc._altimeter
         if redraw:
             self.cache.reset()
         i = 0
@@ -36,20 +35,11 @@ class AltimeterGui(GuiBase):
         i += 1
         self.show_val(redraw, y + i*ys, "Avg cad", "%d" % (trip.cadence_avg), i)
         i += 1
-#        self.show_val(redraw, y + i*ys, "Alt", "%.1f m" % (altimeter.altitude), i)
-#        i += 1
-#        self.show_val(redraw, y + i*ys, "Alt min", "%.1f m" % (trip.alt_data.min), i)
-#        i += 1
-#        self.show_val(redraw, y + i*ys, "Alt max", "%.1f m" % (trip.alt_data.max), i)
-#        i += 1
         self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (trip.alt_data.sum), i)
         i += 1
         ya = y + i * ys
         if self.cache.changed(i, (int)(trip.alt_data.min)):
             g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.alt_data.min), (int)(g.display.width/2), ya, align=Align.right)
-        #i += 1
-        #if self.cache.changed(i, (int)(altimeter.altitude)):
-        #    g.display.draw_text(fonts.f_narrow_small, "%d" % (altimeter.altitude), (int)(g.display.width/3*2), ya, align=Align.right)
         i += 1
         if self.cache.changed(i, (int)(trip.alt_data.max)):
             g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.alt_data.max), (int)(g.display.width), ya, align=Align.right)

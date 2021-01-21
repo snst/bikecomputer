@@ -1,6 +1,5 @@
 class DataCache:
     def __init__(self):
-        #self._items = [None] * n
         self._items = []
         pass
     

@@ -1,0 +1,37 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "generate fonts",
+            "type": "shell",
+            "command": "./7_gen_fonts.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "copy source",
+            "type": "shell",
+            "command": "./8_copy_source.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "make clean",
+            "type": "shell",
+            "command": "./make.sh clean",
+            "problemMatcher": []
+        },
+        {
+            "label": "make",
+            "type": "shell",
+            "command": "./make.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "make deploy",
+            "type": "shell",
+            "command": "./make.sh deploy",
+            "problemMatcher": []
+        }
+    ]
+}

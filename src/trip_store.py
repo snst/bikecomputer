@@ -3,6 +3,7 @@ from trip_data import *
 
 class TripStore:
     _name = b'meter.dat'
+
     def save(self, data):
         config = {}
         config['altsum'] = data.alt_data.sum
@@ -47,4 +48,4 @@ class TripStore:
         except Exception as e:
             print(e)
             pass
-        pass
+        

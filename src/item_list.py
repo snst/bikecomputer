@@ -10,11 +10,12 @@ class ItemList:
         return self._list[self._index]
 
     def next(self):
-        self._index = (self._index + 1) % len(self._list)
+        self._index = (self._index + 1) % self.count()
         return self.get()
 
     def prev(self):
-        self._index = (self._index + len(self._list) - 1) % len(self._list)
+        cnt = self.count()
+        self._index = (self._index + cnt - 1) % cnt
         return self.get()
 
     def count(self):

@@ -19,16 +19,10 @@ class StatusGui(GuiBase):
     def get_title(self):
         return b'status'
 
-#    def show_val(self, redraw, y, str, val, i):
-#        if redraw:
-#            g.display.draw_text(fonts.f_narrow_small, str , 0, y, align=Align.left)
-#        if self.cache.changed(i, val):
-#            g.display.draw_text(fonts.f_narrow_small, val, g.display.width, y, align=Align.right)
-
     def show(self, redraw):
         y = 0
         ys = fonts.f_wide_smaller.height() + 8
-        altimter = g.bc._altimeter
+        env_data = g.bc._env_data
         if redraw:
             self.cache.reset()
         env = self.main.env_data
@@ -37,11 +31,11 @@ class StatusGui(GuiBase):
         i += 1
         self.show_val(redraw, y + i*ys, "Bat %", "%d" % (env.sensor_bat_percent), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "C", "%.1f" % (altimter.temperature), i)
+        self.show_val(redraw, y + i*ys, "C", "%.1f" % (env_data.temperature), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "hPa", "%.1f" % (altimter.pressure), i)
+        self.show_val(redraw, y + i*ys, "hPa", "%.1f" % (env_data.pressure), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (altimter.altitude), i)
+        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (env_data.altitude), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Mem", "%u" % ((int)(g.hal.gc_mem_free() / 1024)), i)
 

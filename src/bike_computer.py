@@ -9,7 +9,6 @@ from button_handler import *
 import data_global as g
 from scheduler import *
 from item_list import *
-from altimeter import *
 from env_data import *
 from cycle_data import *
 
@@ -19,7 +18,6 @@ class BikeComputer:
         self._settings.load()
         self._scheduler = Scheduler(g.hal)
         self._env_data = EnvData()
-        self._altimeter = Altimeter()
         self._cycling = CycleData(self._settings)
         self._komoot_data = KomootData()
         self._display_ctrl = DisplayCtrl(self._settings)
@@ -83,9 +81,9 @@ class BikeComputer:
 
     def task_update_altimeter(self):
         self._scheduler.insert(self._settings.altimeter_time_ms.value, self.task_update_altimeter)
-        if None != self._altimeter and self._settings.altimeter_enabled.value:
-            self._altimeter.update()
-            self.on_altitude_data(self._altimeter.altitude)
+        if self._settings.altimeter_enabled.value:
+            self._env_data.update_altitude()
+            self.on_altitude_data(self._env_data.altitude)
 
     def task_read_bat(self):
         self.add_task(60000, self.task_read_bat)

@@ -9,19 +9,6 @@ class MenuItem:
         self.action = action
         self.type = self.MENU_ITEM
 
-class IntMenuItem(MenuItem):
-    def __init__(self, name, default, min, max):
-        MenuItem.__init__(self, name, None)
-        self.type = self.INT_ITEM
-        self.value = default
-        self.min = min
-        self.max = max
-
-class FloatMenuItem(IntMenuItem):
-    def __init__(self, name, default, min, max):
-        IntMenuItem.__init__(self, name, default, min, max)
-        self.type = self.FLOAT_ITEM
-
 class MenuValueItem(MenuItem):
     def __init__(self, name, data, cb = None):
         MenuItem.__init__(self, name, None)
