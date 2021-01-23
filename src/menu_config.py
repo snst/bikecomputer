@@ -6,7 +6,7 @@ class MenuMain:
         self.title = b'Menu'
         self.items = [ MenuItem(b'Display', lambda : main.go_menu_settings()),
                        MenuItem(b'CSC', lambda : main.gui_show_csc_menu()),
-                       MenuItem(b'Altimeter', lambda : main.gui_show_altimeter_menu()),
+                       MenuItem(b'Altitude', lambda : main.gui_show_altimeter_menu()),
                        MenuItem(b'Navi', lambda : main.gui_show_navi_menu()),
                        MenuItem(b'BLE;scan', lambda : main.ble_reconnect()),
                        MenuItem(b'Display;off', lambda: g.bc._display_ctrl.set_display_complete_off()),
@@ -54,7 +54,7 @@ class MenuSettings:
 
 class MenuAltimeter:
     def __init__(self, main):
-        self.title = b'Altimeter'
+        self.title = b'Altitude'
         self.data = main._settings
         self.altimeter_enabled = MenuValueItem(b'Enabled;altimeter', self.data.altimeter_enabled)
         self.altimeter_values = MenuValueItem(b'Number of;avg values', self.data.altimeter_values)
