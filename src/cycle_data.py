@@ -1,6 +1,7 @@
 import struct
 from csc_val import *
 from smooth import *
+from const import *
 
 class CycleData:
     def __init__(self, settings):
@@ -63,12 +64,19 @@ class CycleData:
         #self.cadence = (int)(self.calc_cadence(self.crank_counter.delta, self.crank_time.delta))
         cadence = self.calc_cadence(self.crank_counter.delta, self.crank_time.delta)
         self.cadence = (int)(self._smooth_cadence.add(cadence, self._settings.csc_smooth.value))
-        self.is_riding = self.speed < 100 and self.speed >= self._settings.min_speed.value
-        self.has_valid_cadence = self.cadence >= self._settings.min_cadence.value and self.cadence < 140
-        #print("r=%d, km/h=%f, cad=%d" % (self.is_riding, self.speed, self.cadence))
 
-    def convert_wheel_count_to_km(self, wheel_count):
+        #print("r=%d, km/h=%f, cad=%d" % (self.is_riding, self.speed, self.cadence))
+        self.is_riding = self.calc_is_riding(self.speed)
+        self.has_valid_cadence = self.calc_has_valid_cadence(self.cadence)
+
+    def calc_is_riding(self, speed):
+        return speed <= Limits.max_valid_speed and speed >= self._settings.min_speed.value
+
+    def calc_has_valid_cadence(self, cadence):
+        return cadence >= self._settings.min_cadence.value and cadence <= Limits.max_valid_cadence
+
+    def convert_wheel_count_to_km(self, wheel_count): #ut
         return wheel_count * self._settings.wheel_cm.value / 100000
 
-    def convert_wheel_ticks_to_min(self, wheel_ticks):
+    def convert_wheel_ticks_to_min(self, wheel_ticks): #ut
         return wheel_ticks / (60 * 1024)

@@ -1,5 +1,9 @@
 import st7789
 
+class Limits:
+    max_valid_cadence = 140
+    max_valid_speed = 100
+
 class Layout:
     y_breadcrum = 10
     y_setting_text = 60

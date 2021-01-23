@@ -7,24 +7,20 @@ from data_cache import *
 
 
 class StatusGui(GuiBase):
-
     def __init__(self, main):
         GuiBase.__init__(self, main)
-        self.cache = DataCache()
         g.bc.request_sensor_bat()
         g.bc.request_computer_bat()
         g.hal.gc_collect()
-
 
     def get_title(self):
         return b'status'
 
     def show(self, redraw):
+        self.cache.reset(redraw)
         y = 0
         ys = fonts.f_wide_smaller.height() + 8
         env_data = g.bc._env_data
-        if redraw:
-            self.cache.reset()
         env = self.main.env_data
         i = 0
         self.show_val(redraw, y + i*ys, "Lipo V", "%.2f" % (env.computer_bat_volt), i)

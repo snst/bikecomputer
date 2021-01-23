@@ -14,18 +14,15 @@ class AltimeterGui(GuiBase):
 
     def __init__(self, main):
         GuiBase.__init__(self, main)
-        self.cache = DataCache()
-        #self._cnt = 0
 
     def get_title(self):
         return b'alt'
 
     def show(self, redraw):
+        self.cache.reset(redraw)
         y = 0
         ys = fonts.f_wide_smaller.height() + 8
         trip = self.main.get_trip()
-        if redraw:
-            self.cache.reset()
         i = 0
         self.show_val(redraw, y + i*ys, "Id", "%d" % (trip.id), i)
         i += 1

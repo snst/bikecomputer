@@ -3,9 +3,7 @@ import fonts
 from const import *
 import data_global as g
 from helper import *
-
-
-
+from data_cache import *
 class GuiBase:
     x_desc = 6
     x_val = 35
@@ -77,11 +75,11 @@ class GuiBase:
         g.display.draw_text(fonts.f_wide_normal, "%d" % (dval), x-mw, y, fg=color, bg=Color.black, align=Align.left)
 
     def show_speed_max(self, data, y):
-        if self.cache.changed(6, data.speed_max):
+        if self.cache.changed(DataCache.SPEED_MAX, data.speed_max):
             self.show_float_speed(data.speed_max, g.display.width, y)
 
     def show_cadence_avg(self, data, y):
-        if self.cache.changed(7, data.cadence_avg):
+        if self.cache.changed(DataCache.CADENCE_AVG, data.cadence_avg):
             g.display.draw_text(fonts.f_wide_normal, "%2d" % (data.cadence_avg), g.display.width, y, align=Align.right)
 
     def show_desc(self, txt, y):
@@ -110,3 +108,15 @@ class GuiBase:
             g.display.draw_text(fonts.f_narrow_small, str , 0, y+8, align=Align.left)
         if self.cache.changed(i, val):
             g.display.draw_text(fonts.f_wide_smaller, val, g.display.width, y, align=Align.right)
+
+    @property
+    def cache(self):
+        return self.main._cache
+
+    @property
+    def trip(self):
+        return self.main.get_trip()
+    
+    @property
+    def cycling(self):
+        return self.main._cycling

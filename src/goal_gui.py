@@ -17,11 +17,9 @@ class GoalGui(CycleGui):
         return b'goal'
 
     def show(self, redraw):
+        self.cache.reset(redraw)
         data = g.bc._goal_data
         cycling = self.main.cycling
-
-        if redraw:
-            self.cache.reset()
 
         y_speed = 0
         y_avg = 60
@@ -46,7 +44,7 @@ class GoalGui(CycleGui):
         if not data.is_finished:
             self.show_speed_goal(data, y_goal)
 
-        if self.cache.changed(15, data.is_finished):
+        if self.cache.changed(DataCache.GOAL_FINISHED, data.is_finished):
             if data.is_finished:
                 g.display.fill_rect(0, y_goal, (int)(g.display.width/2), fonts.f_narrow_normal.height(), Color.black)
 
@@ -64,25 +62,25 @@ class GoalGui(CycleGui):
 
     def show_speed_goal(self, data, y):
         speed = round(data.calc_required_average_km_h, 1)
-        if self.cache.changed(8, speed):
+        if self.cache.changed(DataCache.GOAL_REQUIRED_AVG_SPEED, speed):
             self.show_float_speed(speed, self.goal_x, y, color=Color.white, align = Align.left, narrow = True)
 
 
     def show_distance_goal(self, data, y):
         distance = round(data.remaining_distance_km, 1)
-        if self.cache.changed(10, distance):
+        if self.cache.changed(DataCache.GOAL_REMAINING_DISTANCE, distance):
             self.show_float_speed(distance, self.goal_x, y, align = Align.left, narrow = True)
 
     def show_time_goal(self, data, y):
-        if self.cache.changed(11, data.remaining_time_min):
+        if self.cache.changed(DataCache.GOAL_REMAINING_TIME, data.remaining_time_min):
             self.show_float_time(data.remaining_time_min, 0, y, align = Align.left, font = fonts.f_narrow_text)
 
     def show_progress_goal(self, data, y):
         max_val = round(data.target_dist_km.value, 1)
         val = round(data.target_dist_km.value-data.remaining_distance_km, 1)
         marker = round(data.optimal_distance_km, 1)
-        updt = self.cache.changed(12, max_val)
-        updt = self.cache.changed(13, val) or updt
-        updt = self.cache.changed(14, marker) or updt
+        updt = self.cache.changed(DataCache.GOAL_PROGRESS_MAX, max_val)
+        updt = self.cache.changed(DataCache.GOAL_PROGRESS_VAL, val) or updt
+        updt = self.cache.changed(DataCache.GOAL_PROGRESS_MARKER, marker) or updt
         if updt:
             self.show_progress(y - 12, 8, max_val, val, marker)

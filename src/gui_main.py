@@ -14,12 +14,15 @@ from status_gui import *
 from item_list import *
 from goal_gui import *
 from trip_store import *
+from data_cache import *
 
 class GuiMain(GuiBase):
     def __init__(self, settings, komoot_data, goal_data, cycling, env_data):
+        GuiBase.__init__(self, self)
+        self._cache = DataCache()
         self._next_trip_id = 1
         self.callback_repaint = None
-        self.cycling = cycling
+        self._cycling = cycling
         self._goal_visible = False
         self._settings = settings
         self._gui_index = 1
@@ -33,8 +36,6 @@ class GuiMain(GuiBase):
         self._meter_list = ItemList()
         self.add_trip()
         self.add_to_gui_stack(self.create_gui())
-        #self.clear()
-        #self._goal_visible = True
 
     @property
     def trip_list(self):
@@ -282,5 +283,5 @@ class GuiMain(GuiBase):
     def load_trip(self, trip):
         ts = TripStore()
         ts.load(trip)
-        trip.process(self.cycling)
+        trip.process(self._cycling)
         self.gui_stack_pop_all()

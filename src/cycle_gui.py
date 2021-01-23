@@ -4,27 +4,22 @@ import const
 from gui_base import *
 from display import *
 import data_global as g
-from data_cache import *
 import s_avg
 import s_hm
 import s_time
 import s_km
 
 class CycleGui(GuiBase):
-
     def __init__(self, main):
         GuiBase.__init__(self, main)
-        self.cache = DataCache()
 
     def get_title(self):
         return b'csc'
 
     def show(self, redraw):
-        if redraw:
-            self.cache.reset()
-
-        trip = self.main.get_trip()
-        cycling = self.main.cycling
+        self.cache.reset(redraw)
+        trip = self.trip
+        cycling = self.cycling
 
         yd = 46
         y_speed = 0
@@ -59,32 +54,32 @@ class CycleGui(GuiBase):
             GuiBase.handle(self, event)
 
     def show_speed_big(self, speed, y, col=Color.white):
-        if self.cache.changed(1, speed) or self.cache.changed(2, col):
+        if self.cache.changed(DataCache.SPEED, speed) or self.cache.changed(DataCache.SPEED_COLOR, col):
             self.show_big_speed(speed, g.display.width, y, col)
 
     def show_cadence(self, trip, y):
-        if self.cache.changed(3, trip.cadence):
+        if self.cache.changed(DataCache.CADENCE, trip.cadence):
             g.display.draw_text(fonts.f_wide_normal, "%2d" % (trip.cadence), 0, y, align=Align.left)
 
     def show_id(self, trip):
         if trip.id != 1:
-            if self.cache.changed(0, trip.id):
+            if self.cache.changed(DataCache.TRIP_ID, trip.id):
                 g.display.draw_text(fonts.f_narrow_small, "%d"%trip.id, 5, 0)
 
     def show_speed_avg(self, trip, y, col = Color.white):
         speed = round(trip.speed_avg, 1)
-        if self.cache.changed(4, speed) or self.cache.changed(5, col):
+        if self.cache.changed(DataCache.SPEED_AVG, speed) or self.cache.changed(DataCache.SPEED_AVG_COLOR, col):
             self.show_float_speed(speed, g.display.width, y, color = col)
 
     def show_trip_distance(self, trip, y, narrow = False):
         distance = round(trip.trip_distance, 1)
-        if self.cache.changed(6, distance):
+        if self.cache.changed(DataCache.TRIP_DISTANCE, distance):
             self.show_float_speed(distance, g.display.width, y, narrow = narrow)
 
     def show_trip_duration(self, trip, x, y, font = fonts.f_wide_normal):
-        if self.cache.changed(7, trip.trip_duration_min):
+        if self.cache.changed(DataCache.TRIP_DURATION, trip.trip_duration_min):
             self.show_float_time(trip.trip_duration_min, x, y, font = font)
 
     def show_trip_alt(self, trip, y):
-        if self.cache.changed(15, trip.alt_data.sum):
+        if self.cache.changed(DataCache.TRIP_ALTITUDE, trip.alt_data.sum):
             g.display.draw_text(fonts.f_wide_normal, "%d" % (trip.alt_data.sum), g.display.width, y, align = Align.right)

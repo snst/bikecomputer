@@ -12,7 +12,7 @@ class TestSmooth(unittest.TestCase):
     def setUp(self):
         self.s = Smooth()
 
-    def test_1(self):
+    def test_values(self):
         self.assertEqual(5, self.s.add(5, 3))
         self.assertEqual((5+8)/2, self.s.add(8, 3))
         self.assertEqual((5+8+2)/3, self.s.add(2, 3))
