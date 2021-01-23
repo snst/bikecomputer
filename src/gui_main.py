@@ -1,7 +1,7 @@
 from gui_edit_value import *
 from cycle_gui import *
 from gui_menu import *
-from komoot_gui import *
+from nav_gui import *
 from goal_data import *
 from menu_config import *
 from goal_data import *
@@ -17,7 +17,7 @@ from trip_store import *
 from data_cache import *
 
 class GuiMain(GuiBase):
-    def __init__(self, settings, komoot_data, goal_data, cycling, env_data):
+    def __init__(self, settings, nav_data, goal_data, cycling, env_data):
         GuiBase.__init__(self, self)
         self._cache = DataCache()
         self._next_trip_id = 1
@@ -29,7 +29,7 @@ class GuiMain(GuiBase):
         self._gui_index_last = 1
         self._max_views = 5
         self._goal_data = goal_data
-        self.komoot_data = komoot_data
+        self.nav_data = nav_data
         self.env_data = env_data
         self.active_gui = None
         self.gui_stack = []
@@ -53,10 +53,10 @@ class GuiMain(GuiBase):
 
     def cyclic_update(self):
         #print("update")
-        #if isinstance(self.active_gui, CycleGui) or isinstance(self.active_gui, KomootGui):
+        #if isinstance(self.active_gui, CycleGui) or isinstance(self.active_gui, NavGui):
         if len(self.gui_stack) == 1:
             self.active_gui.show(False)
-        if isinstance(self.active_gui, CycleGui) or isinstance(self.active_gui, KomootGui):
+        if isinstance(self.active_gui, CycleGui) or isinstance(self.active_gui, NavGui):
             self.gui_update_state()
         self.repaint()
 
@@ -95,7 +95,7 @@ class GuiMain(GuiBase):
         self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_trip())))
 
     def gui_show_komoot_menu(self):
-        self.add_to_gui_stack(GuiMenu(self, MenuKomoot(self)))
+        self.add_to_gui_stack(GuiMenu(self, MenuNav(self)))
 
     def gui_show_altimeter_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuAltimeter(self)))
@@ -125,7 +125,7 @@ class GuiMain(GuiBase):
         i = self._gui_index
         gui = None
         if i == 0:
-            gui = KomootGui(self)
+            gui = NavGui(self)
         elif i == 1:
             gui = CycleGui(self)
         elif i == 2:
@@ -140,7 +140,7 @@ class GuiMain(GuiBase):
     def switch_to_next_gui(self):
         index = min(self._gui_index + 1, 4)
         #index = (self._gui_index + 1) % self._max_views
-        if index == 0 and self._settings.komoot_enabled.value == 0: #skip komoot if not enabled
+        if index == 0 and self._settings.nav_enabled.value == 0: #skip komoot if not enabled
             index += 1
         if not self._goal_visible and index == 2:
             index += 1
@@ -150,7 +150,7 @@ class GuiMain(GuiBase):
         index = (self._gui_index - 1) 
         if not self._goal_visible and index == 2:
             index -= 1
-        if self._settings.komoot_enabled.value == 1:
+        if self._settings.nav_enabled.value == 1:
             if index < 0:
                 index = 1
         elif index < 1:
@@ -241,23 +241,14 @@ class GuiMain(GuiBase):
         g.hal.set_backlight(val)
 
     def gui_update_state(self):
-        #return
-        #txt = ""
-        #txt += "S" if g.bt.is_scanning() else " "
-        #txt += "R" if self.get_trip().is_riding else "  "
-        #txt += "C" if g.bt.is_csc_connected() else " "
-        #txt += "K" if g.bt.is_komoot_connected() else " "
-
-        #g.display.draw_text(fonts.f_narrow_small, txt, 50, Display.height - fonts.f_narrow_small.height())
-        #g.display.draw_text(fonts.f_narrow_small, "%.2f" % (g.hal.read_bat()), 0, Display.height - fonts.f_narrow_small.height())
         h = 4
         w = 10
         g.display.fill_rect(0, g.display.height-h, w-1, h, Color.yellow if g.bt.is_scanning() else Color.black)
         g.display.fill_rect(w, g.display.height-h, w-1, h, Color.green if g.bt.is_csc_connected() else Color.black)
-        g.display.fill_rect(2*w, g.display.height-h, w-1, h, Color.green if g.bt.is_komoot_connected() else Color.black)
+        g.display.fill_rect(2*w, g.display.height-h, w-1, h, Color.green if g.bt.is_nav_connected() else Color.black)
 
     def is_kommot_gui_active(self):
-        return isinstance(self.active_gui, KomootGui)
+        return isinstance(self.active_gui, NavGui)
 
     def show_goal_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuGoal(self, g.bc._goal_data)))
@@ -272,7 +263,7 @@ class GuiMain(GuiBase):
         self.gui_stack_pop_all()
         
     def enable_komoot(self):
-        self._settings.komoot_enabled.value = 1
+        self._settings.nav_enabled.value = 1
         self.gui_stack_pop_all()
 
     def save_trip(self, trip):

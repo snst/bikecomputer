@@ -29,7 +29,7 @@ class MenuMeter:
             self.items.append(MenuItem(b'- Meter', lambda : main.del_trip()))
         if not main._goal_visible:
             self.items.append(MenuItem(b'Goal', lambda: main.show_goal_meter(True)))
-        if main._settings.komoot_enabled.value == 0:
+        if main._settings.nav_enabled.value == 0:
             self.items.append(MenuItem(b'Komoot', lambda : main.enable_komoot()))
         pass    
 
@@ -108,24 +108,24 @@ class MenuGoal:
         pass    
 
 
-class MenuKomoot:
+class MenuNav:
     def __init__(self, main):
-        self.title = b'Komoot'
+        self.title = b'Nav'
         self.data = main._settings
-        self.komoot_enabled = MenuValueItem(b'Enable BLE', self.data.komoot_enabled)
-        self.komoot_auto_on = MenuValueItem(b'Auto switch;on LED', self.data.komoot_auto_on)
-        self.komoot_flash_on = MenuValueItem(b'Warn LED;before m', self.data.komoot_flash_on)
-        self.komoot_all_on = MenuValueItem(b'Steady LED;before m', self.data.komoot_all_on)
-        self.komoot_red_color = MenuValueItem(b'Red color;before m', self.data.komoot_red_color)
-        self.komoot_req_interval = MenuValueItem(b'BLE update ms', self.data.komoot_req_interval)
-        self.komoot_street_dist = MenuValueItem(b'Street;dist m', self.data.komoot_street_dist)
-        self.items = [ self.komoot_enabled,
-                       self.komoot_auto_on,
-                       self.komoot_flash_on,
-                       self.komoot_all_on,
-                       self.komoot_red_color,
-                       self.komoot_req_interval,
-                       self.komoot_street_dist,
+        self.nav_enabled = MenuValueItem(b'Enable BLE', self.data.nav_enabled)
+        self.nav_auto_on = MenuValueItem(b'Auto switch;on LED', self.data.nav_auto_on)
+        self.nav_flash_on = MenuValueItem(b'Warn LED;before m', self.data.nav_flash_on)
+        self.nav_all_on = MenuValueItem(b'Steady LED;before m', self.data.nav_all_on)
+        self.nav_red_color = MenuValueItem(b'Red color;before m', self.data.nav_red_color)
+        self.nav_req_interval = MenuValueItem(b'BLE update ms', self.data.nav_req_interval)
+        self.nav_street_dist = MenuValueItem(b'Street;dist m', self.data.nav_street_dist)
+        self.items = [ self.nav_enabled,
+                       self.nav_auto_on,
+                       self.nav_flash_on,
+                       self.nav_all_on,
+                       self.nav_red_color,
+                       self.nav_req_interval,
+                       self.nav_street_dist,
                        MenuItem(b'Save', lambda : main.save_settings()),
 
         ]

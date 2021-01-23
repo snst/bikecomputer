@@ -47,7 +47,7 @@ class Display:
         x = (int)((Display.width - w) / 2)
         return x
 
-    # komoot sign
+    # Nav sign
     def text(self, font, text, x, y, fg = Color.white, bg = Color.black):
         space = 2
         w = 0

@@ -14,7 +14,7 @@ class BtManagerEmu:
     def is_csc_connected(self):
         return False
 
-    def is_komoot_connected(self):
+    def is_nav_connected(self):
         return False
 
     def is_scanning(self):

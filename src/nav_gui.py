@@ -1,5 +1,5 @@
 # This Python file uses the following encoding: utf-8
-from komoot_data import *
+from nav_data import *
 import fonts
 import const
 from cycle_gui import *
@@ -7,7 +7,7 @@ import data_global as g
 from data_cache import *
 from signs import *
 
-class KomootGui(CycleGui):
+class NavGui(CycleGui):
     y_distance = 0
     y_direction = 55
     y_street_speed = 140
@@ -17,10 +17,10 @@ class KomootGui(CycleGui):
         GuiBase.__init__(self, main)
 
     def get_title(self):
-        return b'komoot'
+        return b'nav'
 
     def get_color_from_dist(self, nav):
-        return Color.red if nav.distance <= self.main._settings.komoot_red_color.value else Color.white
+        return Color.red if nav.distance <= self.main._settings.nav_red_color.value else Color.white
 
     def show_distance(self, nav, y):
         #print("d %u" % (nav.distance))
@@ -61,7 +61,7 @@ class KomootGui(CycleGui):
     def show(self, redraw):
         self.cache.reset(redraw)
 
-        nav = self.main.komoot_data
+        nav = self.main.nav_data
         trip = self.main.get_trip()
         settings = self.main._settings
 
@@ -75,9 +75,9 @@ class KomootGui(CycleGui):
 
         if self.cache.changed(DataCache.NAV_DISTANCE, nav.distance):
             self.show_distance(nav, self.y_distance)
-            dist_notify = nav.distance <= settings.komoot_all_on.value or (self.cache.changed(DataCache.NAV_DIST_100, (int)(nav.distance/100)) and nav.distance <= settings.komoot_flash_on.value)
+            dist_notify = nav.distance <= settings.nav_all_on.value or (self.cache.changed(DataCache.NAV_DIST_100, (int)(nav.distance/100)) and nav.distance <= settings.nav_flash_on.value)
 
-        show_street = settings.komoot_street_dist.value == 0 or nav.distance < settings.komoot_street_dist.value
+        show_street = settings.nav_street_dist.value == 0 or nav.distance < settings.nav_street_dist.value
         show_street_changed = self.cache.changed(DataCache.NAV_SHOW_STREET, show_street)
 
         if show_street_changed:
@@ -97,7 +97,7 @@ class KomootGui(CycleGui):
             self.show_trip_distance(trip, self.y_time_direction)
             self.show_trip_duration(trip, 58, self.y_time_direction, font=fonts.f_narrow_text)
 
-        if settings.komoot_auto_on.value == 1 and (dir_changed or dist_notify):
+        if settings.nav_auto_on.value == 1 and (dir_changed or dist_notify):
             g.bc._display_ctrl.set_display_on()
 
     def show_speed(self, speed, y):

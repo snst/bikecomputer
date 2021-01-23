@@ -58,14 +58,12 @@ class CycleData:
         return self.init
 
     def calculate(self):
-        #self.speed = round(self.calc_speed_kmh(self.wheel_counter.delta, self.wheel_time.delta), 1)
         speed = self.calc_speed_kmh(self.wheel_counter.delta, self.wheel_time.delta)
         self.speed = round(self._smooth_speed.add(speed, self._settings.csc_smooth.value), 1)
-        #self.cadence = (int)(self.calc_cadence(self.crank_counter.delta, self.crank_time.delta))
+
         cadence = self.calc_cadence(self.crank_counter.delta, self.crank_time.delta)
         self.cadence = (int)(self._smooth_cadence.add(cadence, self._settings.csc_smooth.value))
 
-        #print("r=%d, km/h=%f, cad=%d" % (self.is_riding, self.speed, self.cadence))
         self.is_riding = self.calc_is_riding(self.speed)
         self.has_valid_cadence = self.calc_has_valid_cadence(self.cadence)
 

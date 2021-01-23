@@ -6,12 +6,12 @@ import sys
 site.addsitedir('./src')  # Always appends to end
 site.addsitedir('./modules')  # Always appends to end
 site.addsitedir('./emu')  # Always appends to end
-from komoot_gui import *
+from nav_gui import *
 
 class TestKomoot(unittest.TestCase):
 
     def setUp(self):
-        self.kg = KomootGui(None)
+        self.kg = NavGui(None)
         pass
 
     def test_1(self):

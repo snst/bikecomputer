@@ -8,7 +8,7 @@ from const import *
 from button_handler import *
 from bike_computer import *
 from hal_esp32 import *
-from komoot_data import *
+from nav_data import *
 import data_global as g
 from bt_manager import *
 from altimeter_bmp280 import *

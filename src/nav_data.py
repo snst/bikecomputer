@@ -1,6 +1,6 @@
 import struct
 
-class KomootData:
+class NavData:
     def __init__(self):
         self.direction = 0
         self.distance = 0

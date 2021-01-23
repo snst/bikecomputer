@@ -2,7 +2,7 @@ from gui_main import *
 from data_settings import *
 from trip_data import *
 from goal_data import *
-from komoot_data import *
+from nav_data import *
 from display_ctrl import *
 from const import *
 from button_handler import *
@@ -19,11 +19,11 @@ class BikeComputer:
         self._scheduler = Scheduler(g.hal)
         self._env_data = EnvData()
         self._cycling = CycleData(self._settings)
-        self._komoot_data = KomootData()
+        self._nav_data = NavData()
         self._display_ctrl = DisplayCtrl(self._settings)
         self._goal_data = GoalData(self._settings)
         self._goal_data.load()
-        self.gui = GuiMain(self._settings, self._komoot_data, self._goal_data, self._cycling, self._env_data)
+        self.gui = GuiMain(self._settings, self._nav_data, self._goal_data, self._cycling, self._env_data)
         self._btn_left = ButtonHandler(g.hal, g.hal.btn_left, self.btn_event, Button.left, self._settings.long_click.value) 
         self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
 
@@ -71,12 +71,12 @@ class BikeComputer:
 
     def task_update_bt(self):
         self.add_task(5000, self.task_update_bt)
-        if (self._settings.csc_on.value and not g.bt.is_csc_connected()) or (self._settings.komoot_enabled.value and not g.bt.is_komoot_connected()):
-            g.bt.scan(csc_enabled = self._settings.csc_on.value, komoot_enabled = self._settings.komoot_enabled.value)
+        if (self._settings.csc_on.value and not g.bt.is_csc_connected()) or (self._settings.nav_enabled.value and not g.bt.is_nav_connected()):
+            g.bt.scan(csc_enabled = self._settings.csc_on.value, komoot_enabled = self._settings.nav_enabled.value)
 
     def task_read_komoot(self):
-        self.add_task(self._settings.komoot_req_interval.value, self.task_read_komoot)
-        if self._settings.komoot_enabled.value:
+        self.add_task(self._settings.nav_req_interval.value, self.task_read_komoot)
+        if self._settings.nav_enabled.value:
             g.bt.read_komoot()
 
     def task_update_altimeter(self):
@@ -98,7 +98,7 @@ class BikeComputer:
 
     def run(self):
         g.bt.register_cycle_callback(cycle_cb = self.on_cycle_data, bat_cb = self._env_data.on_sensor_bat)
-        g.bt.register_komoot_callback(self._komoot_data.on_data)
+        g.bt.register_komoot_callback(self._nav_data.on_data)
         self.task_update_bt()
         self.task_read_komoot()
         #self.task_read_bat()

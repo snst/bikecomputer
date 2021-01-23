@@ -52,7 +52,7 @@ class BtManager:
     def is_csc_connected(self):
         return self._con_csc._conn_handle != None
 
-    def is_komoot_connected(self):
+    def is_nav_connected(self):
         return self._con_komoot._conn_handle != None        
 
     def is_scanning(self):
