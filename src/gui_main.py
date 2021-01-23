@@ -94,7 +94,7 @@ class GuiMain(GuiBase):
     def gui_show_meter_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuMeter(self, self.get_trip())))
 
-    def gui_show_komoot_menu(self):
+    def gui_show_navi_menu(self):
         self.add_to_gui_stack(GuiMenu(self, MenuNav(self)))
 
     def gui_show_altimeter_menu(self):
@@ -174,7 +174,7 @@ class GuiMain(GuiBase):
     def add_trip(self):
         id = self._next_trip_id 
         self._next_trip_id += 1
-        trip = TripData(id, self._settings)
+        trip = TripData(id)
         self._meter_list.add(trip)
         self._meter_list.select_last()
         self.gui_stack_pop_all()
@@ -213,10 +213,10 @@ class GuiMain(GuiBase):
         self.gui_stack_pop_all()
 
     def save_goal_settings(self):
-        g.bc._goal_data.save()
+        self._goal_data.save()
 
     def load_goal_settings(self):
-        self.get_trip().goal.load()
+        self._goal_data.load()
 
     def gui_toggle_komoot(self):
         if 0 == self._gui_index:
@@ -262,7 +262,7 @@ class GuiMain(GuiBase):
         self.switch_to_gui(2 if visible else 1)
         self.gui_stack_pop_all()
         
-    def enable_komoot(self):
+    def enable_navi(self):
         self._settings.nav_enabled.value = 1
         self.gui_stack_pop_all()
 

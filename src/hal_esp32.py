@@ -80,3 +80,9 @@ class Hal_esp32:
 
     def gc_mem_free(self):
         return gc.mem_free()
+
+    def get_cpu_freq(self):
+        return machine.freq()
+
+    def set_cpu_freq(self, hz=80000000):
+        machine.freq(hz)

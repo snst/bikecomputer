@@ -107,6 +107,6 @@ class NavGui(CycleGui):
 
     def handle(self, event):
         if event == (Button.right | Button.long):
-            self.main.gui_show_komoot_menu()
+            self.main.gui_show_navi_menu()
         else:
             GuiBase.handle(self, event)

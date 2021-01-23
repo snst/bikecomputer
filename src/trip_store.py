@@ -6,9 +6,9 @@ class TripStore:
 
     def save(self, data):
         config = {}
-        config['altsum'] = data.alt_data.sum
-        config['altmin'] = data.alt_data.min
-        config['altmax'] = data.alt_data.max
+        config['altsum'] = data.altitude.sum
+        config['altmin'] = data.altitude.min
+        config['altmax'] = data.altitude.max
         config['wc'] = data.wheel_counter
         config['wt'] = data.wheel_time
         config['cc'] = data.crank_counter
@@ -29,11 +29,11 @@ class TripStore:
                 config = g.hal.json_load(fp.read())
                 for key, val in config.items():
                     if key == 'altsum':
-                        data.alt_data.sum = val
+                        data.altitude.sum = val
                     elif key == 'altmin':
-                        data.alt_data.min = val
+                        data.altitude.min = val
                     elif key == 'altmax':
-                        data.alt_data.max = val
+                        data.altitude.max = val
                     elif key == 'wc':
                         data.wheel_counter = val
                     elif key == 'wt':

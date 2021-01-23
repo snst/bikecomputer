@@ -53,19 +53,25 @@ class CycleData:
         #self.crank_counter.print("cc")
         #self.crank_time.print("ct")
         if self.init:
-            self.calculate()
+            self.calculate(self.wheel_counter_delta, self.wheel_time_delta, self.crank_counter_delta, self.crank_time_delta)
         self.init = True
         return self.init
 
-    def calculate(self):
-        speed = self.calc_speed_kmh(self.wheel_counter.delta, self.wheel_time.delta)
-        self.speed = round(self._smooth_speed.add(speed, self._settings.csc_smooth.value), 1)
+    def calculate(self, wheel_counter_delta, wheel_time_delta, crank_counter_delta, crank_time_delta):
+        speed = self.calc_speed_kmh(wheel_counter_delta, wheel_time_delta)
+        self.speed = self.smooth_speed(speed)
 
-        cadence = self.calc_cadence(self.crank_counter.delta, self.crank_time.delta)
-        self.cadence = (int)(self._smooth_cadence.add(cadence, self._settings.csc_smooth.value))
+        cadence = self.calc_cadence(crank_counter_delta, crank_time_delta)
+        self.cadence = self.smooth_cadence(cadence)
 
         self.is_riding = self.calc_is_riding(self.speed)
         self.has_valid_cadence = self.calc_has_valid_cadence(self.cadence)
+
+    def smooth_speed(self, speed):
+        return round(self._smooth_speed.add(speed, self._settings.csc_smooth.value), 1)
+
+    def smooth_cadence(self, cadence):
+        return (int)(self._smooth_cadence.add(cadence, self._settings.csc_smooth.value))
 
     def calc_is_riding(self, speed):
         return speed <= Limits.max_valid_speed and speed >= self._settings.min_speed.value
@@ -78,3 +84,19 @@ class CycleData:
 
     def convert_wheel_ticks_to_min(self, wheel_ticks): #ut
         return wheel_ticks / (60 * 1024)
+
+    @property
+    def wheel_counter_delta(self):
+        return self.wheel_counter.delta
+
+    @property
+    def wheel_time_delta(self):
+        return self.wheel_time.delta
+
+    @property
+    def crank_counter_delta(self):
+        return self.crank_counter.delta
+
+    @property
+    def crank_time_delta(self):
+        return self.crank_time.delta                        

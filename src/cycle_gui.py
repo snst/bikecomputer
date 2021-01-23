@@ -81,5 +81,5 @@ class CycleGui(GuiBase):
             self.show_float_time(trip.trip_duration_min, x, y, font = font)
 
     def show_trip_alt(self, trip, y):
-        if self.cache.changed(DataCache.TRIP_ALTITUDE, trip.alt_data.sum):
-            g.display.draw_text(fonts.f_wide_normal, "%d" % (trip.alt_data.sum), g.display.width, y, align = Align.right)
+        if self.cache.changed(DataCache.TRIP_ALTITUDE, trip.altitude.sum):
+            g.display.draw_text(fonts.f_wide_normal, "%d" % (trip.altitude.sum), g.display.width, y, align = Align.right)

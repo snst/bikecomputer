@@ -6,18 +6,13 @@ site.addsitedir('./src')  # Always appends to end
 site.addsitedir('./modules')  # Always appends to end
 site.addsitedir('./emu')  # Always appends to end
 from cycle_data import *
-from setting_val import *
+from data_settings import *
 
-class Settings:
-    def __init__(self):
-        self.wheel_cm = SettingVal(212,0,0,True,0)
-        self.min_speed = SettingVal(8,0,0,True,0)
-        self.min_cadence = SettingVal(12,0,0,True,0)
 
 class TestCycleData(unittest.TestCase):
 
     def setUp(self):
-        self.settings = Settings()
+        self.settings = DataSettings()
         self.t = CycleData(self.settings)
 
     def test_convert_wheel_ticks_to_min(self):
@@ -46,6 +41,25 @@ class TestCycleData(unittest.TestCase):
         self.assertFalse(self.t.calc_is_riding(self.settings.min_speed.value-1))
         self.assertTrue(self.t.calc_is_riding(Limits.max_valid_speed))
         self.assertFalse(self.t.calc_is_riding(Limits.max_valid_speed+1))
+
+
+    def test_smooth_speed(self):
+        self.assertEqual(7.3, self.t.smooth_speed(7.34))
+        self.assertEqual(8, self.t.smooth_speed(8.64))
+
+    def test_smooth_cadence(self):
+        self.assertEqual(6, self.t.smooth_cadence(6.34))
+        self.assertEqual(7, self.t.smooth_cadence(8.5))
+
+    def test_calculate(self):
+        self.t.calculate(2, 1024, 1, 1024)
+        self.assertTrue(self.t.has_valid_cadence)
+        self.assertTrue(self.t.is_riding)
+
+        self.t.calculate(30, 1024, 10, 1024)
+        self.assertEqual(self.t.cadence <= Limits.max_valid_cadence, self.t.has_valid_cadence)
+        self.assertEqual(self.t.speed <= Limits.max_valid_speed, self.t.is_riding)
+
 
 if __name__ == '__main__':
     unittest.main()

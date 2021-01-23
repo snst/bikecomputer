@@ -3,6 +3,7 @@ import st7789
 class Limits:
     max_valid_cadence = 140
     max_valid_speed = 100
+    goal_max_required_speed = 99.9
 
 class Layout:
     y_breadcrum = 10

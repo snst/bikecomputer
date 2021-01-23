@@ -35,7 +35,7 @@ class BikeComputer:
 
     def on_altitude_data(self, altitude):
         for trip in self.gui.trip_list:
-            trip.alt_data.process(altitude, self._settings.altimeter_step.value / 100, self._cycling.is_riding)
+            trip.altitude.process(altitude, self._settings.altimeter_step.value / 100, self._cycling.is_riding)
 
     def ignore_click(self, is_long):
         display_off = not self._display_ctrl.is_display_on()

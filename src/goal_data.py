@@ -1,13 +1,14 @@
 from data_settings import SettingVal
 from data_store import *
 from trip_data import *
+from const import *
 
 filename = b'goal.cfg'
 
 
 class GoalData(DataStore, TripData):
     def __init__(self, settings):
-        TripData.__init__(self, 0, settings)
+        TripData.__init__(self, 0)
         self.target_time_min = SettingVal(60, 1, 500)
         self.target_dist_km = SettingVal(30, 1, 300, True)
         self.target_average_km_h = SettingVal(30, 10, 45, True)
@@ -32,9 +33,9 @@ class GoalData(DataStore, TripData):
             self.remaining_time_min = max(0, 60 * (self.target_dist_km.value - (self.target_average_km_h.value * self.trip_duration_min / 60)) / self.target_average_km_h.value)
             if self.remaining_distance_km > 0: 
                 if self.remaining_time_min > 0:
-                    self.calc_required_average_km_h = min(99.9, 60 * self.remaining_distance_km / self.remaining_time_min)
+                    self.calc_required_average_km_h = min(Limits.goal_max_required_speed, 60 * self.remaining_distance_km / self.remaining_time_min)
                 else: 
-                    self.calc_required_average_km_h = 99.9
+                    self.calc_required_average_km_h = Limits.goal_max_required_speed
                 self.is_finished = False
             else:
                 if not self.is_finished:
@@ -45,7 +46,8 @@ class GoalData(DataStore, TripData):
             self.optimal_distance_km = self.target_average_km_h.value * self.trip_duration_min / 60
             pass
 
-    def is_behind(self):
+    @property
+    def is_behind(self): #ut
         return self.trip_distance < self.optimal_distance_km
 
     def get_all_attributes(self):

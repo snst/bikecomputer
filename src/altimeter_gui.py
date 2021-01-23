@@ -32,14 +32,14 @@ class AltimeterGui(GuiBase):
         i += 1
         self.show_val(redraw, y + i*ys, "Avg cad", "%d" % (trip.cadence_avg), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (trip.alt_data.sum), i)
+        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (trip.altitude.sum), i)
         i += 1
         ya = y + i * ys
-        if self.cache.changed(i, (int)(trip.alt_data.min)):
-            g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.alt_data.min), (int)(g.display.width/2), ya, align=Align.right)
+        if self.cache.changed(i, (int)(trip.altitude.min)):
+            g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.altitude.min), (int)(g.display.width/2), ya, align=Align.right)
         i += 1
-        if self.cache.changed(i, (int)(trip.alt_data.max)):
-            g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.alt_data.max), (int)(g.display.width), ya, align=Align.right)
+        if self.cache.changed(i, (int)(trip.altitude.max)):
+            g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.altitude.max), (int)(g.display.width), ya, align=Align.right)
         
     def handle(self, event = 0):
         if event == (Button.right | Button.long):

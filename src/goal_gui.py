@@ -36,7 +36,7 @@ class GoalGui(CycleGui):
 
         col = Color.white
         if data.is_started:
-            col = Color.red if data.is_behind() else Color.green
+            col = Color.red if data.is_behind else Color.green
         self.show_speed_avg(data, y_avg, col)
         self.show_trip_distance(data, y_distance, narrow = True)
         self.show_trip_duration(data, g.display.width, y_time, font = fonts.f_narrow_text)

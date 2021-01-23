@@ -38,19 +38,11 @@ g.bt = BtManager()
 i2c = I2C(1, scl=machine.Pin(22), sda=machine.Pin(21), freq=400000)
 g.altimeter = Altimeter_bmp280(i2c)
 
-
 g.bc = BikeComputer()
 
-
-#machine.freq()          # get the current frequency of the CPU
-#machine.freq(80000000) # set the CPU frequency to 240 MHz
-print("freq: %u" % (machine.freq() ))
-
 def task_mem():
-    #gc.collect()
     g.bc.add_task(5000, task_mem)
     #print("mem: %d" % (gc.mem_free()))
 
 #task_mem()
-
 g.bc.run()

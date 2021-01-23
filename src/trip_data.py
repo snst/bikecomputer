@@ -4,10 +4,9 @@ from altitude_sum import *
 
 
 class TripData:
-    def __init__(self, id, settings):
+    def __init__(self, id):
         self.id = id
-        self._settings = settings
-        self.alt_data = AltitudeSum()
+        self.altitude = AltitudeSum()
         self.reset()
 
     def reset(self):
@@ -22,25 +21,24 @@ class TripData:
         self.trip_duration_min = 0
         self.sim = 10
         self.is_started = True
-        self.alt_data.reset()
+        self.altitude.reset()
 
     def process(self, cd):
         if self.is_started:
             if cd.has_valid_cadence:
-                self.crank_counter += cd.crank_counter.delta
-                self.crank_time += cd.crank_time.delta
-            self.cadence_avg = cd.calc_cadence(self.crank_counter, self.crank_time)
+                self.crank_counter += cd.crank_counter_delta
+                self.crank_time += cd.crank_time_delta
 
             if cd.is_riding:
                 self.speed_max = max(self.speed_max, cd.speed)
+                self.wheel_counter += cd.wheel_counter_delta
+                self.wheel_time += cd.wheel_time_delta
 
-                self.wheel_counter += cd.wheel_counter.delta
-                self.wheel_time += cd.wheel_time.delta
+            self.cadence_avg = cd.calc_cadence(self.crank_counter, self.crank_time)
             self.speed_avg = cd.calc_speed_kmh(self.wheel_counter, self.wheel_time)
-
             self.trip_distance = cd.convert_wheel_count_to_km(self.wheel_counter)
             self.trip_duration_min = cd.convert_wheel_ticks_to_min(self.wheel_time)
 
     def enable(self, val):
         self.is_started = val
-        self.alt_data.enable(val)
+        self.altitude.enable(val)
