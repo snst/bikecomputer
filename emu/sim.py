@@ -116,6 +116,7 @@ class Sim:
             self.speed += 1#0.5
             #self.bc.nav_data.distance += 25
             self.bc._nav_data.direction += 1
+            self.bc._nav_data.street = "abcdef1234567890"
             pass
         elif btn == 121: #y
             if self.speed > 1:

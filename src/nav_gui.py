@@ -15,14 +15,13 @@ class NavGui(CycleGui):
 
     def __init__(self, main):
         GuiBase.__init__(self, main)
+        self._last_ms = g.hal.ticks_ms()
+        self.show_distance_field = False
 
     def get_title(self):
         return b'nav'
 
-    def get_color_from_dist(self, nav):
-        return Color.red if nav.distance <= self.main._settings.nav_red_color.value else Color.white
-
-    def show_distance(self, nav, y):
+    def show_nav_distance(self, nav, y):
         #print("d %u" % (nav.distance))
         if nav.distance < 1000:
             str = " %3d " % nav.distance
@@ -40,7 +39,7 @@ class NavGui(CycleGui):
         if sign:
             x = (int)((W - sign.WIDTH)/2)
             y += (int)((H - sign.HEIGHT)/2)
-            g.display.bitmap_blit(x, y, sign, fg=self.get_color_from_dist(nav))
+            g.display.bitmap_blit(x, y, sign)
 
     def replace_street_str(self, txt):
         txt = txt.replace("ß", "ss")
@@ -65,16 +64,23 @@ class NavGui(CycleGui):
         trip = self.main.get_trip()
         settings = self.main._settings
 
-        #nav.street = "Schulstraße 77"
-
         dist_notify = False
+
+
+        if (g.hal.ticks_ms() - self._last_ms) > (settings.nav_km_time_ms.value * 1000):
+            self.show_distance_field = not self.show_distance_field
+            self._last_ms = g.hal.ticks_ms()
+            self.cache.reset_val(DataCache.TRIP_DISTANCE)
+            self.cache.reset_val(DataCache.TRIP_DURATION)
+            g.display.fill_rect(0, self.y_time_direction, g.display.width, fonts.f_wide_normal.height(), Color.black)
+
         dir_changed = self.cache.changed(DataCache.NAV_DIRECTION, nav.direction)
 
-        if dir_changed or self.cache.changed(DataCache.NAV_DIST_COLOR, self.get_color_from_dist(nav)):
+        if dir_changed:
             self.show_direction(nav, self.y_direction)
 
         if self.cache.changed(DataCache.NAV_DISTANCE, nav.distance):
-            self.show_distance(nav, self.y_distance)
+            self.show_nav_distance(nav, self.y_distance)
             dist_notify = nav.distance <= settings.nav_all_on.value or (self.cache.changed(DataCache.NAV_DIST_100, (int)(nav.distance/100)) and nav.distance <= settings.nav_flash_on.value)
 
         show_street = settings.nav_street_dist.value == 0 or nav.distance < settings.nav_street_dist.value
@@ -84,18 +90,23 @@ class NavGui(CycleGui):
             self.clear_street()
 
             if show_street:
-                self.cache.reset_val(9)
+                self.cache.reset_val(DataCache.NAV_STREET)
             else:
-                self.cache.reset_val(1)
-                self.cache.reset_val(6)
-                self.cache.reset_val(7)
+                self.cache.reset_val(DataCache.SPEED)
 
         if show_street:
             self.show_street(nav, self.y_street_speed)
         else:
             self.show_speed(self.main.cycling.speed, self.y_street_speed)
-            self.show_trip_distance(trip, self.y_time_direction)
-            self.show_trip_duration(trip, 58, self.y_time_direction, font=fonts.f_narrow_text)
+            #self.show_trip_distance(trip, self.y_time_direction)
+            #self.show_trip_duration(trip, 68, self.y_time_direction, font=fonts.f_narrow_text)
+
+            if self.show_distance_field:
+                self.show_trip_distance(trip, self.y_time_direction)
+                self.show_icon(s_km, self.y_time_direction)
+            else:
+                self.show_trip_duration(trip, g.display.width, self.y_time_direction)
+                self.show_icon(s_time, self.y_time_direction)
 
         if settings.nav_auto_on.value == 1 and (dir_changed or dist_notify):
             g.bc._display_ctrl.set_display_on()

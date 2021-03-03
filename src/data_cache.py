@@ -10,7 +10,7 @@ class DataCache:
     SPEED_COLOR = 8
     NAV_SHOW_STREET = 9
     NAV_DIRECTION = 10
-    NAV_DIST_COLOR = 11
+    NAV_KM_OR_TIME = 11
     NAV_DISTANCE = 12
     NAV_STREET = 13
     SPEED_MAX = 14
@@ -44,4 +44,5 @@ class DataCache:
                 self._items[i] = None
 
     def reset_val(self, index):
-        self._items[index] = None
+        if index < len(self._items):
+            self._items[index] = None

@@ -116,16 +116,17 @@ class MenuNav:
         self.nav_auto_on = MenuValueItem(b'Auto switch;on LED', self.data.nav_auto_on)
         self.nav_flash_on = MenuValueItem(b'Warn LED;before [m]', self.data.nav_flash_on)
         self.nav_all_on = MenuValueItem(b'Steady LED;before [m]', self.data.nav_all_on)
-        self.nav_red_color = MenuValueItem(b'Red color;before [m]', self.data.nav_red_color)
         self.nav_req_interval = MenuValueItem(b'BLE update;[ms]', self.data.nav_req_interval)
         self.nav_street_dist = MenuValueItem(b'Show street;closer [m]', self.data.nav_street_dist)
+        self.nav_km_time_ms = MenuValueItem(b'Toggle dist;time [s]', self.data.nav_km_time_ms)
+        
         self.items = [ self.nav_enabled,
                        self.nav_auto_on,
                        self.nav_flash_on,
                        self.nav_all_on,
-                       self.nav_red_color,
                        self.nav_req_interval,
                        self.nav_street_dist,
+                       self.nav_km_time_ms,
                        MenuItem(b'Save', lambda : main.save_settings()),
 
         ]
