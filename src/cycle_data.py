@@ -3,6 +3,24 @@ from csc_val import *
 from smooth import *
 from const import *
 
+class SmoothSpeed:
+    def __init__(self, n):
+        self.n = n
+        self.elem = []
+
+    def add(self, delta_counter, delta_ticks):
+        sum_counter = 0
+        sum_ticks = 0
+        self.elem.append((delta_counter, delta_ticks))
+        while len(self.elem) > self.n:
+            del self.elem[0]
+        for e in self.elem:
+            sum_counter += e[0]
+            sum_ticks += e[1]
+        l = len(self.elem)
+        return (sum_counter/l, sum_ticks/l)
+
+
 class CycleData:
     def __init__(self, settings):
         self.reset()
@@ -21,6 +39,16 @@ class CycleData:
         self.is_riding = False
         self.sim = 10
         self.has_valid_cadence = False
+        self.smooth_speed2  = SmoothSpeed(3)
+
+    def calc_speed_kmh_from_ms(self, wheel_counter, time_ms):
+        if time_ms > 0:
+            # wheel_counter * wheel_cm     3600
+            # ------------------------  *  ---------------
+            #         100 * 1000           time_ms / 1000
+            return (self._settings.wheel_cm.value * wheel_counter * 36) / (time_ms)
+        else:
+            return 0
 
     def calc_speed_kmh(self, wheel_counter, time_ticks):
         if time_ticks > 0:
@@ -28,6 +56,12 @@ class CycleData:
             # ------------------------  *  ---------------
             #         100 * 1000           time_ticks / 1024
             return (1024 * self._settings.wheel_cm.value * wheel_counter * 36) / (1000 * time_ticks)
+        else:
+            return 0
+
+    def calc_cadence_from_ms(self, counter_delta, ms_delta):
+        if ms_delta > 0:
+            return 1000 * counter_delta * 60 / ms_delta
         else:
             return 0
 
@@ -58,8 +92,10 @@ class CycleData:
         return self.init
 
     def calculate(self, wheel_counter_delta, wheel_time_delta, crank_counter_delta, crank_time_delta):
-        speed = self.calc_speed_kmh(wheel_counter_delta, wheel_time_delta)
-        self.speed = self.smooth_speed(speed)
+        wc, wt = self.smooth_speed2.add(wheel_counter_delta, wheel_time_delta)
+        self.speed = self.calc_speed_kmh(wc, wt)
+        #speed = self.calc_speed_kmh(wheel_counter_delta, wheel_time_delta)
+        #self.speed = self.smooth_speed(speed)
 
         cadence = self.calc_cadence(crank_counter_delta, crank_time_delta)
         self.cadence = self.smooth_cadence(cadence)
@@ -82,8 +118,8 @@ class CycleData:
     def convert_wheel_count_to_km(self, wheel_count): #ut
         return wheel_count * self._settings.wheel_cm.value / 100000
 
-    def convert_wheel_ticks_to_min(self, wheel_ticks): #ut
-        return wheel_ticks / (60 * 1024)
+    def convert_wheel_ticks_to_sec(self, wheel_ticks): #ut
+        return wheel_ticks / 1024
 
     @property
     def wheel_counter_delta(self):

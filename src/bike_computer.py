@@ -28,10 +28,11 @@ class BikeComputer:
         self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
 
     def on_cycle_data(self, raw_data):
+        ms = g.hal.ticks_ms()
         if self._cycling.process(raw_data):
             for trip in self.gui.trip_list:
-                trip.process(self._cycling)
-            self._goal_data.process(self._cycling)
+                trip.process(self._cycling, ms)
+            self._goal_data.process(self._cycling, ms)
 
     def on_altitude_data(self, altitude):
         for trip in self.gui.trip_list:
