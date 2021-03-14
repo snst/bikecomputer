@@ -1,0 +1,6 @@
+{
+    "files.exclude": {
+        "micropython/": true,
+        "esp-idf/": true
+    }
+}

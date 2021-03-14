@@ -11,9 +11,7 @@ class TripData:
 
     def reset(self):
         self.wheel_counter = 0
-        self.wheel_time = 0
         self.crank_counter = 0
-        self.crank_time = 0
         self.speed_avg = 0
         self.speed_max = 0
         self.cadence_avg = 0
@@ -33,22 +31,16 @@ class TripData:
     def process(self, cd, ms):
         trip_paused = True
         cadence_paused = True
-        if self.trip_duration_start_ms == 0:
-            self.trip_duration_start_ms = ms
-        if self.cadence_duration_start_ms == 0:
-            self.cadence_duration_start_ms = ms
 
         if self.is_started:
-            if cd.has_valid_cadence:
+            if cd.has_valid_cadence and self.cadence_duration_start_ms > 0:
                 self.crank_counter += cd.crank_counter_delta
-                self.crank_time += cd.crank_time_delta
                 self.cadence_duration_part_ms = ms - self.cadence_duration_start_ms
                 cadence_paused = False
 
-            if cd.is_riding:
+            if cd.is_riding and self.trip_duration_start_ms > 0:
                 self.speed_max = max(self.speed_max, cd.speed)
                 self.wheel_counter += cd.wheel_counter_delta
-                self.wheel_time += cd.wheel_time_delta
                 self.trip_duration_part_ms = ms - self.trip_duration_start_ms
                 trip_paused = False
 
@@ -66,13 +58,10 @@ class TripData:
 
         self.trip_paused = trip_paused
         self.cadence_paused = cadence_paused
-        #self.cadence_avg_ticks = cd.calc_cadence(self.crank_counter, self.crank_time)
         self.cadence_avg = cd.calc_cadence_from_ms(self.crank_counter, self.cadence_duration_ms)
         #print("cadence ms/tck %d %d" % (self.cadence_avg, self.cadence_avg_ticks))
         self.speed_avg = cd.calc_speed_kmh_from_ms(self.wheel_counter, self.trip_duration_ms)
         self.trip_distance = cd.convert_wheel_count_to_km(self.wheel_counter)
-        #self.trip_duration_sec_ticks = cd.convert_wheel_ticks_to_sec(self.wheel_time)
-        #print("tripdur ms/tck %d %d" % (self.trip_duration_sec, self.trip_duration_sec_ticks))
 
     def enable(self, val):
         self.is_started = val

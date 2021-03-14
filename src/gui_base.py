@@ -44,7 +44,8 @@ class GuiBase:
         else:
             if align == Align.left:
                 x += 3 * font_normal.get_width('0')
-            g.display.draw_text(font_normal, "%3d" % (ival), x, y, fg=color, align = Align.right)
+            txt = "   " if (ival == 999) else "%3d" % (ival)
+            g.display.draw_text(font_normal, txt, x, y, fg=color, align = Align.right)
 
     def show_float_time(self, val, x, y, align = Align.right, font = fonts.f_wide_normal):
         h = (int)(val / 60)

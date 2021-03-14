@@ -38,6 +38,12 @@
             "type": "shell",
             "command": "./cov.sh",
             "problemMatcher": []
+        },
+        {
+            "label": "comp_flash",
+            "type": "shell",
+            "command": "./comp_flash.sh",
+            "problemMatcher": []
         }
     ]
 }

@@ -18,7 +18,7 @@ class Sim:
         self.crank_event = 0
         self.last_ms = self.get_ms()
         self.s = 0
-        self.speed = 10
+        self.speed = 8
         self.paused = True
 
     def set_demo_data(self, data):
@@ -66,28 +66,28 @@ class Sim:
 
     def simulate(self, speed, sec, factor):
 
-        s = 0
-        while s < sec:
+        #s = speed + 1
+        s= 8 / speed
 
-            dist = 2 * (speed * 1000) / 36
-            n = (dist / 214)
-            ng = (int) (n)
+        #dist = 2 * (speed * 1000) / 36
+        #n = (dist / 214)
+        #ng = (int) (n)
 
-            delta_event = (int) (2 * 1024 / n * ng)
+        delta_event = (int)(s * 1024) #  (int) (2 * 1024 / n * ng)
 
-            self.wheel_counter += ng
-            self.crank_counter += (int) (ng / 3)
+        self.wheel_counter +=  1 # ng
+        self.crank_counter += 1#(int) (ng / 3)
 
-            self.wheel_event += delta_event
-            self.crank_event += delta_event
+        self.wheel_event += delta_event
+        self.crank_event += delta_event
 
-            val1 = struct.pack("<BIHHH", 0, self.wheel_counter,self.wheel_event & 0xFFFF, self.crank_counter & 0xFFFF, self.crank_event & 0xFFFF)
-            self.bc.on_cycle_data(val1)
-            #self.gui.cyclic_update()
+        val1 = struct.pack("<BIHHH", 0, self.wheel_counter,self.wheel_event & 0xFFFF, self.crank_counter & 0xFFFF, self.crank_event & 0xFFFF)
+        self.bc.on_cycle_data(val1)
+        #self.gui.cyclic_update()
 
-            time.sleep(1/factor)
+        #time.sleep(1/factor)
+        time.sleep(s-0.001)
             
-            s += factor
 
     def sim1(self):
         while(True):

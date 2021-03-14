@@ -29,10 +29,10 @@ class BikeComputer:
 
     def on_cycle_data(self, raw_data):
         ms = g.hal.ticks_ms()
-        if self._cycling.process(raw_data):
-            for trip in self.gui.trip_list:
-                trip.process(self._cycling, ms)
-            self._goal_data.process(self._cycling, ms)
+        self._cycling.process(raw_data)
+        for trip in self.gui.trip_list:
+            trip.process(self._cycling, ms)
+        self._goal_data.process(self._cycling, ms)
 
     def on_altitude_data(self, altitude):
         for trip in self.gui.trip_list:
