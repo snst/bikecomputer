@@ -19,6 +19,8 @@ class TripData:
         self.trip_duration_sum_ms = 0
         self.trip_duration_part_ms = 0
         self.trip_duration_start_ms = 0
+        self.trip_pause_start_ms = 0
+        self.trip_pause_sum_ms = 0
         self.cadence_duration_sum_ms = 0
         self.cadence_duration_part_ms = 0
         self.cadence_duration_start_ms = 0
@@ -48,7 +50,10 @@ class TripData:
             if not self.trip_paused: # switch from not paused -> paused
                 self.trip_duration_sum_ms += self.trip_duration_part_ms
                 self.trip_duration_part_ms = 0
+            else:
+                self.trip_pause_sum_ms += (ms - self.trip_pause_start_ms)
             self.trip_duration_start_ms = ms
+            self.trip_pause_start_ms = ms
 
         if cadence_paused:
             if not self.cadence_paused: # switch from not paused -> paused
@@ -73,11 +78,11 @@ class TripData:
 
     @property
     def trip_duration_sec(self):
-        return self.trip_duration_ms / 1000
+        return (int)(self.trip_duration_ms / 1000)
 
     @property
     def trip_duration_min(self):
-        return self.trip_duration_ms / 60000
+        return (int)(self.trip_duration_ms / 60000)
 
     @property
     def cadence_duration_ms(self):

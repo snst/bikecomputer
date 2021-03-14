@@ -72,7 +72,7 @@ class CycleGui(GuiBase):
             self.show_float_speed(speed, g.display.width, y, color = col)
 
     def show_trip_distance(self, trip, y, narrow = False):
-        distance = round(trip.trip_distance, 1)
+        distance = math.floor(trip.trip_distance*10) / 10
         if self.cache.changed(DataCache.TRIP_DISTANCE, distance):
             self.show_float_speed(distance, g.display.width, y, narrow = narrow)
 

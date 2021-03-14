@@ -9,7 +9,8 @@ from const import *
 import fonts 
 import math
 import data_global as g
-from altimeter_gui import *
+from trip2_gui import *
+from trip3_gui import *
 from status_gui import *
 from item_list import *
 from goal_gui import *
@@ -131,14 +132,16 @@ class GuiMain(GuiBase):
         elif i == 2:
             gui = GoalGui(self)
         elif i == 3:
-            gui = AltimeterGui(self)
+            gui = Trip2Gui(self)
         elif i == 4:
+            gui = Trip3Gui(self)
+        elif i == 5:
             gui = StatusGui(self)
         g.hal.gc_collect()
         return gui
 
     def switch_to_next_gui(self):
-        index = min(self._gui_index + 1, 4)
+        index = min(self._gui_index + 1, 5)
         #index = (self._gui_index + 1) % self._max_views
         if index == 0 and self._settings.nav_enabled.value == 0: #skip komoot if not enabled
             index += 1

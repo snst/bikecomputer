@@ -6,7 +6,7 @@ import data_global as g
 from data_cache import *
 
 
-class AltimeterGui(GuiBase):
+class Trip2Gui(GuiBase):
     y_speed = 0
     y_avg = 60
     y_distance = y_avg + 60
@@ -24,22 +24,17 @@ class AltimeterGui(GuiBase):
         ys = fonts.f_wide_smaller.height() + 8
         trip = self.main.get_trip()
         i = 0
-        self.show_val(redraw, y + i*ys, "Id", "%d" % (trip.id), i)
+        self.show_val(redraw, y + i*ys, "#", "%d" % (trip.id), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "km/h", "%.1f" % (round(trip.speed_max, 1)), i)
+        self.show_val(redraw, y + i*ys, "Max", "%.1f" % (round(trip.speed_max, 1)), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Cadence", "%d" % (self.main.cycling.cadence), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Avg cad", "%d" % (trip.cadence_avg), i)
+        self.show_val(redraw, y + i*ys, "Cad-0", "%d" % (trip.cadence_avg), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (trip.altitude.sum), i)
+        self.show_val(redraw, y + i*ys, "Alt-", "%.1f" % (trip.altitude.min), i)
         i += 1
-        ya = y + i * ys
-        if self.cache.changed(i, (int)(trip.altitude.min)):
-            g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.altitude.min), (int)(g.display.width/2), ya, align=Align.right)
-        i += 1
-        if self.cache.changed(i, (int)(trip.altitude.max)):
-            g.display.draw_text(fonts.f_wide_smaller, "%d" % (trip.altitude.max), (int)(g.display.width), ya, align=Align.right)
+        self.show_val(redraw, y + i*ys, "Alt+", "%.1f" % (trip.altitude.max), i)
         
     def handle(self, event = 0):
         if event == (Button.right | Button.long):
