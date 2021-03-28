@@ -108,5 +108,5 @@ class BikeComputer:
         while(True):
             try:
                 self._scheduler.run()
-            except OSError:
-                print("OSError")
+            except OSError as exc:
+                print("OSError %d" % exc.args[0])

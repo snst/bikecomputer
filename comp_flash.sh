@@ -1,0 +1,1 @@
+./8_copy_source.sh && ./make.sh && ./make.sh deploy

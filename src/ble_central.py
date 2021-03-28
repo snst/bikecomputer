@@ -328,9 +328,12 @@ class BleCentral:
             self.disconnect(conn)
 
     def read(self, conn, srv):
-        if None != conn._conn_handle and None != srv._value_handle:
-            #print("READ %d %d" % (conn._conn_handle, srv._value_handle))
-            self._ble.gattc_read(conn._conn_handle, srv._value_handle)
+        try:
+            if None != conn._conn_handle and None != srv._value_handle:
+                #print("READ %d %d" % (conn._conn_handle, srv._value_handle))
+                self._ble.gattc_read(conn._conn_handle, srv._value_handle)
+        except OSError as exc:
+            print("ble:read:err: %d" % exc.args[0])
 
 
 def demo():

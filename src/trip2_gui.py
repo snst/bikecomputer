@@ -24,17 +24,17 @@ class Trip2Gui(GuiBase):
         ys = fonts.f_wide_smaller.height() + 8
         trip = self.main.get_trip()
         i = 0
-        self.show_val(redraw, y + i*ys, "#", "%d" % (trip.id), i)
-        i += 1
-        self.show_val(redraw, y + i*ys, "Max", "%.1f" % (round(trip.speed_max, 1)), i)
+        #self.show_val(redraw, y + i*ys, "#", "%d" % (trip.id), i)
+        #i += 1
+        self.show_val(redraw, y + i*ys, "%d-Max" % (trip.id), "%.1f" % (round(trip.speed_max, 1)), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Cadence", "%d" % (self.main.cycling.cadence), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Cad-0", "%d" % (trip.cadence_avg), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Alt-", "%.1f" % (trip.altitude.min), i)
+        self.show_val(redraw, y + i*ys, "Alt-L", "%.1f" % (trip.altitude.min), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "Alt+", "%.1f" % (trip.altitude.max), i)
+        self.show_val(redraw, y + i*ys, "Alt-H", "%.1f" % (trip.altitude.max), i)
         
     def handle(self, event = 0):
         if event == (Button.right | Button.long):

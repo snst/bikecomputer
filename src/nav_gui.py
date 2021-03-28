@@ -21,13 +21,13 @@ class NavGui(CycleGui):
     def get_title(self):
         return b'nav'
 
-    def show_nav_distance(self, nav, y):
-        #print("d %u" % (nav.distance))
-        if nav.distance < 1000:
-            str = " %3d " % nav.distance
+    def show_nav_distance(self, distance, y):
+        #print("d %u" % (nav_distance))
+        if distance < 1000:
+            str = " %3d " % distance
             g.display.draw_text(fonts.f_wide_big, str, g.display.width, y, align=Align.center)
         else:
-            str = " %.1f " % (nav.distance / 1000)
+            str = " %.1f " % (distance / 1000)
             g.display.draw_text(fonts.f_wide_big, str, g.display.width, y, align=Align.center)
 
     def show_direction(self, nav, y):
@@ -66,24 +66,17 @@ class NavGui(CycleGui):
 
         dist_notify = False
 
-
-        if (g.hal.ticks_ms() - self._last_ms) > (settings.nav_km_time_ms.value * 1000):
-            self.show_distance_field = not self.show_distance_field
-            self._last_ms = g.hal.ticks_ms()
-            self.cache.reset_val(DataCache.TRIP_DISTANCE)
-            self.cache.reset_val(DataCache.TRIP_DURATION)
-            g.display.fill_rect(0, self.y_time_direction, g.display.width, fonts.f_wide_normal.height(), Color.black)
-
         dir_changed = self.cache.changed(DataCache.NAV_DIRECTION, nav.direction)
 
         if dir_changed:
             self.show_direction(nav, self.y_direction)
 
-        if self.cache.changed(DataCache.NAV_DISTANCE, nav.distance):
-            self.show_nav_distance(nav, self.y_distance)
-            dist_notify = nav.distance <= settings.nav_all_on.value or (self.cache.changed(DataCache.NAV_DIST_100, (int)(nav.distance/100)) and nav.distance <= settings.nav_flash_on.value)
+        nav_distance = (int)(round(nav.distance/10)*10)
+        if self.cache.changed(DataCache.NAV_DISTANCE, nav_distance):
+            self.show_nav_distance(nav_distance, self.y_distance)
+            dist_notify = nav_distance <= settings.nav_all_on.value# or (and nav_distance <= settings.nav_flash_on.value)
 
-        show_street = settings.nav_street_dist.value == 0 or nav.distance < settings.nav_street_dist.value
+        show_street = settings.nav_street_dist.value == 0 or nav_distance < settings.nav_street_dist.value
         show_street_changed = self.cache.changed(DataCache.NAV_SHOW_STREET, show_street)
 
         if show_street_changed:
@@ -93,6 +86,15 @@ class NavGui(CycleGui):
                 self.cache.reset_val(DataCache.NAV_STREET)
             else:
                 self.cache.reset_val(DataCache.SPEED)
+
+        if (g.hal.ticks_ms() - self._last_ms) > (settings.nav_km_time_ms.value * 1000):
+            self.show_distance_field = not self.show_distance_field
+            self._last_ms = g.hal.ticks_ms()
+            self.cache.reset_val(DataCache.TRIP_DISTANCE)
+            self.cache.reset_val(DataCache.TRIP_DURATION)
+            if not show_street:
+                g.display.fill_rect(0, self.y_time_direction, g.display.width, fonts.f_wide_normal.height(), Color.black)
+
 
         if show_street:
             self.show_street(nav, self.y_street_speed)
@@ -108,7 +110,7 @@ class NavGui(CycleGui):
                 self.show_trip_duration(trip, g.display.width, self.y_time_direction)
                 self.show_icon(s_time, self.y_time_direction)
 
-        if settings.nav_auto_on.value == 1 and (dir_changed or dist_notify):
+        if (settings.nav_auto_on.value == 1) and (dir_changed or dist_notify):
             g.bc._display_ctrl.set_display_on()
 
     def show_speed(self, speed, y):

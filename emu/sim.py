@@ -116,7 +116,8 @@ class Sim:
             self.speed += 1#0.5
             #self.bc.nav_data.distance += 25
             self.bc._nav_data.direction += 1
-            self.bc._nav_data.street = "abcdef1234567890"
+            #self.bc._nav_data.street = "abcdef1234567890"
+            self.bc._nav_data.street = "Zielstraße"
             pass
         elif btn == 121: #y
             if self.speed > 1:
@@ -125,9 +126,9 @@ class Sim:
             self.bc._nav_data.direction -= 1
             pass
         elif btn == 99: #c
-            self.bc._nav_data.distance -= 50
+            self.bc._nav_data.distance -= 53
         elif btn == 118: #v
-            self.bc._nav_data.distance += 50
+            self.bc._nav_data.distance += 47
         elif btn == 32: #space
             self.paused = not self.paused
             pass

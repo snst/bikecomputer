@@ -23,6 +23,7 @@ class CycleData:
         self.is_riding = False
         self.sim = 10
         self.has_valid_cadence = False
+        self.msg_cnt = 0
 
     def calc_speed_kmh_from_ms(self, wheel_counter, time_ms):
         if time_ms > 0:
@@ -55,6 +56,7 @@ class CycleData:
             return 0
 
     def unpack_data(self, data):
+        self.msg_cnt += 1
         val = struct.unpack("<BIHHH", data)
         return val[1], val[2], val[3], val[4]
     

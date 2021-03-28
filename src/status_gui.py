@@ -29,12 +29,12 @@ class StatusGui(GuiBase):
         i += 1
         self.show_val(redraw, y + i*ys, "C", "%.1f" % (env_data.temperature), i)
         i += 1
-        self.show_val(redraw, y + i*ys, "hPa", "%.1f" % (env_data.pressure), i)
+        #self.show_val(redraw, y + i*ys, "hPa", "%.1f" % (env_data.pressure), i)
+        self.show_val(redraw, y + i*ys, "msg", "%d" % (self.cycling.msg_cnt), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (env_data.altitude), i)
         i += 1
         self.show_val(redraw, y + i*ys, "Mem", "%u" % ((int)(g.hal.gc_mem_free() / 1024)), i)
-
 
     def handle(self, event):
         GuiBase.handle(self, event)

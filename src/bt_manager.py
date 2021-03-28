@@ -69,5 +69,5 @@ class BtManager:
 
     def request_sensor_bat(self):
         self._bt.read(self._con_csc, self._csc_bat_service)
-        self._bt.enable_notify(self._con_csc, self._csc_service)
+        #self._bt.enable_notify(self._con_csc, self._csc_service)
         #self._bt.enable_notify(self._con_komoot, self._komoot_service)
