@@ -165,6 +165,7 @@ class BleCentral:
 
         elif event == _IRQ_SCAN_DONE:
             #print("_IRQ_SCAN_DONE")
+            #print("-scan")
             self._is_scanning = False
 
         elif event == _IRQ_PERIPHERAL_CONNECT:
@@ -307,10 +308,15 @@ class BleCentral:
 
     # Find a device advertising the environmental sensor service.
     def scan(self, callback=None):
-        if not self._is_scanning:
-            #print("scan")
-            self._is_scanning = True
-            self._ble.gap_scan(2000, 30000, 30000)
+        #if not self._is_scanning:
+        #print("+scan")
+        self._is_scanning = True
+        self._ble.gap_scan(2000)
+
+    def stop_scan(self):
+        #print("+stop_scan")
+        #self._is_scanning = True
+        self._ble.gap_scan(None)
 
     # Connect to the specified device (otherwise use cached address from a scan).
     def connect(self, conn):
@@ -321,11 +327,20 @@ class BleCentral:
         if None != conn._conn_handle:
             #print("disconnect " +  conn._name)
             self._ble.gap_disconnect(conn._conn_handle)
+            conn.reset()
 
 
     def disconnect_all(self):
+
+        self._ble.active(False)
+        time.sleep(0.5)
+        self._ble.active(True)
+
+        time.sleep(0.5)
         for conn in self.connections:
-            self.disconnect(conn)
+            #self.disconnect(conn)
+            conn.reset()
+
 
     def read(self, conn, srv):
         try:

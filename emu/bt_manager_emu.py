@@ -8,6 +8,9 @@ class BtManagerEmu:
     def scan(self, csc_enabled, komoot_enabled):
         pass
 
+    def stop_scan(self):
+        pass
+
     def reconnect_all(self):
         pass
 

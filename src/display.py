@@ -67,8 +67,9 @@ class Display:
             self.fill_rect(x+cx, y, w, font.HEIGHT, bg)
             cx += w
 
-    def get_digit_width(self, font, text):
+    def get_digit_width(self, font, text, digits):
         text_width = 0
+        clear_width = 0
         chw0 = font.get_width(b'0')
         w0 = 0
         for ch in text:
@@ -76,21 +77,22 @@ class Display:
                 ch = chr(ch)
             width = font.get_width(ch)
             text_width += width
-            if (ch >= '0' and ch <= '9') or ch == ' ':
-                w0 += chw0
-            else:
+
+            if (ch == ':' or ch == '.'):
                 w0 += width
-        clear_width = w0 - text_width
+        if digits > 0:
+            w0 += digits * chw0
+            clear_width = w0 - text_width
         return text_width, clear_width
 
 
-    def draw_text(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left, htrim=True):
-        text_width, clear_width = self.get_digit_width(font, txt)
+    def draw_text(self, font, txt, x, y, fg=Color.white, bg=Color.black, align=Align.left, digits=0):
+        text_width, clear_width = self.get_digit_width(font, txt, digits)
         x0 = None
 
         if align == Align.right:
             x -= text_width
-            x0 = x - clear_width
+            x0 = max(0, x - clear_width)
         elif align == Align.center:
             x = int((Display.width - text_width) / 2)
         else:

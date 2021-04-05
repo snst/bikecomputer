@@ -44,7 +44,12 @@ class BtManager:
     def scan(self, csc_enabled, komoot_enabled):
         self._con_csc.enabled = csc_enabled
         self._con_komoot.enabled = komoot_enabled
-        self._bt.scan()
+        if not self.is_scanning():
+            self._bt.scan()
+
+    def stop_scan(self):
+        if self.is_scanning():
+            self._bt.stop_scan()
 
     def reconnect_all(self):
         self._bt.disconnect_all()

@@ -39,13 +39,13 @@ class GuiBase:
             else:
                 x -= font_small.get_width('0')
 
-            g.display.draw_text(font_normal, "%2d" % (ival), x, y, fg=color, align = Align.right)
-            g.display.draw_text(font_small, "%d" % (dval), x, y, fg=color, align = Align.left)
+            g.display.draw_text(font_normal, "%2d" % (ival), x, y, fg=color, align = Align.right, digits=2)
+            g.display.draw_text(font_small, "%d" % (dval), x, y, fg=color, align = Align.left, digits=1)
         else:
             if align == Align.left:
                 x += 3 * font_normal.get_width('0')
             txt = "   " if (ival == 999) else "%3d" % (ival)
-            g.display.draw_text(font_normal, txt, x, y, fg=color, align = Align.right)
+            g.display.draw_text(font_normal, txt, x, y, fg=color, align = Align.right, digits=3)
 
     def show_float_time(self, val, x, y, align = Align.right, font = fonts.f_wide_normal):
         h = (int)(val / 60)
@@ -59,8 +59,8 @@ class GuiBase:
             mw -= font.get_width(':')
         else:
             mw *= 2
-        g.display.draw_text(font, "%d:" % (h), x-mw, y, align = Align.right, htrim=True)
-        g.display.draw_text(font, "%.2d" % (m), x-mw, y, align = Align.left, htrim=True)
+        g.display.draw_text(font, "%d:" % (h), x-mw, y, align = Align.right, digits=1)
+        g.display.draw_text(font, "%.2d" % (m), x-mw, y, align = Align.left, digits=2)
 
     def show_float_time_old(self, val, x, y, align = Align.right):
         h = (int)(val / 60)
@@ -72,8 +72,8 @@ class GuiBase:
         ival = (int) (val)
         dval = (int)((val - ival)*10)
         mw = fonts.f_wide_normal.get_width(b'0')
-        g.display.draw_text(fonts.f_wide_big, " %2d" % (ival), x-mw+2, y, fg=color, bg=Color.black, align=Align.right)
-        g.display.draw_text(fonts.f_wide_normal, "%d" % (dval), x-mw, y, fg=color, bg=Color.black, align=Align.left)
+        g.display.draw_text(fonts.f_wide_big, " %2d" % (ival), x-mw+2, y, color, Color.black, Align.right, 2)
+        g.display.draw_text(fonts.f_wide_normal, "%d" % (dval), x-mw, y, color, Color.black, Align.left, 1)
 
     def show_speed_max(self, data, y):
         if self.cache.changed(DataCache.SPEED_MAX, data.speed_max):
@@ -104,11 +104,11 @@ class GuiBase:
     def clear(self):
         self.main.clear()
 
-    def show_val(self, redraw, y, str, val, i):
+    def show_val(self, redraw, y, str, val, i, digits=0):
         if redraw:
             g.display.draw_text(fonts.f_narrow_small, str , 0, y+8, align=Align.left)
         if self.cache.changed(i, val):
-            g.display.draw_text(fonts.f_wide_smaller, val, g.display.width, y, align=Align.right)
+            g.display.draw_text(fonts.f_wide_smaller, val, g.display.width, y, align=Align.right, digits=digits)
 
     @property
     def cache(self):

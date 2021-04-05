@@ -2,6 +2,7 @@ import struct
 from csc_val import *
 from smooth import *
 from const import *
+import data_global as g
 
 
 
@@ -24,6 +25,7 @@ class CycleData:
         self.sim = 10
         self.has_valid_cadence = False
         self.msg_cnt = 0
+        self.raw_data = []
 
     def calc_speed_kmh_from_ms(self, wheel_counter, time_ms):
         if time_ms > 0:
@@ -60,9 +62,12 @@ class CycleData:
         val = struct.unpack("<BIHHH", data)
         return val[1], val[2], val[3], val[4]
     
-    def process(self, raw_data):
-        wheel_counter, wheel_time, crank_counter, crank_time = self.unpack_data(raw_data)
+    def queue_raw_data(self, raw_data):
+        b = bytes(raw_data)
+        self.raw_data.append( b )
 
+    def process_raw_data(self, raw_data):
+        wheel_counter, wheel_time, crank_counter, crank_time = self.unpack_data(raw_data)
         self.wheel_counter.calc_delta(wheel_counter)
         self.wheel_time.calc_delta(wheel_time)
         self.crank_counter.calc_delta(crank_counter)
@@ -74,6 +79,15 @@ class CycleData:
         if self.init:
             self.calculate(self.wheel_counter_delta, self.wheel_time.delta, self.crank_counter_delta, self.crank_time.delta)
         self.init = True
+
+    def process(self):
+        data = None
+        if len(self.raw_data) > 0:
+            data = self.raw_data.pop(0)
+        if data:
+            self.process_raw_data(data)
+            
+        return data != None
 
     def calculate(self, wheel_counter_delta, wheel_time_delta, crank_counter_delta, crank_time_delta):
         wc, wt = self.smooth_speed.add(wheel_counter_delta, wheel_time_delta, self._settings.csc_smooth.value)

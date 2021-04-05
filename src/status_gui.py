@@ -23,18 +23,18 @@ class StatusGui(GuiBase):
         env_data = g.bc._env_data
         env = self.main.env_data
         i = 0
-        self.show_val(redraw, y + i*ys, "Lipo V", "%.2f" % (env.computer_bat_volt), i)
+        self.show_val(redraw, y + i*ys, "Lipo V", "%.2f" % (env.computer_bat_volt), i, 3)
         i += 1
-        self.show_val(redraw, y + i*ys, "Bat %", "%d" % (env.sensor_bat_percent), i)
+        self.show_val(redraw, y + i*ys, "Bat %", "%d" % (env.sensor_bat_percent), i, 3)
         i += 1
-        self.show_val(redraw, y + i*ys, "C", "%.1f" % (env_data.temperature), i)
+        self.show_val(redraw, y + i*ys, "C", "%.1f" % (env_data.temperature), i, 3)
         i += 1
         #self.show_val(redraw, y + i*ys, "hPa", "%.1f" % (env_data.pressure), i)
-        self.show_val(redraw, y + i*ys, "msg", "%d" % (self.cycling.msg_cnt), i)
+        self.show_val(redraw, y + i*ys, "#m", "%d" % (self.cycling.msg_cnt), i, 5)
         i += 1
-        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (env_data.altitude), i)
+        self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (env_data.altitude), i, 5)
         i += 1
-        self.show_val(redraw, y + i*ys, "Mem", "%u" % ((int)(g.hal.gc_mem_free() / 1024)), i)
+        self.show_val(redraw, y + i*ys, "Mem", "%u" % ((int)(g.hal.gc_mem_free() / 1024)), i, 4)
 
     def handle(self, event):
         GuiBase.handle(self, event)

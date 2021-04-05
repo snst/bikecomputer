@@ -28,11 +28,15 @@ class BikeComputer:
         self._btn_right = ButtonHandler(g.hal, g.hal.btn_right, self.btn_event, Button.right, self._settings.long_click.value)
 
     def on_cycle_data(self, raw_data):
-        ms = g.hal.ticks_ms()
-        self._cycling.process(raw_data)
-        for trip in self.gui.trip_list:
-            trip.process(self._cycling, ms)
-        self._goal_data.process(self._cycling, ms)
+        self._cycling.queue_raw_data(raw_data)
+
+    def task_process_csc_data(self):
+        self._scheduler.insert(100, self.task_process_csc_data)
+        while self._cycling.process():
+            ms = g.hal.ticks_ms()
+            for trip in self.gui.trip_list:
+                trip.process(self._cycling, ms)
+            self._goal_data.process(self._cycling, ms)
 
     def on_altitude_data(self, altitude):
         for trip in self.gui.trip_list:
@@ -72,13 +76,24 @@ class BikeComputer:
 
     def task_update_bt(self):
         self.add_task(5000, self.task_update_bt)
-        if (self._settings.csc_on.value and not g.bt.is_csc_connected()) or (self._settings.nav_enabled.value and not g.bt.is_nav_connected()):
-            g.bt.scan(csc_enabled = self._settings.csc_on.value, komoot_enabled = self._settings.nav_enabled.value)
+        try:
+            if (self._settings.csc_on.value and not g.bt.is_csc_connected()) \
+                or (self._settings.nav_enabled.value and not g.bt.is_nav_connected()):
+                #print("g.bt.scan()")
+                g.bt.scan(csc_enabled = self._settings.csc_on.value, komoot_enabled = self._settings.nav_enabled.value)
+            #else:
+                #print("g.bt.stop_scan()")
+                #g.bt.stop_scan()
+        except OSError as exc:
+                print("BT: OSError %d" % exc.args[0])
 
     def task_read_komoot(self):
         self.add_task(self._settings.nav_req_interval.value, self.task_read_komoot)
-        if self._settings.nav_enabled.value:
-            g.bt.read_komoot()
+        try:
+            if self._settings.nav_enabled.value:
+                g.bt.read_komoot()
+        except OSError as exc:
+                print("komoot: OSError %d" % exc.args[0])            
 
     def task_update_altimeter(self):
         self._scheduler.insert(self._settings.altimeter_time_ms.value, self.task_update_altimeter)
@@ -105,6 +120,7 @@ class BikeComputer:
         #self.task_read_bat()
         self.task_update_gui()
         self.task_update_altimeter()
+        self.task_process_csc_data()
         while(True):
             try:
                 self._scheduler.run()
