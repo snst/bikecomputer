@@ -133,15 +133,15 @@ class GuiMain(GuiBase):
             gui = GoalGui(self)
         elif i == 3:
             gui = Trip2Gui(self)
+        #elif i == 4:
+        #    gui = Trip3Gui(self)
         elif i == 4:
-            gui = Trip3Gui(self)
-        elif i == 5:
             gui = StatusGui(self)
         g.hal.gc_collect()
         return gui
 
     def switch_to_next_gui(self):
-        index = min(self._gui_index + 1, 5)
+        index = min(self._gui_index + 1, 4)
         #index = (self._gui_index + 1) % self._max_views
         if index == 0 and self._settings.nav_enabled.value == 0: #skip komoot if not enabled
             index += 1
