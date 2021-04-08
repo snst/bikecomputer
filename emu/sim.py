@@ -28,7 +28,7 @@ class Sim:
         data.cadence = 93
         data.cadence_avg = 80
         data.trip_distance = 114.22
-        data.trip_duration_min = (60*4 + 33 + 12)
+        data.trip_duration_sec = (60*4 + 33 + 12)
 
     def get_ms(self):
         return int(round(time.time() * 1000))

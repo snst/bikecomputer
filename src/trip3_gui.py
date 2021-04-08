@@ -27,17 +27,11 @@ class Trip3Gui(GuiBase):
         #self.show_val(redraw, y + i*ys, "#", "%d" % (trip.id), i)
         #i += 1
         self.show_val(redraw, y + i*ys, "#%d" % (trip.id), "%.1f" % round(self.cycling.speed, 1), i, 4)
-        i += 1
-        self.show_val(redraw, y + i*ys, "", "%.2f" % round(trip.trip_distance, 2), i, 5)
-        i += 1
-        ms = trip.trip_duration_sec
-        txt = "%.2d:%.2d:%.2d" % (ms/3600, (ms/60)% 60, ms % 60)
-        self.show_val(redraw, y + i*ys, "", txt, i, 6)
 
         i += 1
-        ms = trip.trip_pause_sum_ms/1000
-        txt = "%.2d:%.2d:%.2d" % (ms/3600, (ms/60)% 60, ms % 60)
-        self.show_val(redraw, y + i*ys, "", txt, i, 6)
+        self.show_val(redraw, y + i*ys, "Alt-L", "%d" % (trip.altitude.min), i, 4)
+        i += 1
+        self.show_val(redraw, y + i*ys, "Alt-H", "%d" % (trip.altitude.max), i, 4)
 
         i += 1
         self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (trip.altitude.sum), i, 5)

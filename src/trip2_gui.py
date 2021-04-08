@@ -26,16 +26,23 @@ class Trip2Gui(GuiBase):
         i = 0
         #self.show_val(redraw, y + i*ys, "#", "%d" % (trip.id), i)
         #i += 1
-        self.show_val(redraw, y + i*ys, "%d-Max" % (trip.id), "%.1f" % (round(trip.speed_max, 1)), i, 3)
+        self.show_val(redraw, y + i*ys, "Cad", "%d" % (self.main.cycling.cadence), i, 3)
         i += 1
-        self.show_val(redraw, y + i*ys, "Cadence", "%d" % (self.main.cycling.cadence), i, 3)
+        self.show_val(redraw, y + i*ys, "%d Cad-0" % (trip.id), "%d" % (trip.cadence_avg), i, 3)
         i += 1
-        self.show_val(redraw, y + i*ys, "Cad-0", "%d" % (trip.cadence_avg), i, 3)
+        self.show_val(redraw, y + i*ys, "Max", "%.1f" % (round(trip.speed_max, 1)), i, 3)
         i += 1
-        self.show_val(redraw, y + i*ys, "Alt-L", "%d" % (trip.altitude.min), i, 4)
+        self.show_val(redraw, y + i*ys, "km", "%.2f" % round(trip.trip_distance, 2), i, 5)
         i += 1
-        self.show_val(redraw, y + i*ys, "Alt-H", "%d" % (trip.altitude.max), i, 4)
-        
+        ms = trip.trip_duration_sec
+        txt = "%.2d:%.2d:%.2d" % (ms/3600, (ms/60)% 60, ms % 60)
+        self.show_val(redraw, y + i*ys, "", txt, i, 6)
+
+        i += 1
+        ms = trip.trip_pause_sum_ms/1000
+        txt = "%.2d:%.2d:%.2d" % (ms/3600, (ms/60)% 60, ms % 60)
+        self.show_val(redraw, y + i*ys, "", txt, i, 6)
+
     def handle(self, event = 0):
         if event == (Button.right | Button.long):
             self.main.show_cycle_menu()

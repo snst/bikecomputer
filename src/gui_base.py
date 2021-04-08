@@ -47,6 +47,28 @@ class GuiBase:
             txt = "   " if (ival == 999) else "%3d" % (ival)
             g.display.draw_text(font_normal, txt, x, y, fg=color, align = Align.right, digits=3)
 
+    def show_float_speed2(self, val, x, y, color = Color.white, align = Align.right, narrow = False):
+        #val += 100
+        font_normal = fonts.f_narrow_normal if narrow else fonts.f_wide_normal
+        font_small = fonts.f_narrow_small if False else fonts.f_wide_smaller
+        val = limit(val, 0, 999)
+        ival = (int) (val)
+        dval = (int)((val - ival)*100)
+        dd = 0
+        if ival < 200:
+            if align == Align.left:
+                x += 2 * font_normal.get_width('0')
+            else:
+                x -= 2*font_small.get_width('0')
+
+            g.display.draw_text(font_normal, "%2d" % (ival), x, y, fg=color, align = Align.right, digits=2)
+            g.display.draw_text(font_small, "%02d" % (dval), x, y, fg=color, align = Align.left, digits=2)
+        else:
+            if align == Align.left:
+                x += 3 * font_normal.get_width('0')
+            txt = "   " if (ival == 999) else "%3d" % (ival)
+            g.display.draw_text(font_normal, txt, x, y, fg=color, align = Align.right, digits=3)
+
     def show_float_time(self, val, x, y, align = Align.right, font = fonts.f_wide_normal):
         h = (int)(val / 60)
         m = val % 60
@@ -61,12 +83,6 @@ class GuiBase:
             mw *= 2
         g.display.draw_text(font, "%d:" % (h), x-mw, y, align = Align.right, digits=1)
         g.display.draw_text(font, "%.2d" % (m), x-mw, y, align = Align.left, digits=2)
-
-    def show_float_time_old(self, val, x, y, align = Align.right):
-        h = (int)(val / 60)
-        m = val % 60
-        font = fonts.f_wide_normal
-        g.display.draw_text(font, "%1d:%.2d" % (h,m), x, y, align = align)
 
     def show_big_speed(self, val, x, y, color=Color.white):
         ival = (int) (val)

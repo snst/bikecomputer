@@ -72,8 +72,9 @@ class GoalGui(CycleGui):
             self.show_float_speed(distance, self.goal_x, y, align = Align.left, narrow = True)
 
     def show_time_goal(self, data, y):
-        if self.cache.changed(DataCache.GOAL_REMAINING_TIME, data.remaining_time_min):
-            self.show_float_time(data.remaining_time_min, 0, y, align = Align.left, font = fonts.f_narrow_text)
+        val = data.remaining_time_sec if data.remaining_time_sec < 60 else data.remaining_time_sec / 60
+        if self.cache.changed(DataCache.GOAL_REMAINING_TIME, val):
+            self.show_float_time(val, 0, y, align = Align.left, font = fonts.f_narrow_text)
 
     def show_progress_goal(self, data, y):
         max_val = round(data.target_dist_km.value, 1)
