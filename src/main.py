@@ -37,7 +37,7 @@ g.hal = Hal_esp32()
 g.scheduler = Scheduler(g.hal)
 
 g.bt = BtManager()
-print("alt2")
+
 i2c = I2C(1, scl=machine.Pin(22), sda=machine.Pin(21), freq=400000)
 g.altimeter = Altimeter_bmp280(i2c)
 
