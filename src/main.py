@@ -23,7 +23,7 @@ from scheduler import *
 
 # MOSI 19, SCLK 18, CS 5, DC 16, RST 23, BL 4
 
-spi = machine.SPI(2, baudrate=30000000, polarity=1, phase=1, sck=machine.Pin(18), mosi=machine.Pin(19))
+spi = machine.SPI(1, baudrate=30000000, polarity=1, phase=1, sck=machine.Pin(18), mosi=machine.Pin(19))
 tft = st7789.ST7789(
         spi, 135, 240,
         reset=machine.Pin(23, machine.Pin.OUT),
@@ -37,7 +37,7 @@ g.hal = Hal_esp32()
 g.scheduler = Scheduler(g.hal)
 
 g.bt = BtManager()
-
+print("alt2")
 i2c = I2C(1, scl=machine.Pin(22), sda=machine.Pin(21), freq=400000)
 g.altimeter = Altimeter_bmp280(i2c)
 
