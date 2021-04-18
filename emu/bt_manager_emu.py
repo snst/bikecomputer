@@ -1,5 +1,8 @@
+from bt_stat_data import *
+
 class BtManagerEmu:
     def __init__(self):
+        self.stat = BtStatData()
         pass
 
     def read_komoot(self):

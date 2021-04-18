@@ -12,6 +12,7 @@ from nav_data import *
 import data_global as g
 from bt_manager import *
 from altimeter_bmp280 import *
+from scheduler import *
 
 
 #https://github.com/palto42/komoot-navi/blob/master/src/main.cpp
@@ -33,6 +34,8 @@ tft.init()
 
 g.display = Display(tft)
 g.hal = Hal_esp32()
+g.scheduler = Scheduler(g.hal)
+
 g.bt = BtManager()
 
 i2c = I2C(1, scl=machine.Pin(22), sda=machine.Pin(21), freq=400000)
@@ -45,4 +48,10 @@ def task_mem():
     #print("mem: %d" % (gc.mem_free()))
 
 #task_mem()
-g.bc.run()
+g.bc.start()
+
+while(True):
+    try:
+        g.scheduler.run()
+    except OSError as exc:
+        print("OSError %d" % exc.args[0])

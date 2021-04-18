@@ -58,16 +58,17 @@ class CycleData:
             return 0
 
     def unpack_data(self, data):
-        self.msg_cnt += 1
         val = struct.unpack("<BIHHH", data)
         return val[1], val[2], val[3], val[4]
     
     def queue_raw_data(self, raw_data):
         b = bytes(raw_data)
         self.raw_data.append( b )
+        self.msg_cnt += 1
 
     def process_raw_data(self, raw_data):
         wheel_counter, wheel_time, crank_counter, crank_time = self.unpack_data(raw_data)
+        #print("p %d %d %d %d" % (wheel_counter, wheel_time, crank_counter, crank_time))
         self.wheel_counter.calc_delta(wheel_counter)
         self.wheel_time.calc_delta(wheel_time)
         self.crank_counter.calc_delta(crank_counter)
@@ -91,6 +92,7 @@ class CycleData:
 
     def calculate(self, wheel_counter_delta, wheel_time_delta, crank_counter_delta, crank_time_delta):
         wc, wt = self.smooth_speed.add(wheel_counter_delta, wheel_time_delta, self._settings.csc_smooth.value)
+        #print("c %d %d %d %d" % (wheel_counter_delta, wheel_time_delta, crank_counter_delta, crank_time_delta))
         self.speed = self.calc_speed_kmh(wc, wt)
 
         cc, ct = self.smooth_cadence.add(crank_counter_delta, crank_time_delta, self._settings.csc_smooth.value)

@@ -60,18 +60,16 @@ class NavGui(CycleGui):
     def show(self, redraw):
         self.cache.reset(redraw)
 
-        nav = self.main.nav_data
-        trip = self.main.get_trip()
         settings = self.main._settings
 
         dist_notify = False
 
-        dir_changed = self.cache.changed(DataCache.NAV_DIRECTION, nav.direction)
+        dir_changed = self.cache.changed(DataCache.NAV_DIRECTION, self.nav.direction)
 
         if dir_changed:
-            self.show_direction(nav, self.y_direction)
+            self.show_direction(self.nav, self.y_direction)
 
-        nav_distance = (int)(round(nav.distance/10)*10)
+        nav_distance = (int)(round(self.nav.distance/10)*10)
         if self.cache.changed(DataCache.NAV_DISTANCE, nav_distance):
             self.show_nav_distance(nav_distance, self.y_distance)
             dist_notify = nav_distance <= settings.nav_all_on.value# or (and nav_distance <= settings.nav_flash_on.value)
@@ -97,17 +95,17 @@ class NavGui(CycleGui):
 
 
         if show_street:
-            self.show_street(nav, self.y_street_speed)
+            self.show_street(self.nav, self.y_street_speed)
         else:
             self.show_speed(self.main.cycling.speed, self.y_street_speed)
             #self.show_trip_distance(trip, self.y_time_direction)
             #self.show_trip_duration(trip, 68, self.y_time_direction, font=fonts.f_narrow_text)
 
             if self.show_distance_field:
-                self.show_trip_distance(trip, self.y_time_direction)
+                self.show_trip_distance(self.trip, self.y_time_direction)
                 self.show_icon(s_km, self.y_time_direction)
             else:
-                self.show_trip_duration(trip, g.display.width, self.y_time_direction)
+                self.show_trip_duration(self.trip, g.display.width, self.y_time_direction)
                 self.show_icon(s_time, self.y_time_direction)
 
         if (settings.nav_auto_on.value == 1) and (dir_changed or dist_notify):

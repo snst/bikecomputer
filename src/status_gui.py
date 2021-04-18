@@ -30,8 +30,8 @@ class StatusGui(GuiBase):
         self.show_val(redraw, y + i*ys, "C", "%.1f" % (env_data.temperature), i, 3)
         i += 1
         #self.show_val(redraw, y + i*ys, "hPa", "%.1f" % (env_data.pressure), i)
-        self.show_val(redraw, y + i*ys, "#m", "%d" % (self.cycling.msg_cnt), i, 5)
-        i += 1
+        #self.show_val(redraw, y + i*ys, "#m", "%d" % (self.cycling.msg_cnt), i, 5)
+        #i += 1
         self.show_val(redraw, y + i*ys, "Alt", "%.1f" % (env_data.altitude), i, 5)
         i += 1
         self.show_val(redraw, y + i*ys, "Mem", "%u" % ((int)(g.hal.gc_mem_free() / 1024)), i, 4)

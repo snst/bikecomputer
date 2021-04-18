@@ -16,7 +16,7 @@ class BikeComputer:
     def __init__(self):
         self._settings = DataSettings()
         self._settings.load()
-        self._scheduler = Scheduler(g.hal)
+        self._scheduler = g.scheduler
         self._env_data = EnvData()
         self._cycling = CycleData(self._settings)
         self._nav_data = NavData()
@@ -30,13 +30,8 @@ class BikeComputer:
     def on_cycle_data(self, raw_data):
         self._cycling.queue_raw_data(raw_data)
 
-    def task_process_csc_data(self):
-        self._scheduler.insert(100, self.task_process_csc_data)
-        while self._cycling.process():
-            ms = g.hal.ticks_ms()
-            for trip in self.gui.trip_list:
-                trip.process(self._cycling, ms)
-            self._goal_data.process(self._cycling, ms)
+    def on_nav_data(self, raw_data):
+        self._nav_data.on_data(raw_data)
 
     def on_altitude_data(self, altitude):
         for trip in self.gui.trip_list:
@@ -67,9 +62,22 @@ class BikeComputer:
             elif btn_id == Button.right:
                 self._scheduler.insert(1, self.btn_right_long if is_long else self.btn_right_short)
 
-    def task_update_gui(self):
-        self._scheduler.insert(500, self.task_update_gui)
+    def process_csc_data(self):
+        while self._cycling.process():
+            ms = g.hal.ticks_ms()
+            for trip in self.gui.trip_list:
+                trip.process(self._cycling, ms)
+            self._goal_data.process(self._cycling, ms)
+
+    #def task_update_gui(self):
+    #    self._scheduler.insert(100, self.task_update_gui)
+    #    self.gui.cyclic_update()
+
+    def task_cyclic(self):
+        self._scheduler.insert(200, self.task_cyclic)
+        self.process_csc_data()
         self.gui.cyclic_update()
+
 
     def add_task(self, ms, task):
         self._scheduler.insert(ms, task)
@@ -101,10 +109,10 @@ class BikeComputer:
             self._env_data.update_altitude()
             self.on_altitude_data(self._env_data.altitude)
 
-    def task_read_bat(self):
-        self.add_task(60000, self.task_read_bat)
-        self.request_sensor_bat()
-        self.request_computer_bat()
+    #def task_read_bat(self):
+    #    self.add_task(60000, self.task_read_bat)
+    #    self.request_sensor_bat()
+    #    self.request_computer_bat()
 
     def request_sensor_bat(self):
         g.bt.request_sensor_bat()
@@ -112,17 +120,14 @@ class BikeComputer:
     def request_computer_bat(self):
         self._env_data.computer_bat_volt = g.hal.update_bat()
 
-    def run(self):
+    def start(self):
         g.bt.register_cycle_callback(cycle_cb = self.on_cycle_data, bat_cb = self._env_data.on_sensor_bat)
-        g.bt.register_komoot_callback(self._nav_data.on_data)
+        g.bt.register_komoot_callback(self.on_nav_data)
         self.task_update_bt()
         self.task_read_komoot()
         #self.task_read_bat()
-        self.task_update_gui()
+        #self.task_update_gui()
         self.task_update_altimeter()
-        self.task_process_csc_data()
-        while(True):
-            try:
-                self._scheduler.run()
-            except OSError as exc:
-                print("OSError %d" % exc.args[0])
+        #self.task_process_csc_data()
+        self.task_cyclic()
+        #self._scheduler.insert(5000, lambda : print("test"))

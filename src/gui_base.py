@@ -137,3 +137,7 @@ class GuiBase:
     @property
     def cycling(self):
         return self.main._cycling
+
+    @property
+    def nav(self):
+        return self.main.nav_data

@@ -12,6 +12,7 @@ import data_global as g
 from trip2_gui import *
 from trip3_gui import *
 from status_gui import *
+from status2_gui import *
 from item_list import *
 from goal_gui import *
 from trip_store import *
@@ -137,11 +138,13 @@ class GuiMain(GuiBase):
         #    gui = Trip3Gui(self)
         elif i == 4:
             gui = StatusGui(self)
+        elif i == 5:
+            gui = Status2Gui(self)
         g.hal.gc_collect()
         return gui
 
     def switch_to_next_gui(self):
-        index = min(self._gui_index + 1, 4)
+        index = min(self._gui_index + 1, 5)
         #index = (self._gui_index + 1) % self._max_views
         if index == 0 and self._settings.nav_enabled.value == 0: #skip komoot if not enabled
             index += 1

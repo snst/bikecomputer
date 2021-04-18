@@ -1,4 +1,5 @@
 from ble_central import *
+from bt_stat_data import *
 
 class BtManager:
     _CSC_ADDR = bytes([0xf4, 0xb8, 0x5e, 0x40, 0xea, 0xe4])
@@ -18,10 +19,11 @@ class BtManager:
 
 
     def __init__(self):
-        self._bt = BleCentral()
+        self.stat = BtStatData()
+        self._bt = BleCentral(self.stat)
         self._csc_service = ServiceData("csc", service_uuid = self._CSC_SERVICE_UUID, 
                                         char_uuid = self._CSC_MEASUREMENT_UUID, 
-                                        notify = ServiceData.NOTIFY_ENABLE)
+                                        notify = True)
         self._csc_bat_service = ServiceData("bat", service_uuid = self._BAT_SERVICE_UUID, 
                                         char_uuid = self._BAT_LEVEL_UUID)
 

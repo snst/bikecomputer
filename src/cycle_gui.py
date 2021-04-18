@@ -30,6 +30,7 @@ class CycleGui(GuiBase):
 
         self.show_id(trip)
         self.show_speed_big(cycling.speed, y_speed, col=Color.white if cycling.is_riding else Color.red)
+        #print("s %f" % (cycling.speed))
         #self.show_cadence(trip, self.y_avg)
 
         self.show_speed_avg(trip, y_avg)
